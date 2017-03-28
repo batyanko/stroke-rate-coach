@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Stroke Rate Coach</string>
+    <string name="changer_button_text">Angi tempo</string>
+    <string name="stopper_button_text">Stopp</string>
+</resources>

@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Stroke Rate Coach</string>
+    <string name="changer_button_text">Set Rate</string>
+    <string name="stopper_button_text">Stop</string>
+    <!--Depreciated: -->
+    <string name="initial_spm" translatable="false">22</string>
+</resources>
