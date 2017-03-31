@@ -3,4 +3,5 @@
     <string name="app_name">Stroke Rate Coach</string>
     <string name="changer_button_text">Tempo einsetzen</string>
     <string name="stopper_button_text">Stoppen</string>
+    <string name="speed_button_text">Geschwindigkeit</string>
 </resources>

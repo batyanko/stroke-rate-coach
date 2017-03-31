@@ -1,7 +1,9 @@
 <resources>
     <string name="app_name">Stroke Rate Coach</string>
-    <string name="changer_button_text">Set Rate</string>
+    <string name="speed_button_text">Speed</string>
     <string name="stopper_button_text">Stop</string>
     <!--Depreciated: -->
     <string name="initial_spm" translatable="false">22</string>
+    <string name="default_kph">000.0 hours/hour</string>
+    <string name="use_metric_units">Use metric units?</string>
 </resources>
