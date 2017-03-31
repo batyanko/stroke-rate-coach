@@ -15,8 +15,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.example.yanko.strokeratecoach.Utils.RowingUtilities;
+
 import java.util.Timer;
 import java.util.TimerTask;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -24,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String RATE_KEY = "rate";
     int strokeRate;
     long strokeDuration;
-    String strokeRateString;
+    String spmString;
     TextView textView;
     EditText spmEditText;
     ToneGenerator toneGen1;
@@ -39,10 +42,13 @@ public class MainActivity extends AppCompatActivity {
 
     private SharedPreferences pref;
 
+    //malkaValna testing
     private static int strokeCount = 0;
-    private static int strokeCountTrigger = 0;
-
+    private static int strokeCountTrigger = 4;
     private static int phase = 0;
+
+    //VariableListener testing
+    private VariableChangeListener variableChangeListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,10 +58,10 @@ public class MainActivity extends AppCompatActivity {
         pref = PreferenceManager.getDefaultSharedPreferences(this);
 
 
-        strokeRateString = pref.getString(RATE_KEY, DEFAULT_RATE);
+        spmString = pref.getString(RATE_KEY, DEFAULT_RATE);
 
         textView = (TextView) findViewById(R.id.textView);
-        textView.setText(strokeRateString);
+        textView.setText(spmString);
 
         spmEditText = (EditText) findViewById(R.id.rateInputField);
         spmEditText.addTextChangedListener(new CustomWatcher());
@@ -84,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         startTheTempo();
-        Log.i("Stroke rate at start: ", strokeRateString);
+        Log.i("Stroke rate at start: ", spmString);
         super.onStart();
     }
 
@@ -101,16 +107,18 @@ public class MainActivity extends AppCompatActivity {
 
     private void startTheTempo() {
 
-        if (strokeRateString.length() < 2) {
-            return;
-        }
-        Log.v("StrokeRateString", strokeRateString);
+//        if (spmString.length() < 2) {
+//            return;
+//        }
+//        Log.v("StrokeRateString", spmString);
+//
+//
+//        strokeRate = Integer.parseInt(spmString.substring(0, 2));
+//        strokeDuration = (long) (1 / (((double) strokeRate) / 60) * 1000);
 
+        strokeDuration = RowingUtilities.spmToMilis(spmString);
 
-        strokeRate = Integer.parseInt(strokeRateString.substring(0, 2));
-        strokeDuration = (long) (1 / (((double) strokeRate) / 60) * 1000);
-
-        textView.setText(strokeRateString);
+        textView.setText(spmString);
 
         try {
             timer.cancel();
@@ -120,7 +128,6 @@ public class MainActivity extends AppCompatActivity {
         } catch (NullPointerException e) {
             Log.d("Exception", "Null pointer");
         }
-        timer = new Timer();
 
         timerTask = new TimerTask() {
             @Override
@@ -128,14 +135,18 @@ public class MainActivity extends AppCompatActivity {
                 toneGen1.startTone(ToneGenerator.TONE_CDMA_EMERGENCY_RINGBACK, 150);
                 strokeCount++;
                 if (strokeCountTrigger > 0 && strokeCount == strokeCountTrigger) {
-//                    stopTheTempo();
-                    //TODO use listener count strokes and to iterate through phases?
-//                    malkaValna();
+                    cancel();
+                    //TODO: The Timer thread may not touch the views of an activity. Circumvent?
+//                    strokeCount = 0;
+//                    strokeCountTrigger = 5;
+//                    spmString = "32";
+//                    startTheTempo();
                 }
             }
         };
 
-        timer.schedule(timerTask, 1, strokeDuration);
+        timer = new Timer();
+        timer.scheduleAtFixedRate(timerTask, 1, strokeDuration);
 
         spmEditText.selectAll();
     }
@@ -184,9 +195,9 @@ public class MainActivity extends AppCompatActivity {
 
             if (mCharSequence.length() >= 2) {
                 mCount = 0;
-                strokeRateString = mCharSequence;
+                spmString = mCharSequence;
                 startTheTempo();
-                pref.edit().putString(RATE_KEY, strokeRateString).apply();
+                pref.edit().putString(RATE_KEY, spmString).apply();
                 s.replace(0, s.length(), "");
                 mWasEdited = true;
                 return;
@@ -194,7 +205,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    //Make waves...
+    //Try to  make some waves...
     private void malkaValna() {
         //Initialise phase to 1, or iterate through phases;
         stopTheTempo();
@@ -205,14 +216,14 @@ public class MainActivity extends AppCompatActivity {
             case 1: {
                 strokeCount = 0;
                 strokeCountTrigger = 5;
-                strokeRateString = "32";
+                spmString = "32";
                 startTheTempo();
                 break;
             }
             case 2: {
                 strokeCount = 0;
                 strokeCountTrigger = 5;
-                strokeRateString = "20";
+                spmString = "20";
                 startTheTempo();
                 break;
             }
@@ -221,4 +232,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    //Try to listen for variable changes
+    public void setVariableChangeListener(VariableChangeListener variableChangeListener) {
+        this.variableChangeListener = variableChangeListener;
+    }
 }
