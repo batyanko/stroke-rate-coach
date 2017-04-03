@@ -124,6 +124,7 @@
         tools:layout_editor_absoluteY="57dp" />
 
     <Button
+        android:background="@color/normalButtonColor"
         android:text="1"
         android:id="@+id/dig_1"
         android:layout_width="0dp"
@@ -138,6 +139,7 @@
         app:layout_constraintTop_toTopOf="@+id/guideline_hor0" />
 
     <Button
+        android:background="@color/normalButtonColor"
         android:text="2"
         android:id="@+id/dig_2"
         android:layout_width="0dp"
@@ -152,6 +154,7 @@
         app:layout_constraintTop_toTopOf="@+id/guideline_hor0" />
 
     <Button
+        android:background="@color/normalButtonColor"
         android:text="3"
         android:id="@+id/dig_3"
         android:layout_width="0dp"
@@ -166,6 +169,7 @@
         app:layout_constraintTop_toTopOf="@+id/guideline_hor0" />
 
     <Button
+        android:background="@color/normalButtonColor"
         android:text="4"
         android:id="@+id/dig_4"
         android:layout_width="0dp"
@@ -180,6 +184,7 @@
         app:layout_constraintTop_toTopOf="@+id/guideline_hor1" />
 
     <Button
+        android:background="@color/normalButtonColor"
         android:text="5"
         android:id="@+id/dig_5"
         android:layout_width="0dp"
@@ -194,6 +199,7 @@
         app:layout_constraintTop_toTopOf="@+id/guideline_hor1"/>
 
     <Button
+        android:background="@color/normalButtonColor"
         android:text="6"
         android:id="@+id/dig_6"
         android:layout_width="0dp"
@@ -208,6 +214,7 @@
         app:layout_constraintTop_toTopOf="@+id/guideline_hor1" />
 
     <Button
+        android:background="@color/normalButtonColor"
         android:text="7"
         android:id="@+id/dig_7"
         android:layout_width="0dp"
@@ -222,6 +229,7 @@
         app:layout_constraintTop_toTopOf="@+id/guideline_hor2" />
 
     <Button
+        android:background="@color/normalButtonColor"
         android:text="8"
         android:id="@+id/dig_8"
         android:layout_width="0dp"
@@ -236,6 +244,7 @@
         app:layout_constraintTop_toTopOf="@+id/guideline_hor2" />
 
     <Button
+        android:background="@color/normalButtonColor"
         android:text="9"
         android:id="@+id/dig_9"
         android:layout_width="0dp"
@@ -250,6 +259,7 @@
         app:layout_constraintTop_toTopOf="@+id/guideline_hor2" />
 
     <Button
+        android:background="@color/normalButtonColor"
         android:text="0"
         android:id="@+id/dig_0"
         android:layout_width="0dp"

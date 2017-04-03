@@ -18,6 +18,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.yanko.strokeratecoach.Utils.RowingUtilities;
 
@@ -27,8 +28,10 @@ import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final String DEFAULT_RATE = "22";
+    public static final int DEFAULT_RATE = 22;
     public static final String RATE_KEY = "rate";
+    public int firstDigit;
+    public int spm;
     int strokeRate;
     long strokeDuration;
     String spmString;
@@ -37,12 +40,18 @@ public class MainActivity extends AppCompatActivity {
     TimerTask timerTaskBlueprint;
     TimerTask timerTask;
 
+    ProgressBar waveProgress;
+    Button waveButton;
     TextView textView;
     EditText spmEditText;
+
+    Button[] digits;
+    Button dig2;
+
+    private int[] colors;
+
     Button speedButton;
     Button stopperButton;
-    Button waveButton;
-    ProgressBar waveProgress;
 
     private int progressVisibility;
 
@@ -63,18 +72,32 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        firstDigit = 0;
+
         pref = PreferenceManager.getDefaultSharedPreferences(this);
+        spm = pref.getInt("zz", 22);
 
+        //Initialize UI elements
+        waveButton = (Button) findViewById(R.id.wave_button);
+        waveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                phase = 0;
+                malkaValna();
+            }
+        });
 
-        spmString = pref.getString(RATE_KEY, DEFAULT_RATE);
+        waveProgress = (ProgressBar) findViewById(R.id.wave_progress_bar);
+        waveProgress.setVisibility(View.INVISIBLE);
+
+        isFirstRun = false;
 
         textView = (TextView) findViewById(R.id.textView);
-        textView.setText(spmString);
 
         spmEditText = (EditText) findViewById(R.id.rateInputField);
 
 
-        spmEditText.addTextChangedListener(new CustomWatcher());
+        //spmEditText.addTextChangedListener(new CustomWatcher());
         toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
 
         stopperButton = (Button) findViewById(R.id.stopper_button);
@@ -94,25 +117,96 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        waveButton = (Button) findViewById(R.id.wave_button);
-        waveButton.setOnClickListener(new View.OnClickListener() {
+        //TODO: Find a way to use colors from xml...
+        colors = new int[2];
+        colors[0] = Color.BLUE;
+        colors[1] = Color.WHITE;
+
+        //Find out hex colors...
+//        String hexColor = String.format("#%06X", (0xFFFFFF & colors[0]));
+//        Toast.makeText(this, hexColor, Toast.LENGTH_LONG).show();
+
+        digits = new Button[10];
+
+        digits[1] = (Button) findViewById(R.id.dig_1);
+        digits[2] = (Button) findViewById(R.id.dig_2);
+        digits[3] = (Button) findViewById(R.id.dig_3);
+        digits[4] = (Button) findViewById(R.id.dig_4);
+        digits[5] = (Button) findViewById(R.id.dig_5);
+        digits[6] = (Button) findViewById(R.id.dig_6);
+        digits[7] = (Button) findViewById(R.id.dig_7);
+        digits[8] = (Button) findViewById(R.id.dig_8);
+        digits[9] = (Button) findViewById(R.id.dig_9);
+        digits[0] = (Button) findViewById(R.id.dig_0);
+
+        digits[1].setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                phase = 0;
-                malkaValna();
+            public void onClick(View v) {
+                setSpmFromDigital(1);
+            }
+        });
+        digits[2].setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setSpmFromDigital(2);
+            }
+        });
+        digits[3].setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setSpmFromDigital(3);
+            }
+        });
+        digits[4].setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setSpmFromDigital(4);
+            }
+        });
+        digits[5].setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setSpmFromDigital(5);
+            }
+        });
+        digits[6].setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setSpmFromDigital(6);
+            }
+        });
+        digits[7].setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setSpmFromDigital(7);
+            }
+        });
+        digits[8].setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setSpmFromDigital(8);
+            }
+        });
+        digits[9].setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setSpmFromDigital(9);
+            }
+        });
+        digits[0].setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setSpmFromDigital(0);
             }
         });
 
-        waveProgress = (ProgressBar) findViewById(R.id.wave_progress_bar);
-        waveProgress.setVisibility(View.INVISIBLE);
 
-        isFirstRun = false;
     }
 
     @Override
     protected void onStart() {
         startTheTempo();
-        Log.i("Stroke rate at start: ", spmString);
+        Log.i("Stroke rate at start: ", "" + spm);
         super.onStart();
     }
 
@@ -127,20 +221,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void startTheTempo() {
 
-//        if (spmString.length() < 2) {
-//            return;
-//        }
-//        Log.v("StrokeRateString", spmString);
-//
-//
-//        strokeRate = Integer.parseInt(spmString.substring(0, 2));
-//        strokeDuration = (long) (1 / (((double) strokeRate) / 60) * 1000);
-
         strokeCount = 0;
 
-        strokeDuration = RowingUtilities.spmToMilis(spmString);
-
-        textView.setText(spmString);
+        strokeDuration = RowingUtilities.spmToMilis(spm);
 
         try {
             timer.cancel();
@@ -176,6 +259,9 @@ public class MainActivity extends AppCompatActivity {
         timer = new Timer();
         timer.scheduleAtFixedRate(timerTask, 1, strokeDuration);
 
+        spmString = String.valueOf(spm);
+        textView.setText(spmString);
+
         spmEditText.selectAll();
     }
 
@@ -192,51 +278,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    //Upon entry of 2 digits, start the tempo and clear the EditText
-    public class CustomWatcher implements TextWatcher {
 
-        private boolean mWasEdited = false;
-        private int mCount = 0;
 
-        String mCharSequence = "";
-
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-        }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-            mCount++;
-            mCharSequence = s.toString();
-            Log.d("Char Sequence: ", mCharSequence);
-        }
-
-        @Override
-        public void afterTextChanged(Editable s) {
-
-            if (mWasEdited) {
-
-                mWasEdited = false;
-                return;
-            }
-//
-            Log.d("Current count: ", "" + mCount);
-
-            if (mCharSequence.length() >= 2) {
-                mCount = 0;
-                spmString = mCharSequence;
-                waveEnder();
-                startTheTempo();
-                pref.edit().putString(RATE_KEY, spmString).apply();
-                s.replace(0, s.length(), "");
-                mWasEdited = true;
-                return;
-            }
-        }
-    }
-
-    //Try to  make some waves...
+    //Try to make some waves...
     private void malkaValna() {
 
         //
@@ -320,8 +364,65 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    //Try to listen for variable changes
-    public void setVariableChangeListener(VariableChangeListener variableChangeListener) {
-        this.variableChangeListener = variableChangeListener;
+    public void setSpmFromDigital (int digitalInput) {
+        if (firstDigit != 0) {
+            spm = firstDigit * 10 + digitalInput;
+            //TODO: make startTheTempo() use spm instead spmString
+            spmString = String.valueOf(spm);
+            Log.d("SpmString / spm: ", spmString + " / " + spm);
+            pref.edit().putInt("zz", spm).apply();
+            startTheTempo();
+            digits[firstDigit].setBackgroundColor(colors[0]);
+            firstDigit = 0;
+
+        } else {
+            firstDigit = digitalInput;
+            digits[firstDigit].setBackgroundColor(colors[1]);
+        }
+
     }
+
+    /*//Upon entry of 2 digits, start the tempo and clear the EditText
+    public class CustomWatcher implements TextWatcher {
+
+        private boolean mWasEdited = false;
+        private int mCount = 0;
+
+        String mCharSequence = "";
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            mCount++;
+            mCharSequence = s.toString();
+            Log.d("Char Sequence: ", mCharSequence);
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+
+            if (mWasEdited) {
+
+                mWasEdited = false;
+                return;
+            }
+//
+            Log.d("Current count: ", "" + mCount);
+
+            if (mCharSequence.length() >= 2) {
+                mCount = 0;
+                spmString = mCharSequence;
+                waveEnder();
+                startTheTempo();
+                pref.edit().putString(RATE_KEY, spmString).apply();
+                s.replace(0, s.length(), "");
+                mWasEdited = true;
+                return;
+            }
+        }
+    }*/
 }
