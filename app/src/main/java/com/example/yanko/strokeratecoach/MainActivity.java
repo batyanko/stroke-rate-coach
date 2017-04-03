@@ -1,7 +1,9 @@
 package com.example.yanko.strokeratecoach;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.preference.PreferenceManager;
@@ -11,8 +13,10 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.yanko.strokeratecoach.Utils.RowingUtilities;
@@ -28,15 +32,19 @@ public class MainActivity extends AppCompatActivity {
     int strokeRate;
     long strokeDuration;
     String spmString;
-    TextView textView;
-    EditText spmEditText;
     ToneGenerator toneGen1;
     Timer timer;
     TimerTask timerTaskBlueprint;
     TimerTask timerTask;
 
+    TextView textView;
+    EditText spmEditText;
     Button speedButton;
     Button stopperButton;
+    Button waveButton;
+    ProgressBar waveProgress;
+
+    private int progressVisibility;
 
     boolean isFirstRun = true;
 
@@ -44,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
 
     //malkaValna testing
     private static int strokeCount = 0;
-    private static int strokeCountTrigger = 4;
+    private static int strokeCountTrigger = 0;
     private static int phase = 0;
 
     //VariableListener testing
@@ -64,6 +72,8 @@ public class MainActivity extends AppCompatActivity {
         textView.setText(spmString);
 
         spmEditText = (EditText) findViewById(R.id.rateInputField);
+
+
         spmEditText.addTextChangedListener(new CustomWatcher());
         toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
 
@@ -71,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
         stopperButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                stopTheTempo();
+                waveEnder();
             }
         });
 
@@ -83,6 +93,18 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        waveButton = (Button) findViewById(R.id.wave_button);
+        waveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                phase = 0;
+                malkaValna();
+            }
+        });
+
+        waveProgress = (ProgressBar) findViewById(R.id.wave_progress_bar);
+        waveProgress.setVisibility(View.INVISIBLE);
 
         isFirstRun = false;
     }
@@ -101,8 +123,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
-
     //Method to start beeping in the rate needed
 
     private void startTheTempo() {
@@ -115,6 +135,8 @@ public class MainActivity extends AppCompatActivity {
 //
 //        strokeRate = Integer.parseInt(spmString.substring(0, 2));
 //        strokeDuration = (long) (1 / (((double) strokeRate) / 60) * 1000);
+
+        strokeCount = 0;
 
         strokeDuration = RowingUtilities.spmToMilis(spmString);
 
@@ -136,7 +158,13 @@ public class MainActivity extends AppCompatActivity {
                 strokeCount++;
                 if (strokeCountTrigger > 0 && strokeCount == strokeCountTrigger) {
                     cancel();
-                    //TODO: The Timer thread may not touch the views of an activity. Circumvent?
+                    //TODO: Only change views on the UI thread
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            malkaValna();
+                        }
+                    });
 //                    strokeCount = 0;
 //                    strokeCountTrigger = 5;
 //                    spmString = "32";
@@ -152,6 +180,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void stopTheTempo() {
+        strokeCount = 0;
+        strokeCountTrigger = 0;
         try {
             timer.cancel();
             timerTask.cancel();
@@ -196,6 +226,7 @@ public class MainActivity extends AppCompatActivity {
             if (mCharSequence.length() >= 2) {
                 mCount = 0;
                 spmString = mCharSequence;
+                waveEnder();
                 startTheTempo();
                 pref.edit().putString(RATE_KEY, spmString).apply();
                 s.replace(0, s.length(), "");
@@ -207,28 +238,85 @@ public class MainActivity extends AppCompatActivity {
 
     //Try to  make some waves...
     private void malkaValna() {
+
+        //
+        final String[] GEARS = new String[] {
+                "40", "20"
+        };
+        final int[] STROKES_PER_PHASE = new int[] {
+                3
+        };
+        final int PHASES_IN_WAVE = 9;
+
+        final int STROKES_TOTAL = STROKES_PER_PHASE[0] * PHASES_IN_WAVE;
+
         //Initialise phase to 1, or iterate through phases;
         stopTheTempo();
+
+        //Initialize / iterate phase
         phase++;
         Log.i("Phase at start: ", "" + phase);
 
         switch (phase) {
             case 1: {
-                strokeCount = 0;
-                strokeCountTrigger = 5;
-                spmString = "32";
-                startTheTempo();
+                phaseStarter(PHASES_IN_WAVE, STROKES_PER_PHASE[0], GEARS[0], Color.RED);
                 break;
             }
             case 2: {
-                strokeCount = 0;
-                strokeCountTrigger = 5;
-                spmString = "20";
-                startTheTempo();
+                phaseStarter(PHASES_IN_WAVE, STROKES_PER_PHASE[0], GEARS[1], Color.GREEN);
                 break;
             }
-            default: stopTheTempo();
+            case 3: {
+                phaseStarter(PHASES_IN_WAVE, STROKES_PER_PHASE[0], GEARS[0], Color.RED);
+                break;
+            }
+            case 4: {
+                phaseStarter(PHASES_IN_WAVE, STROKES_PER_PHASE[0], GEARS[1], Color.GREEN);
+                break;
+            }
+            case 5: {
+                phaseStarter(PHASES_IN_WAVE, STROKES_PER_PHASE[0], GEARS[0], Color.RED);
+                break;
+            }
+            case 6: {
+                phaseStarter(PHASES_IN_WAVE, STROKES_PER_PHASE[0], GEARS[1], Color.GREEN);
+                break;
+            }
+            case 7: {
+                phaseStarter(PHASES_IN_WAVE, STROKES_PER_PHASE[0], GEARS[0], Color.RED);
+                break;
+            }
+            case 8: {
+                phaseStarter(PHASES_IN_WAVE, STROKES_PER_PHASE[0], GEARS[1], Color.GREEN);
+                break;
+            }
+            case 9: {
+                phaseStarter(PHASES_IN_WAVE, STROKES_PER_PHASE[0], GEARS[0], Color.RED);
+                break;
+            }
+
+            default:
+                waveEnder();
         }
+    }
+
+    private void phaseStarter(int phasesTotal, int lengthTrigger, String spm, int color) {
+        strokeCountTrigger = lengthTrigger;
+        spmString = spm;
+        textView.setBackgroundColor(color);
+        final String phase_progress = phase + "/" + phasesTotal;
+        waveButton.setText(phase_progress);
+        waveProgress.setVisibility(View.VISIBLE);
+        int progress = (int) (((float)phase/(float)phasesTotal)*100);
+        waveProgress.setProgress(progress);
+        startTheTempo();
+    }
+
+    private void waveEnder() {
+        phase = 0;
+        waveProgress.setVisibility(View.INVISIBLE);
+        stopTheTempo();
+
     }
 
 

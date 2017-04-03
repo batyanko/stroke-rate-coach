@@ -1,9 +1,10 @@
 <resources>
     <string name="app_name">Stroke Rate Coach</string>
-    <string name="speed_button_text">Speed</string>
-    <string name="stopper_button_text">Stop</string>
+    <string name="speed_button_text">spd</string>
+    <string name="stopper_button_text">stp</string>
     <!--Depreciated: -->
     <string name="initial_spm" translatable="false">22</string>
     <string name="default_kph">000.0 hours/hour</string>
     <string name="use_metric_units">Use metric units?</string>
+    <string name="wave_button_text">Malka Valna</string>
 </resources>
