@@ -7,4 +7,5 @@
     <string name="default_kph">000.0 hours/hour</string>
     <string name="use_metric_units">Use metric units?</string>
     <string name="wave_button_text">Malka Valna</string>
+    <string name="speed_label">Speed</string>
 </resources>
