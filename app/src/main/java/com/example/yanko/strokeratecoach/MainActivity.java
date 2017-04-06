@@ -14,13 +14,16 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.GridView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.yanko.strokeratecoach.Utils.RowingUtilities;
+import com.example.yanko.strokeratecoach.Utils.TextAdapter;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -47,11 +50,12 @@ public class MainActivity extends AppCompatActivity {
 
     Button[] digits;
     Button dig2;
-
     private int[] colors;
 
     Button speedButton;
     Button stopperButton;
+
+    GridView dialGrid;
 
     private int progressVisibility;
 
@@ -78,14 +82,6 @@ public class MainActivity extends AppCompatActivity {
         spm = pref.getInt("zz", 22);
 
         //Initialize UI elements
-        waveButton = (Button) findViewById(R.id.wave_button);
-        waveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                phase = 0;
-                malkaValna();
-            }
-        });
 
         waveProgress = (ProgressBar) findViewById(R.id.wave_progress_bar);
         waveProgress.setVisibility(View.INVISIBLE);
@@ -94,11 +90,22 @@ public class MainActivity extends AppCompatActivity {
 
         textView = (TextView) findViewById(R.id.textView);
 
-        spmEditText = (EditText) findViewById(R.id.rateInputField);
-
-
+        //EditText watcher, in case if an EditText is used
+        //spmEditText = (EditText) findViewById(R.id.rateInputField);
         //spmEditText.addTextChangedListener(new CustomWatcher());
+
         toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
+
+        //Initialize digital dial buttons
+
+        waveButton = (Button) findViewById(R.id.wave_button);
+        waveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                phase = 0;
+                malkaValna();
+            }
+        });
 
         stopperButton = (Button) findViewById(R.id.stopper_button);
         stopperButton.setOnClickListener(new View.OnClickListener() {
@@ -200,6 +207,31 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //Try with a GridView
+
+        dialGrid = (GridView) findViewById(R.id.dial_grid);
+        dialGrid.setAdapter(new TextAdapter(this));
+
+        //Define dial grid button functions
+        dialGrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                if (position < 9){
+                    setSpmFromDigital(position + 1);
+                } else if (position == 9) {
+                    setSpmFromDigital(0);
+                } else if (position == 10) {
+                    waveEnder();
+                } else if (position == 11) {
+                    Intent intent = new Intent(MainActivity.this, SpeedActivity.class);
+                    startActivity(intent);
+                }
+
+                Toast.makeText(MainActivity.this, "" + position, Toast.LENGTH_SHORT).show();
+            }
+        });
+
 
     }
 
@@ -261,8 +293,6 @@ public class MainActivity extends AppCompatActivity {
 
         spmString = String.valueOf(spm);
         textView.setText(spmString);
-
-        spmEditText.selectAll();
     }
 
     private void stopTheTempo() {
@@ -279,15 +309,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
     //Try to make some waves...
     private void malkaValna() {
 
         //
-        final String[] GEARS = new String[] {
+        final String[] GEARS = new String[]{
                 "40", "20"
         };
-        final int[] STROKES_PER_PHASE = new int[] {
+        final int[] STROKES_PER_PHASE = new int[]{
                 3
         };
         final int PHASES_IN_WAVE = 9;
@@ -351,7 +380,7 @@ public class MainActivity extends AppCompatActivity {
         final String phase_progress = phase + "/" + phasesTotal;
         waveButton.setText(phase_progress);
         waveProgress.setVisibility(View.VISIBLE);
-        int progress = (int) (((float)phase/(float)phasesTotal)*100);
+        int progress = (int) (((float) phase / (float) phasesTotal) * 100);
         waveProgress.setProgress(progress);
         startTheTempo();
     }
@@ -364,7 +393,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public void setSpmFromDigital (int digitalInput) {
+    public void setSpmFromDigital(int digitalInput) {
         if (firstDigit != 0) {
             spm = firstDigit * 10 + digitalInput;
             //TODO: make startTheTempo() use spm instead spmString
