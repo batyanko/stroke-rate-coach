@@ -7,10 +7,14 @@ import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
+import android.support.constraint.Guideline;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -35,29 +39,21 @@ public class MainActivity extends AppCompatActivity {
     public static final String RATE_KEY = "rate";
     public int firstDigit;
     public int spm;
-    int strokeRate;
     long strokeDuration;
     String spmString;
     ToneGenerator toneGen1;
     Timer timer;
-    TimerTask timerTaskBlueprint;
     TimerTask timerTask;
 
     ProgressBar waveProgress;
     Button waveButton;
     TextView textView;
-    EditText spmEditText;
 
-    Button[] digits;
-    Button dig2;
     private int[] colors;
 
-    Button speedButton;
-    Button stopperButton;
 
     GridView dialGrid;
-
-    private int progressVisibility;
+    View firstDigitView;
 
     boolean isFirstRun = true;
 
@@ -68,13 +64,24 @@ public class MainActivity extends AppCompatActivity {
     private static int strokeCountTrigger = 0;
     private static int phase = 0;
 
-    //VariableListener testing
-    private VariableChangeListener variableChangeListener;
+    public static int windowWidth;
+    public static int windowHeight;
+    public static int statusbarHeight;
+
+    //Torba s hitrosti
+
+    //EditText spmEditText;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        DisplayMetrics metrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        windowWidth = metrics.widthPixels;
+        windowHeight = metrics.heightPixels;
 
         firstDigit = 0;
 
@@ -107,23 +114,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        stopperButton = (Button) findViewById(R.id.stopper_button);
-        stopperButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                waveEnder();
-            }
-        });
-
-        speedButton = (Button) findViewById(R.id.speed_button);
-        speedButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, SpeedActivity.class);
-                startActivity(intent);
-            }
-        });
-
         //TODO: Find a way to use colors from xml...
         colors = new int[2];
         colors[0] = Color.BLUE;
@@ -133,81 +123,13 @@ public class MainActivity extends AppCompatActivity {
 //        String hexColor = String.format("#%06X", (0xFFFFFF & colors[0]));
 //        Toast.makeText(this, hexColor, Toast.LENGTH_LONG).show();
 
-        digits = new Button[10];
-
-        digits[1] = (Button) findViewById(R.id.dig_1);
-        digits[2] = (Button) findViewById(R.id.dig_2);
-        digits[3] = (Button) findViewById(R.id.dig_3);
-        digits[4] = (Button) findViewById(R.id.dig_4);
-        digits[5] = (Button) findViewById(R.id.dig_5);
-        digits[6] = (Button) findViewById(R.id.dig_6);
-        digits[7] = (Button) findViewById(R.id.dig_7);
-        digits[8] = (Button) findViewById(R.id.dig_8);
-        digits[9] = (Button) findViewById(R.id.dig_9);
-        digits[0] = (Button) findViewById(R.id.dig_0);
-
-        digits[1].setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setSpmFromDigital(1);
-            }
-        });
-        digits[2].setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setSpmFromDigital(2);
-            }
-        });
-        digits[3].setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setSpmFromDigital(3);
-            }
-        });
-        digits[4].setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setSpmFromDigital(4);
-            }
-        });
-        digits[5].setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setSpmFromDigital(5);
-            }
-        });
-        digits[6].setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setSpmFromDigital(6);
-            }
-        });
-        digits[7].setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setSpmFromDigital(7);
-            }
-        });
-        digits[8].setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setSpmFromDigital(8);
-            }
-        });
-        digits[9].setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setSpmFromDigital(9);
-            }
-        });
-        digits[0].setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setSpmFromDigital(0);
-            }
-        });
-
         //Try with a GridView
+
+        int resource = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resource > 0) {
+            statusbarHeight = getResources().getDimensionPixelSize(resource);
+            Log.d("Statusbar Height!!!: ", "" + statusbarHeight);
+        }
 
         dialGrid = (GridView) findViewById(R.id.dial_grid);
         dialGrid.setAdapter(new TextAdapter(this));
@@ -218,9 +140,9 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                 if (position < 9){
-                    setSpmFromDigital(position + 1);
+                    setSpmFromDigital(position + 1, view);
                 } else if (position == 9) {
-                    setSpmFromDigital(0);
+                    setSpmFromDigital(0, view);
                 } else if (position == 10) {
                     waveEnder();
                 } else if (position == 11) {
@@ -231,7 +153,6 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "" + position, Toast.LENGTH_SHORT).show();
             }
         });
-
 
     }
 
@@ -280,10 +201,6 @@ public class MainActivity extends AppCompatActivity {
                             malkaValna();
                         }
                     });
-//                    strokeCount = 0;
-//                    strokeCountTrigger = 5;
-//                    spmString = "32";
-//                    startTheTempo();
                 }
             }
         };
@@ -309,7 +226,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    //Try to make some waves...
+    //Make some waves...
     private void malkaValna() {
 
         //
@@ -393,25 +310,36 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public void setSpmFromDigital(int digitalInput) {
+    public void setSpmFromDigital(int digitalInput, View view) {
         if (firstDigit != 0) {
+            firstDigitView.setBackgroundColor(Color.TRANSPARENT);
             spm = firstDigit * 10 + digitalInput;
             //TODO: make startTheTempo() use spm instead spmString
             spmString = String.valueOf(spm);
             Log.d("SpmString / spm: ", spmString + " / " + spm);
             pref.edit().putInt("zz", spm).apply();
             startTheTempo();
-            digits[firstDigit].setBackgroundColor(colors[0]);
             firstDigit = 0;
 
         } else {
             firstDigit = digitalInput;
-            digits[firstDigit].setBackgroundColor(colors[1]);
+            firstDigitView = view;
+            view.setBackgroundColor(Color.RED);
+
+            Log.d("GridHeight!!!: ", "" + dialGrid.getHeight());
+            Log.d("WindowHeight!!!: ", "" + windowHeight);
+
+            ConstraintLayout constraintLayout = (ConstraintLayout) findViewById(R.id.activity_main);
+            Log.d("Constrai PostCreate???:", "" + constraintLayout.getHeight());
+
         }
 
     }
 
-    /*//Upon entry of 2 digits, start the tempo and clear the EditText
+    //Torba s hitrosti
+
+    /*
+    //Upon entry of 2 digits, start the tempo and clear the EditText
     public class CustomWatcher implements TextWatcher {
 
         private boolean mWasEdited = false;

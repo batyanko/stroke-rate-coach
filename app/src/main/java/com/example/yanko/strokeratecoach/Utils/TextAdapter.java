@@ -1,8 +1,8 @@
 package com.example.yanko.strokeratecoach.Utils;
 
 import android.content.Context;
-import android.text.TextWatcher;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -24,9 +24,13 @@ public class TextAdapter extends BaseAdapter {
         mContext = c;
         Log.d("Context in constr!!!!: ", mContext.getPackageName());
 
-        digitIds = new String[] {
-                "1", "2", "3", "4", "5", "6", "7", "8", "9", "0",
-                mContext.getString(R.string.stopper_button_text), mContext.getString(R.string.speed_button_text)
+        digitIds = new String[]{
+                "1", "2", "3",
+                "4", "5", "6",
+                "7", "8", "9",
+                "0",
+                mContext.getString(R.string.stopper_button_text),
+                mContext.getString(R.string.speed_button_text)
         };
     }
 
@@ -48,30 +52,25 @@ public class TextAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
-        Log.d("Context in getView: ", mContext.getPackageName());
-
-        TextView textView;
+        View view;
 
         if (convertView == null) {
-            textView = new TextView(mContext);
-            textView.setTextSize(20);
-            textView.setGravity(1);
+            LayoutInflater inflater =
+                    (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            view = inflater.inflate(R.layout.text_view_item, null);
+            TextView text = (TextView) view.findViewById(R.id.digit_item);
+            text.setText(digitIds[position]);
+
+            view.setLayoutParams(
+                    new ViewGroup.LayoutParams(MainActivity.windowWidth / 3 - 5,
+                            (MainActivity.windowHeight - MainActivity.statusbarHeight) / 10 - 1
+                    )
+            );
+            Log.d("Cell Height!!!: ", "" + MainActivity.windowHeight / 10);
         } else {
-            textView = (TextView) convertView;
+            view = convertView;
         }
 
-        /*
-        String text;
-        if (digitIds[position + 1] < 10) {
-            text = String.valueOf(digitIds[position + 1]);
-        } else {
-            text = "0";
-        }*/
-
-        textView.setText(digitIds[position]);
-
-        return textView;
+        return view;
     }
-
-
 }
