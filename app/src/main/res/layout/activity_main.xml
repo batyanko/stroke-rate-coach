@@ -16,8 +16,8 @@
         style="@android:style/Widget.ProgressBar.Horizontal"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="0dp"
-        android:layout_marginLeft="0dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginStart="8dp"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -28,7 +28,7 @@
         android:id="@+id/wave_button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="0dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginStart="0dp"
@@ -46,13 +46,14 @@
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="0dp"
+        android:layout_marginTop="8dp"
         android:text="@string/initial_spm"
         android:textAlignment="center"
         android:textSize="128sp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/wave_button" />
+        app:layout_constraintTop_toBottomOf="@+id/wave_button"
+        app:layout_constraintBottom_toTopOf="@+id/guideline_hor50"/>
 
     <GridView
         android:id="@+id/dial_grid"
@@ -65,8 +66,8 @@
         android:gravity="center"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/guideline_hor00"
-        app:layout_constraintBottom_toBottomOf="@+id/guideline_hor3"
+        app:layout_constraintTop_toBottomOf="@+id/guideline_hor50"
+        app:layout_constraintBottom_toBottomOf="@+id/guideline_hor90"
         />
 
     <android.support.constraint.Guideline
@@ -88,7 +89,7 @@
         tools:layout_editor_absoluteY="25dp" />
 
     <android.support.constraint.Guideline
-        android:id="@+id/guideline_hor00"
+        android:id="@+id/guideline_hor50"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -97,7 +98,7 @@
         tools:layout_editor_absoluteY="41dp" />
 
     <android.support.constraint.Guideline
-        android:id="@+id/guideline_hor0"
+        android:id="@+id/guideline_hor60"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -106,7 +107,7 @@
         tools:layout_editor_absoluteY="41dp" />
 
     <android.support.constraint.Guideline
-        android:id="@+id/guideline_hor1"
+        android:id="@+id/guideline_hor70"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -115,7 +116,7 @@
         tools:layout_editor_absoluteY="41dp" />
 
     <android.support.constraint.Guideline
-        android:id="@+id/guideline_hor2"
+        android:id="@+id/guideline_hor80"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -124,7 +125,7 @@
         tools:layout_editor_absoluteY="57dp" />
 
     <android.support.constraint.Guideline
-        android:id="@+id/guideline_hor3"
+        android:id="@+id/guideline_hor90"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"

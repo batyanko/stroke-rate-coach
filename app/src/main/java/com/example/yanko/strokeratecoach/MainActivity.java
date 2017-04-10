@@ -1,30 +1,22 @@
 package com.example.yanko.strokeratecoach;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
-import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
-import android.support.constraint.ConstraintLayout;
-import android.support.constraint.Guideline;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.preference.PreferenceManager;
+import android.support.constraint.ConstraintLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.yanko.strokeratecoach.Utils.RowingUtilities;
 import com.example.yanko.strokeratecoach.Utils.TextAdapter;
@@ -144,13 +136,11 @@ public class MainActivity extends AppCompatActivity {
                 } else if (position == 9) {
                     setSpmFromDigital(0, view);
                 } else if (position == 10) {
-                    waveEnder();
+                    endWave();
                 } else if (position == 11) {
                     Intent intent = new Intent(MainActivity.this, SpeedActivity.class);
                     startActivity(intent);
                 }
-
-                Toast.makeText(MainActivity.this, "" + position, Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -230,11 +220,11 @@ public class MainActivity extends AppCompatActivity {
     private void malkaValna() {
 
         //
-        final String[] GEARS = new String[]{
-                "40", "20"
+        final int[] GEARS = new int[]{
+                32, 20
         };
         final int[] STROKES_PER_PHASE = new int[]{
-                3
+                10, 20, 30
         };
         final int PHASES_IN_WAVE = 9;
 
@@ -249,50 +239,50 @@ public class MainActivity extends AppCompatActivity {
 
         switch (phase) {
             case 1: {
-                phaseStarter(PHASES_IN_WAVE, STROKES_PER_PHASE[0], GEARS[0], Color.RED);
+                startPhase(PHASES_IN_WAVE, STROKES_PER_PHASE[0], GEARS[0], Color.RED);
                 break;
             }
             case 2: {
-                phaseStarter(PHASES_IN_WAVE, STROKES_PER_PHASE[0], GEARS[1], Color.GREEN);
+                startPhase(PHASES_IN_WAVE, STROKES_PER_PHASE[0], GEARS[1], Color.GREEN);
                 break;
             }
             case 3: {
-                phaseStarter(PHASES_IN_WAVE, STROKES_PER_PHASE[0], GEARS[0], Color.RED);
+                startPhase(PHASES_IN_WAVE, STROKES_PER_PHASE[1], GEARS[0], Color.RED);
                 break;
             }
             case 4: {
-                phaseStarter(PHASES_IN_WAVE, STROKES_PER_PHASE[0], GEARS[1], Color.GREEN);
+                startPhase(PHASES_IN_WAVE, STROKES_PER_PHASE[1], GEARS[1], Color.GREEN);
                 break;
             }
             case 5: {
-                phaseStarter(PHASES_IN_WAVE, STROKES_PER_PHASE[0], GEARS[0], Color.RED);
+                startPhase(PHASES_IN_WAVE, STROKES_PER_PHASE[2], GEARS[0], Color.RED);
                 break;
             }
             case 6: {
-                phaseStarter(PHASES_IN_WAVE, STROKES_PER_PHASE[0], GEARS[1], Color.GREEN);
+                startPhase(PHASES_IN_WAVE, STROKES_PER_PHASE[2], GEARS[1], Color.GREEN);
                 break;
             }
             case 7: {
-                phaseStarter(PHASES_IN_WAVE, STROKES_PER_PHASE[0], GEARS[0], Color.RED);
+                startPhase(PHASES_IN_WAVE, STROKES_PER_PHASE[1], GEARS[0], Color.RED);
                 break;
             }
             case 8: {
-                phaseStarter(PHASES_IN_WAVE, STROKES_PER_PHASE[0], GEARS[1], Color.GREEN);
+                startPhase(PHASES_IN_WAVE, STROKES_PER_PHASE[1], GEARS[1], Color.GREEN);
                 break;
             }
             case 9: {
-                phaseStarter(PHASES_IN_WAVE, STROKES_PER_PHASE[0], GEARS[0], Color.RED);
+                startPhase(PHASES_IN_WAVE, STROKES_PER_PHASE[0], GEARS[0], Color.RED);
                 break;
             }
 
             default:
-                waveEnder();
+                endWave();
         }
     }
 
-    private void phaseStarter(int phasesTotal, int lengthTrigger, String spm, int color) {
+    private void startPhase(int phasesTotal, int lengthTrigger, int spm, int color) {
         strokeCountTrigger = lengthTrigger;
-        spmString = spm;
+        this.spm = spm;
         textView.setBackgroundColor(color);
         final String phase_progress = phase + "/" + phasesTotal;
         waveButton.setText(phase_progress);
@@ -302,7 +292,7 @@ public class MainActivity extends AppCompatActivity {
         startTheTempo();
     }
 
-    private void waveEnder() {
+    private void endWave() {
         phase = 0;
         waveProgress.setVisibility(View.INVISIBLE);
         stopTheTempo();
@@ -312,11 +302,12 @@ public class MainActivity extends AppCompatActivity {
 
     public void setSpmFromDigital(int digitalInput, View view) {
         if (firstDigit != 0) {
+            endWave();
             firstDigitView.setBackgroundColor(Color.TRANSPARENT);
             spm = firstDigit * 10 + digitalInput;
             //TODO: make startTheTempo() use spm instead spmString
-            spmString = String.valueOf(spm);
-            Log.d("SpmString / spm: ", spmString + " / " + spm);
+//            spmString = String.valueOf(spm);
+//            Log.d("SpmString / spm: ", spmString + " / " + spm);
             pref.edit().putInt("zz", spm).apply();
             startTheTempo();
             firstDigit = 0;
@@ -333,6 +324,9 @@ public class MainActivity extends AppCompatActivity {
             Log.d("Constrai PostCreate???:", "" + constraintLayout.getHeight());
 
         }
+
+        String aa = "hello";
+        aa.substring(2,3);
 
     }
 
@@ -373,7 +367,7 @@ public class MainActivity extends AppCompatActivity {
             if (mCharSequence.length() >= 2) {
                 mCount = 0;
                 spmString = mCharSequence;
-                waveEnder();
+                endWave();
                 startTheTempo();
                 pref.edit().putString(RATE_KEY, spmString).apply();
                 s.replace(0, s.length(), "");
