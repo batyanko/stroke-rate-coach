@@ -23,8 +23,9 @@
             android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.yanko.strokeratecoach.MainActivity"/>
+                android:value="com.example.yanko.strokeratecoach.MainActivity" />
         </activity>
+        <activity android:name=".WaveActivity"></activity>
     </application>
 
 </manifest>

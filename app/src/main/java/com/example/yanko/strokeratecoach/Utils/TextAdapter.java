@@ -66,7 +66,7 @@ public class TextAdapter extends BaseAdapter {
                             (MainActivity.windowHeight - MainActivity.statusbarHeight) / 10 - 1
                     )
             );
-            Log.d("Cell Height!!!: ", "" + MainActivity.windowHeight / 10);
+//            Log.d("Cell Height!!!: ", "" + MainActivity.windowHeight / 10);
         } else {
             view = convertView;
         }

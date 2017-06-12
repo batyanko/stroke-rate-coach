@@ -14,10 +14,10 @@
         android:text="@string/default_kph"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
-    <CheckBox android:id="@+id/chkMetricUnits"
+<!--    <CheckBox android:id="@+id/chkMetricUnits"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/use_metric_units"
-        android:checked="true"/>
+        android:checked="true"/>-->
 
 </LinearLayout>

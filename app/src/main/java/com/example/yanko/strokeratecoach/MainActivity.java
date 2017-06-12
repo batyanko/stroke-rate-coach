@@ -29,29 +29,36 @@ public class MainActivity extends AppCompatActivity {
 
     public static final int DEFAULT_RATE = 22;
     public static final String RATE_KEY = "rate";
-    public int firstDigit;
-    public int spm;
+
+    //First digit of spm (Strokes per Minute). The firstDigit is used to allow automatic spm
+    // initialization upon dialing two digits
+    public static int firstDigit;
+
+    /* Global spm setting to hold current spm */
+    public static int spm;
+
+    //Variables used in beeping timer setup
     long strokeDuration;
     String spmString;
     ToneGenerator toneGen1;
     Timer timer;
     TimerTask timerTask;
 
+    //UI elements
     ProgressBar waveProgress;
     Button waveButton;
     TextView textView;
 
+    //TODO ??
     private int[] colors;
 
-
+    //UI reference to dialGrid and an element of it
     GridView dialGrid;
     View firstDigitView;
 
-    boolean isFirstRun = true;
-
     private SharedPreferences pref;
 
-    //malkaValna testing
+    //malkaValna values
     private static int strokeCount = 0;
     private static int strokeCountTrigger = 0;
     private static int phase = 0;
@@ -77,23 +84,23 @@ public class MainActivity extends AppCompatActivity {
 
         firstDigit = 0;
 
+        //Initialize spm at last setting, or default at 22
         pref = PreferenceManager.getDefaultSharedPreferences(this);
+
         spm = pref.getInt("zz", 22);
 
-        //Initialize UI elements
-
+        //ProgressBar to show wave progress
         waveProgress = (ProgressBar) findViewById(R.id.wave_progress_bar);
         waveProgress.setVisibility(View.INVISIBLE);
 
-        isFirstRun = false;
-
-        textView = (TextView) findViewById(R.id.textView);
+        textView = (TextView) findViewById(R.id.SpmTextView);
 
         //EditText watcher, in case if an EditText is used
         //spmEditText = (EditText) findViewById(R.id.rateInputField);
         //spmEditText.addTextChangedListener(new CustomWatcher());
 
         toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
+        ToneGenerator toneGen2 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
 
         //Initialize digital dial buttons
 
@@ -103,6 +110,8 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 phase = 0;
                 malkaValna();
+//                Intent waveIntent = new Intent(MainActivity.this, WaveActivity.class);
+//                startActivity(waveIntent);
             }
         });
 
@@ -120,9 +129,10 @@ public class MainActivity extends AppCompatActivity {
         int resource = getResources().getIdentifier("status_bar_height", "dimen", "android");
         if (resource > 0) {
             statusbarHeight = getResources().getDimensionPixelSize(resource);
-            Log.d("Statusbar Height!!!: ", "" + statusbarHeight);
+//            Log.d("Statusbar Height!!!: ", "" + statusbarHeight);
         }
 
+        //A dial that allows the user to set the spm rate
         dialGrid = (GridView) findViewById(R.id.dial_grid);
         dialGrid.setAdapter(new TextAdapter(this));
 
@@ -155,12 +165,14 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onStop() {
+        //Stop beeping on leaving, as screen is expected to remain on while rowing.
+        //Change if intended otherwise.
         stopTheTempo();
         super.onStop();
     }
 
 
-    //Method to start beeping in the rate needed
+    //Method to start beeping in the specified spm
 
     private void startTheTempo() {
 
@@ -182,7 +194,7 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 toneGen1.startTone(ToneGenerator.TONE_CDMA_EMERGENCY_RINGBACK, 150);
                 strokeCount++;
-                if (strokeCountTrigger > 0 && strokeCount == strokeCountTrigger) {
+                if (strokeCountTrigger > 0 && strokeCount >= strokeCountTrigger) {
                     cancel();
                     //TODO: Only change views on the UI thread
                     runOnUiThread(new Runnable() {
@@ -295,8 +307,9 @@ public class MainActivity extends AppCompatActivity {
     private void endWave() {
         phase = 0;
         waveProgress.setVisibility(View.INVISIBLE);
+//        textView.setBackgroundResource(0);
+        textView.setBackgroundColor(Color.TRANSPARENT);
         stopTheTempo();
-
     }
 
 
