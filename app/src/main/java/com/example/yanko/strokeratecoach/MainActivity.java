@@ -18,19 +18,19 @@ import android.widget.GridView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.example.yanko.strokeratecoach.Utils.RowingUtilities;
-import com.example.yanko.strokeratecoach.Utils.TextAdapter;
+import com.example.yanko.strokeratecoach.Utils.SpmUtilities;
+import com.example.yanko.strokeratecoach.Utils.DialGridAdapter;
 
+import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
-
 
 public class MainActivity extends AppCompatActivity {
 
     public static final int DEFAULT_RATE = 22;
     public static final String RATE_KEY = "rate";
 
-    //First digit of spm (Strokes per Minute). The firstDigit is used to allow automatic spm
+    //First digit of spm (Strokes per Minute) used to allow automatic spm
     // initialization upon dialing two digits
     public static int firstDigit;
 
@@ -58,19 +58,21 @@ public class MainActivity extends AppCompatActivity {
 
     private SharedPreferences pref;
 
-    //malkaValna values
+    //autoWave values
+    private static int exerciseRunning = 0;     //0 = off, 1 = autoWave, 2 = autoProgress
+                                                //9 = last phase in progress
     private static int strokeCount = 0;
     private static int strokeCountTrigger = 0;
+    //phase = 0 = wave not running
     private static int phase = 0;
+    private static int phasesTotal = 0;
+    private static int gear = 0;
+    private static int color;
+
 
     public static int windowWidth;
     public static int windowHeight;
     public static int statusbarHeight;
-
-    //Torba s hitrosti
-
-    //EditText spmEditText;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
         //Initialize spm at last setting, or default at 22
         pref = PreferenceManager.getDefaultSharedPreferences(this);
 
-        spm = pref.getInt("zz", 22);
+        spm = pref.getInt("spm", 22);
 
         //ProgressBar to show wave progress
         waveProgress = (ProgressBar) findViewById(R.id.wave_progress_bar);
@@ -95,12 +97,7 @@ public class MainActivity extends AppCompatActivity {
 
         textView = (TextView) findViewById(R.id.SpmTextView);
 
-        //EditText watcher, in case if an EditText is used
-        //spmEditText = (EditText) findViewById(R.id.rateInputField);
-        //spmEditText.addTextChangedListener(new CustomWatcher());
-
         toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
-        ToneGenerator toneGen2 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
 
         //Initialize digital dial buttons
 
@@ -109,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 phase = 0;
-                malkaValna();
+                autoProgress();
 //                Intent waveIntent = new Intent(MainActivity.this, WaveActivity.class);
 //                startActivity(waveIntent);
             }
@@ -117,12 +114,8 @@ public class MainActivity extends AppCompatActivity {
 
         //TODO: Find a way to use colors from xml...
         colors = new int[2];
-        colors[0] = Color.BLUE;
-        colors[1] = Color.WHITE;
-
-        //Find out hex colors...
-//        String hexColor = String.format("#%06X", (0xFFFFFF & colors[0]));
-//        Toast.makeText(this, hexColor, Toast.LENGTH_LONG).show();
+        colors[0] = Color.GREEN;
+        colors[1] = Color.YELLOW;
 
         //Try with a GridView
 
@@ -134,21 +127,24 @@ public class MainActivity extends AppCompatActivity {
 
         //A dial that allows the user to set the spm rate
         dialGrid = (GridView) findViewById(R.id.dial_grid);
-        dialGrid.setAdapter(new TextAdapter(this));
+        dialGrid.setAdapter(new DialGridAdapter(this));
 
         //Define dial grid button functions
         dialGrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                if (position < 9){
+                if (position < 9) {
                     setSpmFromDigital(position + 1, view);
                 } else if (position == 9) {
                     setSpmFromDigital(0, view);
                 } else if (position == 10) {
-                    endWave();
+                    endExercise();
                 } else if (position == 11) {
-                    Intent intent = new Intent(MainActivity.this, SpeedActivity.class);
+                    Intent intent = new Intent(MainActivity.this, WaveActivity.class);
+                    startActivity(intent);
+                } else if (position == 12) {
+                    Intent intent = new Intent(MainActivity.this, WaveActivity.class);
                     startActivity(intent);
                 }
             }
@@ -171,14 +167,13 @@ public class MainActivity extends AppCompatActivity {
         super.onStop();
     }
 
-
     //Method to start beeping in the specified spm
 
     private void startTheTempo() {
 
         strokeCount = 0;
 
-        strokeDuration = RowingUtilities.spmToMilis(spm);
+        strokeDuration = SpmUtilities.spmToMilis(spm);
 
         try {
             timer.cancel();
@@ -194,13 +189,25 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 toneGen1.startTone(ToneGenerator.TONE_CDMA_EMERGENCY_RINGBACK, 150);
                 strokeCount++;
-                if (strokeCountTrigger > 0 && strokeCount >= strokeCountTrigger) {
+                if (exerciseRunning > 0 && strokeCount > strokeCountTrigger) {
                     cancel();
+
+                    Log.d("EXCERCISE:", "" + exerciseRunning);
                     //TODO: Only change views on the UI thread
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            malkaValna();
+                            switch (exerciseRunning) {
+                                case 1:
+                                    autoWave();
+                                    break;
+                                case 2:
+                                    autoProgress();
+                                    break;
+                                default:
+                                    Log.d("DEFAULT", "DEFAULT");
+                                    endExercise();
+                            }
                         }
                     });
                 }
@@ -227,72 +234,81 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void autoWave() {
+        //Set excercise to autoWave;
+        exerciseRunning = 1;
 
-    //Make some waves...
-    private void malkaValna() {
-
-        //
-        final int[] GEARS = new int[]{
+        final int[] GEAR_SETTINGS = new int[]{
                 32, 20
         };
         final int[] STROKES_PER_PHASE = new int[]{
-                10, 20, 30
+                10, 20, 30, 40, 50, 60, 70
         };
-        final int PHASES_IN_WAVE = 9;
 
-        final int STROKES_TOTAL = STROKES_PER_PHASE[0] * PHASES_IN_WAVE;
+        phasesTotal = (STROKES_PER_PHASE.length * 2 - 1) * 2;
+        final int[] ALL_PHASES = new int[phasesTotal];
+
+        //
+        for (int i = 0, j = 0; i < STROKES_PER_PHASE.length; i++, j = j + 2) {
+            //Fill up ascending waves
+            ALL_PHASES[j] = STROKES_PER_PHASE[i];
+            ALL_PHASES[j + 1] = STROKES_PER_PHASE[i];
+            //Fill up descending waves
+            ALL_PHASES[phasesTotal - 1 - j] = STROKES_PER_PHASE[i];
+            ALL_PHASES[phasesTotal - 1 - j - 1] = STROKES_PER_PHASE[i];
+            Log.d("Teh Array: ", Arrays.toString(ALL_PHASES));
+        }
 
         //Initialise phase to 1, or iterate through phases;
         stopTheTempo();
 
         //Initialize / iterate phase
         phase++;
-        Log.i("Phase at start: ", "" + phase);
-
-        switch (phase) {
-            case 1: {
-                startPhase(PHASES_IN_WAVE, STROKES_PER_PHASE[0], GEARS[0], Color.RED);
-                break;
-            }
-            case 2: {
-                startPhase(PHASES_IN_WAVE, STROKES_PER_PHASE[0], GEARS[1], Color.GREEN);
-                break;
-            }
-            case 3: {
-                startPhase(PHASES_IN_WAVE, STROKES_PER_PHASE[1], GEARS[0], Color.RED);
-                break;
-            }
-            case 4: {
-                startPhase(PHASES_IN_WAVE, STROKES_PER_PHASE[1], GEARS[1], Color.GREEN);
-                break;
-            }
-            case 5: {
-                startPhase(PHASES_IN_WAVE, STROKES_PER_PHASE[2], GEARS[0], Color.RED);
-                break;
-            }
-            case 6: {
-                startPhase(PHASES_IN_WAVE, STROKES_PER_PHASE[2], GEARS[1], Color.GREEN);
-                break;
-            }
-            case 7: {
-                startPhase(PHASES_IN_WAVE, STROKES_PER_PHASE[1], GEARS[0], Color.RED);
-                break;
-            }
-            case 8: {
-                startPhase(PHASES_IN_WAVE, STROKES_PER_PHASE[1], GEARS[1], Color.GREEN);
-                break;
-            }
-            case 9: {
-                startPhase(PHASES_IN_WAVE, STROKES_PER_PHASE[0], GEARS[0], Color.RED);
-                break;
-            }
-
-            default:
-                endWave();
+        if (gear == 1 || phase == 1) {
+            gear = 0;
+            color = colors[0];
+        } else {
+            gear = 1;
+            color = colors[1];
         }
+
+        startPhase(ALL_PHASES[phase - 1], GEAR_SETTINGS[gear], color);
     }
 
-    private void startPhase(int phasesTotal, int lengthTrigger, int spm, int color) {
+    private void autoProgress() {
+
+        //Set excercise to autoProgress;
+        exerciseRunning = 2;
+
+        final int[] GEAR_SETTINGS = new int[]{
+                30, 40, 50
+        };
+
+        final int[] STROKES_PER_PHASE = new int[]{
+                3, 3, 3
+        };
+
+        phasesTotal = GEAR_SETTINGS.length;
+
+        final int[] COLOR_PROGRESSION = new int[]{
+                Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW
+        };
+
+        phase++;
+
+/*        if (phase == NUM_PHASES) {
+            exerciseRunning = 0;
+        }*/
+
+
+        startPhase(
+                STROKES_PER_PHASE[phase - 1],
+                GEAR_SETTINGS[phase - 1],
+                COLOR_PROGRESSION[phase - 1]
+        );
+    }
+
+    private void startPhase(int lengthTrigger, int spm, int color) {
         strokeCountTrigger = lengthTrigger;
         this.spm = spm;
         textView.setBackgroundColor(color);
@@ -301,27 +317,28 @@ public class MainActivity extends AppCompatActivity {
         waveProgress.setVisibility(View.VISIBLE);
         int progress = (int) (((float) phase / (float) phasesTotal) * 100);
         waveProgress.setProgress(progress);
+        if (phasesTotal == phase) {exerciseRunning = 9;}
         startTheTempo();
     }
 
-    private void endWave() {
+    public void endExercise() {
         phase = 0;
+        exerciseRunning = 0;
         waveProgress.setVisibility(View.INVISIBLE);
 //        textView.setBackgroundResource(0);
         textView.setBackgroundColor(Color.TRANSPARENT);
         stopTheTempo();
     }
 
-
     public void setSpmFromDigital(int digitalInput, View view) {
         if (firstDigit != 0) {
-            endWave();
+            endExercise();
             firstDigitView.setBackgroundColor(Color.TRANSPARENT);
             spm = firstDigit * 10 + digitalInput;
-            //TODO: make startTheTempo() use spm instead spmString
+            //TODO: maendWaveke startTheTempo() use spm instead spmString
 //            spmString = String.valueOf(spm);
 //            Log.d("SpmString / spm: ", spmString + " / " + spm);
-            pref.edit().putInt("zz", spm).apply();
+            pref.edit().putInt("spm", spm).apply();
             startTheTempo();
             firstDigit = 0;
 
@@ -335,58 +352,6 @@ public class MainActivity extends AppCompatActivity {
 
             ConstraintLayout constraintLayout = (ConstraintLayout) findViewById(R.id.activity_main);
             Log.d("Constrai PostCreate???:", "" + constraintLayout.getHeight());
-
         }
-
-        String aa = "hello";
-        aa.substring(2,3);
-
     }
-
-    //Torba s hitrosti
-
-    /*
-    //Upon entry of 2 digits, start the tempo and clear the EditText
-    public class CustomWatcher implements TextWatcher {
-
-        private boolean mWasEdited = false;
-        private int mCount = 0;
-
-        String mCharSequence = "";
-
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-        }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-            mCount++;
-            mCharSequence = s.toString();
-            Log.d("Char Sequence: ", mCharSequence);
-        }
-
-        @Override
-        public void afterTextChanged(Editable s) {
-
-            if (mWasEdited) {
-
-                mWasEdited = false;
-                return;
-            }
-//
-            Log.d("Current count: ", "" + mCount);
-
-            if (mCharSequence.length() >= 2) {
-                mCount = 0;
-                spmString = mCharSequence;
-                endWave();
-                startTheTempo();
-                pref.edit().putString(RATE_KEY, spmString).apply();
-                s.replace(0, s.length(), "");
-                mWasEdited = true;
-                return;
-            }
-        }
-    }*/
 }

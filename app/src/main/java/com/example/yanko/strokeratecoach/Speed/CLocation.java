@@ -1,4 +1,4 @@
-package com.example.yanko.strokeratecoach;
+package com.example.yanko.strokeratecoach.Speed;
 
 /**
  * Created by yanko on 3/29/17.

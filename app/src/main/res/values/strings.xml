@@ -8,4 +8,8 @@
     <string name="use_metric_units">Use metric units?</string>
     <string name="wave_button_text">Malka Valna</string>
     <string name="speed_label">Speed</string>
+    <string name="waves_button_text">Waves</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Yaba Daba Doo</string>
 </resources>

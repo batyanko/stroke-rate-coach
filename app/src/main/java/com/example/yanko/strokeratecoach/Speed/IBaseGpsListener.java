@@ -1,4 +1,4 @@
-package com.example.yanko.strokeratecoach;
+package com.example.yanko.strokeratecoach.Speed;
 
 import android.location.GpsStatus;
 import android.location.Location;

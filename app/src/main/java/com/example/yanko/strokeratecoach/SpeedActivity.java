@@ -18,20 +18,15 @@ import android.os.Bundle;
 
 import java.util.Formatter;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 
 import android.location.Location;
 import android.location.LocationManager;
-import android.os.Bundle;
-import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
-import android.view.Menu;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import com.example.yanko.strokeratecoach.Speed.CLocation;
+import com.example.yanko.strokeratecoach.Speed.IBaseGpsListener;
 
 public class SpeedActivity extends AppCompatActivity implements IBaseGpsListener {
 

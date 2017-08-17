@@ -10,17 +10,18 @@ import android.widget.TextView;
 
 import com.example.yanko.strokeratecoach.MainActivity;
 import com.example.yanko.strokeratecoach.R;
+import com.example.yanko.strokeratecoach.WaveActivity;
 
 /**
  * Created by yanko on 4/4/17.
  */
 
-public class TextAdapter extends BaseAdapter {
+public class DialGridAdapter extends BaseAdapter {
 
     private Context mContext;
     private String[] digitIds;
 
-    public TextAdapter(Context c) {
+    public DialGridAdapter(Context c) {
         mContext = c;
         Log.d("Context in constr!!!!: ", mContext.getPackageName());
 
@@ -28,9 +29,7 @@ public class TextAdapter extends BaseAdapter {
                 "1", "2", "3",
                 "4", "5", "6",
                 "7", "8", "9",
-                "0",
-                mContext.getString(R.string.stopper_button_text),
-                mContext.getString(R.string.speed_button_text)
+                "0", mContext.getString(R.string.stopper_button_text), mContext.getString(R.string.speed_button_text)
         };
     }
 
@@ -62,8 +61,8 @@ public class TextAdapter extends BaseAdapter {
             text.setText(digitIds[position]);
 
             view.setLayoutParams(
-                    new ViewGroup.LayoutParams(MainActivity.windowWidth / 3 - 5,
-                            (MainActivity.windowHeight - MainActivity.statusbarHeight) / 10 - 1
+                    new ViewGroup.LayoutParams(WaveActivity.windowWidth / 3 - 5,
+                            (WaveActivity.windowHeight - WaveActivity.statusbarHeight) / 10 - 1
                     )
             );
 //            Log.d("Cell Height!!!: ", "" + MainActivity.windowHeight / 10);
