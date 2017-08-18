@@ -12,6 +12,7 @@ import com.example.yanko.strokeratecoach.R;
 
 import java.util.*;
 import java.util.Timer;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by yanko on 3/31/17.

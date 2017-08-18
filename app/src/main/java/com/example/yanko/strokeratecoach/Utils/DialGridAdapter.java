@@ -5,10 +5,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.example.yanko.strokeratecoach.MainActivity;
 import com.example.yanko.strokeratecoach.R;
 import com.example.yanko.strokeratecoach.WaveActivity;
 
@@ -56,15 +56,23 @@ public class DialGridAdapter extends BaseAdapter {
         if (convertView == null) {
             LayoutInflater inflater =
                     (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            view = inflater.inflate(R.layout.text_view_item, null);
+            view = inflater.inflate(R.layout.digit_view_item, null);
             TextView text = (TextView) view.findViewById(R.id.digit_item);
             text.setText(digitIds[position]);
 
+//            view.getLayoutParams().width = 30;
+//            view.getLayoutParams().height = 30;
+//            ViewGroup.LayoutParams lp = view.getLayoutParams();
+//            lp.width = 20; //WaveActivity.windowWidth / 3 - 5;
+//            lp.height = 30; //(WaveActivity.windowHeight - WaveActivity.statusbarHeight) / 10 - 1;
+//
             view.setLayoutParams(
-                    new ViewGroup.LayoutParams(WaveActivity.windowWidth / 3 - 5,
+                    new android.widget.AbsListView.LayoutParams(WaveActivity.windowWidth / 3 - 5,
                             (WaveActivity.windowHeight - WaveActivity.statusbarHeight) / 10 - 1
                     )
             );
+
+//            view.requestLayout();
 //            Log.d("Cell Height!!!: ", "" + MainActivity.windowHeight / 10);
         } else {
             view = convertView;

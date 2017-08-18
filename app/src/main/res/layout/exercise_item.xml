@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:id="@+id/exercise_layout"
+    >
+
+    <Button
+        android:id="@+id/fav_button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="2"/>
+
+    <TextView
+        android:id="@+id/exercise_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="12"
+        android:gravity="center"/>
+
+    <Button
+        android:id="@+id/engage_button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="2"/>
+
+</LinearLayout>

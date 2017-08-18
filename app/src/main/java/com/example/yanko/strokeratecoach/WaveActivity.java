@@ -25,6 +25,20 @@ import java.util.TimerTask;
 
 public class WaveActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
+    public static final String OPERATION_SETTING = "operation";
+    public static final String SWITCH_SETTING = "switch";
+    public static final String SPM_SETTING = "spm";
+
+    public static final int OPERATION_WAVE = 1;
+    public static final int OPERATION_PROGRESS = 2;
+    public static final int OPERATION_STOP = 0;
+
+    //Exercise item function IDs
+    public static final int FAV_BUTTON_FUNCTION = 1;
+    public static final int EXERCISE_ITEM_FUNCTION = 2;
+    public static final int ENGAGE_EXERCISE_FUNCTION = 3;
+
+
 
     public static final int DEFAULT_RATE = 22;
     public static final String RATE_KEY = "rate";
@@ -74,6 +88,43 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 
     static Runnable runForestRun;
 
+    public static int[] GEAR_SETTINGS = new int[]{
+            40, 50, 60
+    };
+
+    public static int[] STROKES_PER_PHASE = new int[]{
+            3, 3, 3
+    };
+
+    //Temp workout settings
+    public static final int[] exerciseSPP1 = {
+            10, 20, 30
+    };
+    public static final int[] exerciseSPP2 = {
+            10, 20, 30
+    };
+    public static final int[] exerciseSPP3 = {
+            10, 20, 30
+    };
+    public static final int[] exerciseSPP4 = {
+            10, 20, 30
+    };
+
+
+    public static final int[] exerciseG1 = {
+            32, 20
+    };
+    public static final int[] exerciseG2 = {
+            24, 28, 32
+    };
+    public static final int[] exerciseG3 = {
+            24, 28, 32
+    };
+    public static final int[] exerciseG4 = {
+            24, 28, 32
+    };
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,7 +135,6 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         SlideFragment slideFragment = new SlideFragment();
         transaction.replace(R.id.slide_frame_layout, slideFragment);
-        //TODO add YAbaDabaDooFragment
         transaction.commit();
 
         DisplayMetrics metrics = new DisplayMetrics();
@@ -113,13 +163,12 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
             @Override
             public void onClick(View view) {
                 phase = 0;
-                autoProgress();
+                autoWave();
 //                Intent waveIntent = new Intent(MainActivity.this, WaveActivity.class);
 //                startActivity(waveIntent);
             }
         });
 
-        //TODO: Find a way to use colors from xml...
         colors = new int[2];
         colors[0] = Color.GREEN;
         colors[1] = Color.YELLOW;
@@ -138,15 +187,12 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
                 switch (exerciseRunning) {
                     case 1:
                         autoWave();
-                        Log.d("YOOOOO", "HOORAAAYYYY");
                         break;
                     case 2:
-                        Log.d("YOOOOO", "HOORAAAYYYY");
                         autoProgress();
                         break;
                     default:
                         endExercise();
-                        Log.d("YOOOOO", "HOORAAAYYYY");
                 }
             }
         };
@@ -190,8 +236,6 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
                 strokeCount++;
                 if (exerciseRunning > 0 && strokeCount > strokeCountTrigger) {
                     cancel();
-                    //TODO: Only change views on the UI thread
-
                     runOnUiThread(
                             runForestRun
                     );
@@ -223,13 +267,6 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         //Set excercise to autoWave;
         exerciseRunning = 1;
 
-        final int[] GEAR_SETTINGS = new int[]{
-                32, 20
-        };
-        final int[] STROKES_PER_PHASE = new int[]{
-                10, 20, 30, 40, 50, 60, 70
-        };
-
         phasesTotal = (STROKES_PER_PHASE.length * 2 - 1) * 2;
         final int[] ALL_PHASES = new int[phasesTotal];
 
@@ -241,7 +278,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
             //Fill up descending waves
             ALL_PHASES[phasesTotal - 1 - j] = STROKES_PER_PHASE[i];
             ALL_PHASES[phasesTotal - 1 - j - 1] = STROKES_PER_PHASE[i];
-            Log.d("Teh Array: ", Arrays.toString(ALL_PHASES));
+            Log.d("Wave array: ", Arrays.toString(ALL_PHASES));
         }
 
         //Initialise phase to 1, or iterate through phases;
@@ -266,14 +303,6 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 
         //Set excercise to autoProgress;
         exerciseRunning = 2;
-
-        final int[] GEAR_SETTINGS = new int[]{
-                40, 50, 60
-        };
-
-        final int[] STROKES_PER_PHASE = new int[]{
-                3, 3, 3
-        };
 
         phasesTotal = GEAR_SETTINGS.length;
 
@@ -322,7 +351,6 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
             endExercise();
             firstDigitView.setBackgroundColor(Color.TRANSPARENT);
             spm = firstDigit * 10 + digitalInput;
-            //TODO: maendWaveke startTheTempo() use spm instead spmString
 //            spmString = String.valueOf(spm);
 //            Log.d("SpmString / spm: ", spmString + " / " + spm);
             pref.edit().putInt("spm", spm).apply();
@@ -345,10 +373,24 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
-        //TODO Make shit actually listen for pref "spm"
-        if (s.equals("spm")) {
+        if (s.equals(SPM_SETTING)) {
             spm = sharedPreferences.getInt("spm", 22);
             startTheTempo();
+        } else if (s.equals(SWITCH_SETTING)) {
+            switch (sharedPreferences.getInt(OPERATION_SETTING, 0)) {
+                case OPERATION_WAVE: {
+                    autoWave();
+                    break;
+                }
+                case OPERATION_PROGRESS: {
+                    autoProgress();
+                    break;
+                }
+                default: {
+                    endExercise();
+                    break;
+                }
+            }
         }
     }
 }

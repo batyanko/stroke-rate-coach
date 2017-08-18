@@ -1,6 +1,6 @@
 package com.example.yanko.strokeratecoach;
 
-
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -9,22 +9,25 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import com.example.yanko.strokeratecoach.Sliding.*;
 import com.example.yanko.strokeratecoach.Utils.DialGridAdapter;
+import com.example.yanko.strokeratecoach.Utils.SvAdapter;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class SlideFragment extends Fragment {
+public class SlideFragment extends Fragment implements SvAdapter.ListItemClickListener{
 
     private int firstDigit;
     private View firstDigitView;
@@ -33,6 +36,11 @@ public class SlideFragment extends Fragment {
 
     public static int width;
     public static int height;
+
+    DialGridAdapter dialAdapter;
+    SvAdapter svAdapter;
+
+    Boolean bool;
 
     public SlideFragment() {
         // Required empty public constructor
@@ -68,9 +76,34 @@ public class SlideFragment extends Fragment {
         // it's PagerAdapter set.
         mSlidingTabLayout = (SlidingTabLayout) view.findViewById(R.id.sliding_tabs);
         mSlidingTabLayout.setViewPager(mViewPager);
+
+        dialAdapter = new DialGridAdapter(view.getContext());
+        svAdapter = new SvAdapter(15, this);
     }
 
-    class SlidePagerAdapter extends PagerAdapter {
+    //OnClickListener for the Exercise list items
+    @Override
+    public void onListItemClick(int clickedItemIndex, int itemFunction) {
+
+        String message = "Eh?";
+        if (itemFunction == WaveActivity.FAV_BUTTON_FUNCTION) {
+            message = "Fav yeah";
+        } else if (itemFunction == WaveActivity.EXERCISE_ITEM_FUNCTION) {
+            message = "Item yeah";
+        } else if (itemFunction == WaveActivity.ENGAGE_EXERCISE_FUNCTION) {
+            WaveActivity.GEAR_SETTINGS = WaveActivity.exerciseG1;
+            WaveActivity.STROKES_PER_PHASE = WaveActivity.exerciseSPP1;
+            pref.edit().putInt(WaveActivity.OPERATION_SETTING, WaveActivity.OPERATION_WAVE).apply();
+            bool = pref.getBoolean(WaveActivity.SWITCH_SETTING, true);
+            pref.edit().putBoolean(WaveActivity.SWITCH_SETTING, !bool).apply();
+            message = "Engage yeah";
+        }
+        Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
+    }
+
+    private class SlidePagerAdapter extends PagerAdapter {
+        private String pageTitle;
+
         @Override
         public int getCount() {
             return 2;
@@ -83,7 +116,22 @@ public class SlideFragment extends Fragment {
 
         @Override
         public CharSequence getPageTitle(int position) {
-            return "Item: " + position;
+            switch (position) {
+                case 0: {
+                    pageTitle = "Speed Dial";
+                    break;
+                }
+                case 1: {
+                    pageTitle = "Workouts";
+                    break;
+                }
+                default: {
+                    pageTitle = "Woot";
+                    break;
+                }
+            }
+
+            return pageTitle;
         }
 
         @Override
@@ -93,13 +141,14 @@ public class SlideFragment extends Fragment {
 
             View view;
             GridView dialGrid;
+            RecyclerView exerciseRV;
+
 
             switch (position) {
                 case 0: {
-                    Log.d("CASE?", "" + position);
                     view = getActivity().getLayoutInflater().inflate(R.layout.fragment_dial, container, false);
                     dialGrid = (GridView) view.findViewById(R.id.dial_grid_frag);
-                    dialGrid.setAdapter(new DialGridAdapter(view.getContext()));
+                    dialGrid.setAdapter(dialAdapter);
 
                     //Define dial grid button functions
                     dialGrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -111,11 +160,18 @@ public class SlideFragment extends Fragment {
                             } else if (position == 9) {
                                 setSpmFromDigital(0, view);
                             } else if (position == 10) {
-//                                endExercise();
-                            } /*else if (position == 11) {
-                                Intent intent = new Intent(WaveActivity.this, SpeedActivity.class);
+                                //Hit the switch
+                                pref.edit().putInt(WaveActivity.OPERATION_SETTING, WaveActivity.OPERATION_STOP).apply();
+                                bool = pref.getBoolean(WaveActivity.SWITCH_SETTING, true);
+                                pref.edit().putBoolean(WaveActivity.SWITCH_SETTING, !bool).apply();
+
+
+//                                pref.edit().putInt(WaveActivity.OPERATION_SETTING, WaveActivity.OPERATION_STOP).apply();
+                            } else if (position == 11) {
+                                Intent intent = new Intent(getActivity(), SpeedActivity.class);
                                 startActivity(intent);
-                            } else if (position == 12) {
+                            }
+                                /* else if (position == 12) {
                                 Intent intent = new Intent(WaveActivity.this, Activity.class);
                                 startActivity(intent);
                             }*/
@@ -124,12 +180,14 @@ public class SlideFragment extends Fragment {
                     break;
                 }
                 case 1: {
-                    Log.d("CASE?", "" + position);
-                    view = getActivity().getLayoutInflater().inflate(R.layout.fragment_yaba_daba_du, container, false);
+                    view = getActivity().getLayoutInflater().inflate(R.layout.fragment_exercises, container, false);
+                    exerciseRV = (RecyclerView) view.findViewById(R.id.exercise_rv);
+                    LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+                    exerciseRV.setLayoutManager(layoutManager);
+                    exerciseRV.setAdapter(svAdapter);
                     break;
                 }
                 default: {
-                    Log.d("CASE?", "" + position);
                     view = getActivity().getLayoutInflater().inflate(R.layout.fragment_dial, container, false);
                 }
             }
