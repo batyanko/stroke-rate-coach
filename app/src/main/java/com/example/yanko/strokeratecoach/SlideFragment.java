@@ -1,7 +1,10 @@
 package com.example.yanko.strokeratecoach;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -22,6 +25,9 @@ import android.widget.Toast;
 import com.example.yanko.strokeratecoach.Sliding.*;
 import com.example.yanko.strokeratecoach.Utils.DialGridAdapter;
 import com.example.yanko.strokeratecoach.Utils.SvAdapter;
+import com.example.yanko.strokeratecoach.data.ExerciseContract.PresetEntry1;
+import com.example.yanko.strokeratecoach.data.PresetDBHelper;
+
 
 
 /**
@@ -41,6 +47,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
     SvAdapter svAdapter;
 
     Boolean bool;
+    private SQLiteDatabase mDb;
 
     public SlideFragment() {
         // Required empty public constructor
@@ -53,6 +60,16 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         // Inflate the layout for this fragment
 
         pref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
+        dialAdapter = new DialGridAdapter(getContext());
+
+        //////////////////////
+        //SQLite stuff
+        PresetDBHelper dbHelper = new PresetDBHelper(getActivity());
+        mDb = dbHelper.getWritableDatabase();
+        Cursor cursor = getAllPresets();
+
+        svAdapter = new SvAdapter(getContext(), cursor, this);
 
         return inflater.inflate(R.layout.fragment_slide, container, false);
 
@@ -76,9 +93,6 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         // it's PagerAdapter set.
         mSlidingTabLayout = (SlidingTabLayout) view.findViewById(R.id.sliding_tabs);
         mSlidingTabLayout.setViewPager(mViewPager);
-
-        dialAdapter = new DialGridAdapter(view.getContext());
-        svAdapter = new SvAdapter(15, this);
     }
 
     //OnClickListener for the Exercise list items
@@ -210,6 +224,9 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                     LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
                     exerciseRV.setLayoutManager(layoutManager);
                     exerciseRV.setAdapter(svAdapter);
+                    addNewGuest("Hoplaaa", 34);
+                    addNewGuest("sdgfgsfdg", 45);
+                    svAdapter.swapCursor(getAllPresets());
                     break;
                 }
                 default: {
@@ -240,7 +257,6 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
 //            endExercise();
             firstDigitView.setBackgroundColor(Color.TRANSPARENT);
             spm = firstDigit * 10 + digitalInput;
-            //TODO: maendWaveke startTheTempo() use spm instead spmString
 //            spmString = String.valueOf(spm);
 //            Log.d("SpmString / spm: ", spmString + " / " + spm);
             pref.edit().putInt("spm", spm).apply();
@@ -258,5 +274,26 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
 //            ConstraintLayout constraintLayout = (ConstraintLayout) findViewById(R.id.activity_main);
 //            Log.d("Constrai PostCreate???:", "" + constraintLayout.getHeight());
         }
+    }
+
+    /////////////////
+    //DBStuff
+    private Cursor getAllPresets() {
+        return mDb.query(
+                PresetEntry1.TABLE_NAME,
+                null,
+                null,
+                null,
+                null,
+                null,
+                PresetEntry1.COLUMN_TIMESTAMP
+        );
+    }
+
+    private long addNewGuest(String name, int partySize) {
+        ContentValues cv = new ContentValues();
+        cv.put(PresetEntry1.COLUMN_NAME, name);
+//        cv.put(WaitlistContract.WaitlistEntry.COLUMN_PARTY_SIZE, partySize);
+        return mDb.insert(PresetEntry1.TABLE_NAME, null, cv);
     }
 }
