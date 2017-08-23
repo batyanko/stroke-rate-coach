@@ -96,18 +96,18 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
             3, 3, 3
     };
 
-    //Temp workout settings
+    //TODO take workouts from SQLite
     public static final int[] exerciseSPP1 = {
             10, 20, 30
     };
     public static final int[] exerciseSPP2 = {
-            10, 20, 30
+            20, 40, 60
     };
     public static final int[] exerciseSPP3 = {
-            10, 20, 30
+            5, 10, 15
     };
     public static final int[] exerciseSPP4 = {
-            10, 20, 30
+            3, 6, 9
     };
 
 
@@ -186,6 +186,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
             public void run() {
                 switch (exerciseRunning) {
                     case 1:
+                        toneGen1.startTone(ToneGenerator.TONE_CDMA_EMERGENCY_RINGBACK, 1000);
                         autoWave();
                         break;
                     case 2:
@@ -214,6 +215,10 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         super.onStop();
     }
 
+    /**
+     * Initiate beeping according to active workout settings.
+     */
+
     private void startTheTempo() {
 
         strokeCount = 0;
@@ -236,6 +241,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
                 strokeCount++;
                 if (exerciseRunning > 0 && strokeCount > strokeCountTrigger) {
                     cancel();
+                    //TODO find out why I needed to run this on the UI thread...
                     runOnUiThread(
                             runForestRun
                     );
@@ -250,6 +256,10 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         textView.setText(spmString);
     }
 
+
+    /**
+     * Stop the beeping mechanism.
+     */
     private static void stopTheTempo() {
         strokeCount = 0;
         strokeCountTrigger = 0;
@@ -263,6 +273,9 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         }
     }
 
+    /**
+     * Initiate a wave type of workout according to the active workout settings.
+     */
     private void autoWave() {
         //Set excercise to autoWave;
         exerciseRunning = 1;
@@ -299,6 +312,9 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
                 color);
     }
 
+    /**
+     * Initiate a progression kind of training according to the active workout settings.
+     */
     private void autoProgress() {
 
         //Set excercise to autoProgress;
@@ -323,6 +339,12 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         );
     }
 
+    /**
+     * Initiate workout phase.
+     * @param lengthTrigger phase length
+     * @param spm           strokes per minute
+     * @param color         color for this phase
+     */
     private void startPhase(int lengthTrigger, int spm, int color) {
         strokeCountTrigger = lengthTrigger;
         this.spm = spm;
@@ -336,6 +358,9 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         startTheTempo();
     }
 
+    /**
+     * Reset the current workout and stop beeping.
+     */
     public void endExercise() {
         phase = 0;
         exerciseRunning = 0;
@@ -346,6 +371,11 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     }
 
 
+    /**
+     * Handle digit input and set the spm accordingly.
+     * @param digitalInput  digit input
+     * @param view          reference to the view that represents the digit
+     */
     public void setSpmFromDigital(int digitalInput, View view) {
         if (firstDigit != 0) {
             endExercise();
@@ -370,6 +400,12 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         }
     }
 
+    /**
+     * Listen for preference changes from child fragments.
+     * Acts as an indirect way to handle UI clicks in child fragments.
+     * @param sharedPreferences a SharedPreferences that was changed
+     * @param s                 key for the changed preference
+     */
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
@@ -379,11 +415,15 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         } else if (s.equals(SWITCH_SETTING)) {
             switch (sharedPreferences.getInt(OPERATION_SETTING, 0)) {
                 case OPERATION_WAVE: {
-                    autoWave();
+                    endExercise();
+                    exerciseRunning = 1;
+                    startTheTempo();
                     break;
                 }
                 case OPERATION_PROGRESS: {
-                    autoProgress();
+                    endExercise();
+                    exerciseRunning = 2;
+                    startTheTempo();
                     break;
                 }
                 default: {

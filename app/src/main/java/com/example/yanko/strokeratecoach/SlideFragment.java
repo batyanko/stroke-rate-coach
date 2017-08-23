@@ -85,14 +85,39 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
     @Override
     public void onListItemClick(int clickedItemIndex, int itemFunction) {
 
+
+
         String message = "Eh?";
         if (itemFunction == WaveActivity.FAV_BUTTON_FUNCTION) {
             message = "Fav yeah";
         } else if (itemFunction == WaveActivity.EXERCISE_ITEM_FUNCTION) {
             message = "Item yeah";
         } else if (itemFunction == WaveActivity.ENGAGE_EXERCISE_FUNCTION) {
-            WaveActivity.GEAR_SETTINGS = WaveActivity.exerciseG1;
-            WaveActivity.STROKES_PER_PHASE = WaveActivity.exerciseSPP1;
+
+            //TODO take workouts from SQLite
+            switch (clickedItemIndex) {
+                case 0: {
+                    WaveActivity.GEAR_SETTINGS = WaveActivity.exerciseG1;
+                    WaveActivity.STROKES_PER_PHASE = WaveActivity.exerciseSPP1;
+                    break;
+                }
+                case 1: {
+                    WaveActivity.GEAR_SETTINGS = WaveActivity.exerciseG2;
+                    WaveActivity.STROKES_PER_PHASE = WaveActivity.exerciseSPP2;
+                    break;
+                }
+                case 2: {
+                    WaveActivity.GEAR_SETTINGS = WaveActivity.exerciseG3;
+                    WaveActivity.STROKES_PER_PHASE = WaveActivity.exerciseSPP3;
+                    break;
+                }
+                case 3: {
+                    WaveActivity.GEAR_SETTINGS = WaveActivity.exerciseG4;
+                    WaveActivity.STROKES_PER_PHASE = WaveActivity.exerciseSPP4;
+                    break;
+                }
+            }
+
             pref.edit().putInt(WaveActivity.OPERATION_SETTING, WaveActivity.OPERATION_WAVE).apply();
             bool = pref.getBoolean(WaveActivity.SWITCH_SETTING, true);
             pref.edit().putBoolean(WaveActivity.SWITCH_SETTING, !bool).apply();
