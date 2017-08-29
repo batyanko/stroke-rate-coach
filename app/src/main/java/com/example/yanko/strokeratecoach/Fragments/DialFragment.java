@@ -28,11 +28,7 @@ public class DialFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_dial, container, false);
-/*
-        dialGrid = (GridView) container.findViewById(R.id.dial_grid_frag);
-        dialGrid.setAdapter(new DialGridAdapter(this));*/
     }
 
     @Override

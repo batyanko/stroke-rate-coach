@@ -11,14 +11,19 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.example.yanko.strokeratecoach.MainActivity;
 import com.example.yanko.strokeratecoach.R;
 import com.example.yanko.strokeratecoach.WaveActivity;
 
-import java.util.Arrays;
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
-import static com.example.yanko.strokeratecoach.WaveActivity.exerciseG1;
-import static com.example.yanko.strokeratecoach.data.ExerciseContract.PresetEntry1.COLUMN_NAME;
+import static com.example.yanko.strokeratecoach.data.WorkoutContract.PresetEntry1.COLUMN_GEARS_CSV;
+import static com.example.yanko.strokeratecoach.data.WorkoutContract.PresetEntry1.COLUMN_NAME;
+import static com.example.yanko.strokeratecoach.data.WorkoutContract.PresetEntry1.COLUMN_SPP_CSV;
+import static com.example.yanko.strokeratecoach.data.WorkoutContract.PresetEntry1.COLUMN_TIMESTAMP;
 
 /**
  * Created by ku4ekasi4ka on 8/17/17.
@@ -37,7 +42,7 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
 
 
     public interface ListItemClickListener {
-        void onListItemClick(int clickedItemIndex, int itemFunction);
+        void onListItemClick(int clickedItemIndex, int itemFunction, Cursor cursor);
     }
 
     //////////////////
@@ -91,6 +96,7 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
         private final int favButtonId;
         private final int engageButtonId;
 
+
         public ExerciseViewHolder(View itemView) {
             super(itemView);
 
@@ -108,11 +114,11 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
             int clickedPosition = getAdapterPosition();
             int viewId = view.getId();
             if (viewId == favButtonId) {
-                mOnClickListener.onListItemClick(clickedPosition, WaveActivity.FAV_BUTTON_FUNCTION);
+                mOnClickListener.onListItemClick(clickedPosition, WaveActivity.FAV_BUTTON_FUNCTION, mCursor);
             } else if (viewId == engageButtonId) {
-                mOnClickListener.onListItemClick(clickedPosition, WaveActivity.ENGAGE_EXERCISE_FUNCTION);
+                mOnClickListener.onListItemClick(clickedPosition, WaveActivity.ENGAGE_WORKOUT_FUNCTION, mCursor);
             } else if (viewId == itemId){
-                mOnClickListener.onListItemClick(clickedPosition, WaveActivity.EXERCISE_ITEM_FUNCTION);
+                mOnClickListener.onListItemClick(clickedPosition, WaveActivity.WORKOUT_ITEM_FUNCTION, mCursor);
             }
             Log.d("VIEW ID: ", viewId + "");
         }
@@ -131,34 +137,34 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
             exerciseItem.setOnClickListener(this);
             engageButton.setOnClickListener(this);
 
-            String exerciseName = mCursor.getString(mCursor.getColumnIndex(COLUMN_NAME));
-            Log.d("NAME", exerciseName);
+            String exerciseName;
 
-/*            switch (position) {
-                case 0: {
-                    textHolder = Arrays.toString(WaveActivity.exerciseSPP1)
-                            + " strokes at " +Arrays.toString(exerciseG1) + " spm";
-                    break;
-                }
-                case 1: {
-                    textHolder = Arrays.toString(WaveActivity.exerciseSPP2)
-                            + " strokes at " +Arrays.toString(WaveActivity.exerciseG2) + " spm";
-                    break;
-                }
-                case 2: {
-                    textHolder = Arrays.toString(WaveActivity.exerciseSPP3)
-                            + " strokes at " +Arrays.toString(WaveActivity.exerciseG3) + " spm";
-                    break;
-                }
-                case 3: {
-                    textHolder = Arrays.toString(WaveActivity.exerciseSPP4)
-                            + " strokes at " +Arrays.toString(WaveActivity.exerciseG4) + " spm";
-                    break;
-                }
-                default: {
-                    textHolder = "Nycki";
-                }
-            }*/
+            String timestampFromSQLite = mCursor.getString(mCursor.getColumnIndex(COLUMN_TIMESTAMP));
+
+            Log.d("DATE BENCH", "START");
+            SimpleDateFormat sdf = new SimpleDateFormat( "yyyy-MM-dd hh:mm:ss", Locale.US );
+            SimpleDateFormat sdfSimple = new SimpleDateFormat( "yyyy-MM-dd", Locale.US );
+            ParsePosition pp = new ParsePosition( 0 );
+            Date dt = sdf.parse(timestampFromSQLite, pp);
+            if( dt != null ) {
+                long currentEpoch = dt.getTime();
+
+                long localOffset = TimeZone.getDefault().getOffset(currentEpoch);
+                //Current local time?
+                String localTime = sdfSimple.format(currentEpoch + localOffset);
+                Log.d("DATE BENCH", "FINISH");
+                Log.d("FORMATTED BACK", localTime);
+                Log.d("Parsed: ", String.valueOf(dt.getTime()));
+
+                exerciseName = mCursor.getString(mCursor.getColumnIndex(COLUMN_NAME)) +
+                        " " +
+                        localTime +
+                        "\n" +
+                        mCursor.getString(mCursor.getColumnIndex(COLUMN_SPP_CSV)) +
+                        " at " +
+                        mCursor.getString(mCursor.getColumnIndex(COLUMN_GEARS_CSV));
+            } else {exerciseName = mCursor.getString(mCursor.getColumnIndex(COLUMN_NAME));}
+
 
             exerciseItem.setText(exerciseName);
         }

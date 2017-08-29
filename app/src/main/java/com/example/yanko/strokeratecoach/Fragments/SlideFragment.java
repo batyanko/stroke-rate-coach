@@ -1,4 +1,4 @@
-package com.example.yanko.strokeratecoach;
+package com.example.yanko.strokeratecoach.Fragments;
 
 import android.content.ContentValues;
 import android.content.Intent;
@@ -20,20 +20,25 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.yanko.strokeratecoach.R;
 import com.example.yanko.strokeratecoach.Sliding.*;
+import com.example.yanko.strokeratecoach.SpeedActivity;
 import com.example.yanko.strokeratecoach.Utils.DialGridAdapter;
 import com.example.yanko.strokeratecoach.Utils.SvAdapter;
-import com.example.yanko.strokeratecoach.data.ExerciseContract.PresetEntry1;
+import com.example.yanko.strokeratecoach.WaveActivity;
+import com.example.yanko.strokeratecoach.data.WorkoutContract.PresetEntry1;
 import com.example.yanko.strokeratecoach.data.PresetDBHelper;
 
+import java.util.Arrays;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class SlideFragment extends Fragment implements SvAdapter.ListItemClickListener{
+public class SlideFragment extends Fragment implements SvAdapter.ListItemClickListener {
 
     private int firstDigit;
     private View firstDigitView;
@@ -46,8 +51,14 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
     DialGridAdapter dialAdapter;
     SvAdapter svAdapter;
 
+    Cursor mCursor;
+
+    RecyclerView workoutRV;
+
     Boolean bool;
     private SQLiteDatabase mDb;
+
+    ViewGroup viewGroup;
 
     public SlideFragment() {
         // Required empty public constructor
@@ -67,11 +78,16 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         //SQLite stuff
         PresetDBHelper dbHelper = new PresetDBHelper(getActivity());
         mDb = dbHelper.getWritableDatabase();
-        Cursor cursor = getAllPresets();
+//        addNewPreset("Hoplaaa", 34);
+//        addNewPreset("sdgfgsfdg", 45);
+//        addNewPreset("sdgfgsfdg", 45);
+        mCursor = getAllPresets();
 
-        svAdapter = new SvAdapter(getContext(), cursor, this);
+        svAdapter = new SvAdapter(getContext(), mCursor, this);
 
+        viewGroup = container;
         return inflater.inflate(R.layout.fragment_slide, container, false);
+
 
     }
 
@@ -95,20 +111,67 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         mSlidingTabLayout.setViewPager(mViewPager);
     }
 
-    //OnClickListener for the Exercise list items
+    //OnClickListener for the Workout list items
     @Override
-    public void onListItemClick(int clickedItemIndex, int itemFunction) {
+    public void onListItemClick(int clickedItemIndex, int itemFunction, Cursor cursor) {
 
-
-
+        Log.d("BENCH onClick", "START");
+        mCursor = getPreset(clickedItemIndex + 1);
+        if (!mCursor.moveToPosition(0)) {
+            return;
+        }
         String message = "Eh?";
+
         if (itemFunction == WaveActivity.FAV_BUTTON_FUNCTION) {
             message = "Fav yeah";
-        } else if (itemFunction == WaveActivity.EXERCISE_ITEM_FUNCTION) {
-            message = "Item yeah";
-        } else if (itemFunction == WaveActivity.ENGAGE_EXERCISE_FUNCTION) {
+            Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
+            Log.d("BENCH onClick", "FINISH");
+
+        } else if (itemFunction == WaveActivity.WORKOUT_ITEM_FUNCTION) {
+
+            message = mCursor.getString(mCursor.getColumnIndex(PresetEntry1.COLUMN_NAME)) +
+                    " : " +
+                    "\n" +
+                    mCursor.getString(mCursor.getColumnIndex(PresetEntry1.COLUMN_SPP_CSV)) +
+                    " at " +
+                    mCursor.getString(mCursor.getColumnIndex(PresetEntry1.COLUMN_GEARS_CSV)) +
+                    "\n" +
+                    mCursor.getString(mCursor.getColumnIndex(PresetEntry1.COLUMN_DESC));
+            Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
+            Log.d("BENCH onClick", "FINISH");
+
+        } else if (itemFunction == WaveActivity.ENGAGE_WORKOUT_FUNCTION) {
+            final int workoutType =
+                    mCursor.getInt(mCursor.getColumnIndex(PresetEntry1.COLUMN_WORKOUT_TYPE));
+            final String gearCSV =  mCursor.getString(mCursor.getColumnIndex(PresetEntry1.COLUMN_GEARS_CSV));
+            final String sppCSV = mCursor.getString(mCursor.getColumnIndex(PresetEntry1.COLUMN_SPP_CSV));
+            final String[] gears = gearCSV.split("\\s*,\\s*");
+            final String[] spp = sppCSV.split("\\s*,\\s*");
+
+            //Number of phases must match number of gears
+            if (gears.length != spp.length) {
+                return;
+            }
+
+            int[] gearInts = new int[gears.length];
+            int[] sppInts = new int[gears.length];
+            for (int i = 0; i < gearInts.length; i++)
+            {
+                gearInts[i] = Integer.parseInt(gears[i]);
+                sppInts[i] = Integer.parseInt(spp[i]);
+            }
+
+
+            Log.d("PARSED GEARS", gearInts[0] + " " + gearInts[1] + " " + gearInts[2] + " Length: " + gears.length);
+            Log.d("PARSED SPP", sppInts[0] + " " + sppInts[1] + " " + sppInts[2] + " Length: " + gears.length);
+
+            WaveActivity.GEAR_SETTINGS = gearInts;
+            WaveActivity.STROKES_PER_PHASE = sppInts;
+
 
             //TODO take workouts from SQLite
+
+/*
             switch (clickedItemIndex) {
                 case 0: {
                     WaveActivity.GEAR_SETTINGS = WaveActivity.exerciseG1;
@@ -131,13 +194,13 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                     break;
                 }
             }
+*/
 
-            pref.edit().putInt(WaveActivity.OPERATION_SETTING, WaveActivity.OPERATION_WAVE).apply();
+            pref.edit().putInt(WaveActivity.OPERATION_SETTING, workoutType).apply();
             bool = pref.getBoolean(WaveActivity.SWITCH_SETTING, true);
             pref.edit().putBoolean(WaveActivity.SWITCH_SETTING, !bool).apply();
-            message = "Engage yeah";
         }
-        Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
+//        Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
     }
 
     private class SlidePagerAdapter extends PagerAdapter {
@@ -180,7 +243,6 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
 
             View view;
             GridView dialGrid;
-            RecyclerView exerciseRV;
 
 
             switch (position) {
@@ -200,12 +262,12 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                                 setSpmFromDigital(0, view);
                             } else if (position == 10) {
                                 //Hit the switch
-                                pref.edit().putInt(WaveActivity.OPERATION_SETTING, WaveActivity.OPERATION_STOP).apply();
+                                pref.edit().putInt(WaveActivity.OPERATION_SETTING, WaveActivity.WORKOUT_STOP).apply();
                                 bool = pref.getBoolean(WaveActivity.SWITCH_SETTING, true);
                                 pref.edit().putBoolean(WaveActivity.SWITCH_SETTING, !bool).apply();
 
 
-//                                pref.edit().putInt(WaveActivity.OPERATION_SETTING, WaveActivity.OPERATION_STOP).apply();
+//                                pref.edit().putInt(WaveActivity.OPERATION_SETTING, WaveActivity.WORKOUT_STOP).apply();
                             } else if (position == 11) {
                                 Intent intent = new Intent(getActivity(), SpeedActivity.class);
                                 startActivity(intent);
@@ -219,13 +281,11 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                     break;
                 }
                 case 1: {
-                    view = getActivity().getLayoutInflater().inflate(R.layout.fragment_exercises, container, false);
-                    exerciseRV = (RecyclerView) view.findViewById(R.id.exercise_rv);
+                    view = getActivity().getLayoutInflater().inflate(R.layout.fragment_workouts, container, false);
+                    workoutRV = (RecyclerView) view.findViewById(R.id.workout_rv);
                     LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
-                    exerciseRV.setLayoutManager(layoutManager);
-                    exerciseRV.setAdapter(svAdapter);
-                    addNewGuest("Hoplaaa", 34);
-                    addNewGuest("sdgfgsfdg", 45);
+                    workoutRV.setLayoutManager(layoutManager);
+                    workoutRV.setAdapter(svAdapter);
                     svAdapter.swapCursor(getAllPresets());
                     break;
                 }
@@ -254,7 +314,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
 
     public void setSpmFromDigital(int digitalInput, View view) {
         if (firstDigit != 0) {
-//            endExercise();
+//            endWorkout();
             firstDigitView.setBackgroundColor(Color.TRANSPARENT);
             spm = firstDigit * 10 + digitalInput;
 //            spmString = String.valueOf(spm);
@@ -290,7 +350,19 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         );
     }
 
-    private long addNewGuest(String name, int partySize) {
+    private Cursor getPreset(int position) {
+        return mDb.query(
+                PresetEntry1.TABLE_NAME,
+                null,
+                PresetEntry1._ID + "=" + position,
+                null,
+                null,
+                null,
+                PresetEntry1.COLUMN_TIMESTAMP
+        );
+    }
+
+    private long addNewPreset(String name, int partySize) {
         ContentValues cv = new ContentValues();
         cv.put(PresetEntry1.COLUMN_NAME, name);
 //        cv.put(WaitlistContract.WaitlistEntry.COLUMN_PARTY_SIZE, partySize);

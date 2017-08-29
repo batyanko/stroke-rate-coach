@@ -78,7 +78,7 @@ public class SpmUtilities {
 
     public void setSpmFromDigital(int digitalInput, View view) {
         if (firstDigit != 0) {
-            MainActivity.endExercise();
+            MainActivity.endWorkout();
             firstDigitView.setBackgroundColor(Color.TRANSPARENT);
             spm = firstDigit * 10 + digitalInput;
             //TODO: make startTheTempo() use spm instead spmString

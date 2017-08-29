@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.yanko.strokeratecoach.SlideFragment"
+    tools:context="com.example.yanko.strokeratecoach.Fragments.SlideFragment"
     android:orientation="vertical">
     <com.example.yanko.strokeratecoach.Sliding.SlidingTabLayout
         android:id="@+id/sliding_tabs"

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="small_wave_name">Small Wave</string>
+    <string name="small_wave_desc">Prebuilt workout going from 10 to 30 strokes and then back to 10.</string>
+    <string name="small_wave_spp" translatable="false">10,10,20,20,30,30,20,20,10,10</string>
+    <string name="small_wave_gears" translatable="false">32,20,32,20,32,20,32,20,32,20</string>
+
+    <string name="big_wave_name">Big Wave</string>
+    <string name="big_wave_desc">Prebuilt workout going from 20 to 60 strokes and then back to 20.</string>
+    <string name="big_wave_spp" translatable="false">20,20,40,40,60,60,40,40,20,20</string>
+    <string name="big_wave_gears" translatable="false">32,20,32,20,32,20,32,20,32,20</string>
+
+    <string name="progress50_name">Progress50</string>
+    <string name="progress50_desc">Prebuilt workout going progressing spm from 22 to 28 with every 50 strokes.</string>
+    <string name="progress50_spp" translatable="false">50,50,50,50</string>
+    <string name="progress50_gears" translatable="false">22,24,26,28</string>
+
+
+</resources>

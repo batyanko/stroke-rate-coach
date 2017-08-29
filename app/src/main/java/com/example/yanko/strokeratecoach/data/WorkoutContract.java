@@ -5,24 +5,25 @@ import android.provider.BaseColumns;
  * Created by ku4ekasi4ka on 8/23/17.
  */
 
-public class ExerciseContract {
+public class WorkoutContract {
     public static final class PresetEntry1 implements BaseColumns {
         public static final String TABLE_NAME = "presets";
         public static final String COLUMN_NAME = "preset_name";
-        public static final String COLUMN_DESC = "reset_desc";
+        public static final String COLUMN_DESC = "preset_desc";
         public static final String COLUMN_TIMESTAMP = "date_added";
-        public static final String COLUMN_EXERCISE_TYPE = "type";
+        public static final String COLUMN_WORKOUT_TYPE = "workout_type";
+        public static final String COLUMN_SPP_TYPE = "spp_type";
         public static final String COLUMN_SPP_CSV = "spp";
         public static final String COLUMN_GEARS_CSV = "gears";
     }
 
-    //Try if lots of colums work faster than parsing CSV
+    //Try if 9 extra columns work faster than parsing CSV
     public static final class PresetEntry2 implements BaseColumns {
         public static final String TABLE_NAME = "presets";
         public static final String COLUMN_NAME = "preset_name";
         public static final String COLUMN_DESC = "preset_desc";
         public static final String COLUMN_TIMESTAMP = "date_added";
-        public static final String COLUMN_EXERCISE_TYPE = "type";
+        public static final String COLUMN_WORKOUT_TYPE = "type";
         public static final String COLUMN_SPP0 = "spp0";
         public static final String COLUMN_SPP1 = "spp1";
         public static final String COLUMN_SPP2 = "spp2";

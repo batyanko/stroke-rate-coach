@@ -17,6 +17,7 @@ import android.widget.GridView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.example.yanko.strokeratecoach.Fragments.SlideFragment;
 import com.example.yanko.strokeratecoach.Utils.SpmUtilities;
 
 import java.util.Arrays;
@@ -25,18 +26,25 @@ import java.util.TimerTask;
 
 public class WaveActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
+    //Constants for OnSharedPreferenceChangeListener
     public static final String OPERATION_SETTING = "operation";
     public static final String SWITCH_SETTING = "switch";
     public static final String SPM_SETTING = "spm";
 
-    public static final int OPERATION_WAVE = 1;
-    public static final int OPERATION_PROGRESS = 2;
-    public static final int OPERATION_STOP = 0;
+    //Workout types
+    public static final int WORKOUT_WAVE = 1;
+    public static final int WORKOUT_PROGRESS = 2;
+    public static final int WORKOUT_STOP = 0;
 
-    //Exercise item function IDs
+    //Workout item function IDs
     public static final int FAV_BUTTON_FUNCTION = 1;
-    public static final int EXERCISE_ITEM_FUNCTION = 2;
-    public static final int ENGAGE_EXERCISE_FUNCTION = 3;
+    public static final int WORKOUT_ITEM_FUNCTION = 2;
+    public static final int ENGAGE_WORKOUT_FUNCTION = 3;
+
+    //SPP (strokes or stuff per phase) unit types
+    public static final int SPP_UNIT_STROKES = 0;
+    public static final int SPP_UNIT_SECONDS = 1;
+    public static final int SPP_UNIT_METERS = 2;
 
 
 
@@ -72,7 +80,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     private SharedPreferences pref;
 
     //autoWave values
-    private static int exerciseRunning = 0;     //0 = off, 1 = autoWave, 2 = autoProgress
+    private static int workoutRunning = 0;     //0 = off, 1 = autoWave, 2 = autoProgress
     private static int strokeCount = 0;
     private static int strokeCountTrigger = 0;
     //phase = 0 = wave not running
@@ -96,7 +104,8 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
             3, 3, 3
     };
 
-    //TODO take workouts from SQLite
+    //TODO delete temp workouts
+
     public static final int[] exerciseSPP1 = {
             10, 20, 30
     };
@@ -110,7 +119,6 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
             3, 6, 9
     };
 
-
     public static final int[] exerciseG1 = {
             32, 20
     };
@@ -123,7 +131,6 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     public static final int[] exerciseG4 = {
             24, 28, 32
     };
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -163,9 +170,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
             @Override
             public void onClick(View view) {
                 phase = 0;
-                autoWave();
-//                Intent waveIntent = new Intent(MainActivity.this, WaveActivity.class);
-//                startActivity(waveIntent);
+                autoProgress();
             }
         });
 
@@ -184,16 +189,15 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         runForestRun = new Runnable() {
             @Override
             public void run() {
-                switch (exerciseRunning) {
+                switch (workoutRunning) {
                     case 1:
-                        toneGen1.startTone(ToneGenerator.TONE_CDMA_EMERGENCY_RINGBACK, 1000);
-                        autoWave();
+                        autoProgress();
                         break;
                     case 2:
                         autoProgress();
                         break;
                     default:
-                        endExercise();
+                        endWorkout();
                 }
             }
         };
@@ -239,9 +243,9 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
             public void run() {
                 toneGen1.startTone(ToneGenerator.TONE_CDMA_EMERGENCY_RINGBACK, 150);
                 strokeCount++;
-                if (exerciseRunning > 0 && strokeCount > strokeCountTrigger) {
+                if (workoutRunning > 0 && strokeCount > strokeCountTrigger) {
                     cancel();
-                    //TODO find out why I needed to run this on the UI thread...
+                    //Got to run on the Main Thread as we need to access UI elements
                     runOnUiThread(
                             runForestRun
                     );
@@ -273,12 +277,13 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         }
     }
 
+    //TODO delete wave method, waves are currently saved in Progress format
     /**
      * Initiate a wave type of workout according to the active workout settings.
      */
     private void autoWave() {
         //Set excercise to autoWave;
-        exerciseRunning = 1;
+        workoutRunning = 1;
 
         phasesTotal = (STROKES_PER_PHASE.length * 2 - 1) * 2;
         final int[] ALL_PHASES = new int[phasesTotal];
@@ -318,7 +323,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     private void autoProgress() {
 
         //Set excercise to autoProgress;
-        exerciseRunning = 2;
+        workoutRunning = 2;
 
         phasesTotal = GEAR_SETTINGS.length;
 
@@ -329,7 +334,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         phase++;
 
         if (phase == phasesTotal) {
-            exerciseRunning = 0;
+            workoutRunning = 0;
         }
 
         startPhase(
@@ -354,16 +359,17 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         waveProgress.setVisibility(View.VISIBLE);
         int progress = (int) (((float) phase / (float) phasesTotal) * 100);
         waveProgress.setProgress(progress);
-        if (phase == phasesTotal) {exerciseRunning = 9;}
+        if (phase == phasesTotal) {
+            workoutRunning = 9;}
         startTheTempo();
     }
 
     /**
      * Reset the current workout and stop beeping.
      */
-    public void endExercise() {
+    public void endWorkout() {
         phase = 0;
-        exerciseRunning = 0;
+        workoutRunning = 0;
         waveProgress.setVisibility(View.INVISIBLE);
 //        textView.setBackgroundResource(0);
         textView.setBackgroundColor(Color.TRANSPARENT);
@@ -371,6 +377,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     }
 
 
+    //TODO delete redundant method, already used from SlideFragment
     /**
      * Handle digit input and set the spm accordingly.
      * @param digitalInput  digit input
@@ -378,7 +385,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
      */
     public void setSpmFromDigital(int digitalInput, View view) {
         if (firstDigit != 0) {
-            endExercise();
+            endWorkout();
             firstDigitView.setBackgroundColor(Color.TRANSPARENT);
             spm = firstDigit * 10 + digitalInput;
 //            spmString = String.valueOf(spm);
@@ -414,20 +421,20 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
             startTheTempo();
         } else if (s.equals(SWITCH_SETTING)) {
             switch (sharedPreferences.getInt(OPERATION_SETTING, 0)) {
-                case OPERATION_WAVE: {
-                    endExercise();
-                    exerciseRunning = 1;
+                case WORKOUT_WAVE: {
+                    endWorkout();
+                    workoutRunning = 1;
                     startTheTempo();
                     break;
                 }
-                case OPERATION_PROGRESS: {
-                    endExercise();
-                    exerciseRunning = 2;
+                case WORKOUT_PROGRESS: {
+                    endWorkout();
+                    workoutRunning = 2;
                     startTheTempo();
                     break;
                 }
                 default: {
-                    endExercise();
+                    endWorkout();
                     break;
                 }
             }
