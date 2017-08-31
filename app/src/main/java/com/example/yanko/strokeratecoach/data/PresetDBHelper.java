@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.example.yanko.strokeratecoach.EntryFormActivity;
 import com.example.yanko.strokeratecoach.R;
 import com.example.yanko.strokeratecoach.WaveActivity;
 
@@ -47,7 +48,7 @@ public class PresetDBHelper extends SQLiteOpenHelper {
         //Initialize with factory presets
         sqLiteDatabase.execSQL(SQL_CREATE_PRESET_TABLE);
         Log.d("SQLite BENCH", "START");
-        addFactoryPreset(sqLiteDatabase,
+        addPreset(sqLiteDatabase,
                 mContext.getString(R.string.small_wave_name),
                 mContext.getString(R.string.small_wave_desc),
                 mContext.getString(R.string.small_wave_spp),
@@ -56,7 +57,7 @@ public class PresetDBHelper extends SQLiteOpenHelper {
                 WaveActivity.SPP_UNIT_STROKES
                 );
 
-        addFactoryPreset(sqLiteDatabase,
+        addPreset(sqLiteDatabase,
                 mContext.getString(R.string.big_wave_name),
                 mContext.getString(R.string.big_wave_desc),
                 mContext.getString(R.string.big_wave_spp),
@@ -66,7 +67,7 @@ public class PresetDBHelper extends SQLiteOpenHelper {
                 WaveActivity.SPP_UNIT_STROKES
         );
 
-        addFactoryPreset(sqLiteDatabase,
+        addPreset(sqLiteDatabase,
                 mContext.getString(R.string.progress50_name),
                 mContext.getString(R.string.progress50_desc),
                 mContext.getString(R.string.progress50_spp),
@@ -90,8 +91,8 @@ public class PresetDBHelper extends SQLiteOpenHelper {
         onCreate(sqLiteDatabase);
     }
 
-    private long addFactoryPreset(SQLiteDatabase db, String name, String description,
-                                  String spp, String gears,int workoutType, int sppType) {
+    private long addPreset(SQLiteDatabase db, String name, String description,
+                          String spp, String gears, int workoutType, int sppType) {
         ContentValues cv = new ContentValues();
         cv.put(PresetEntry1.COLUMN_NAME, name);
         cv.put(PresetEntry1.COLUMN_DESC, description);

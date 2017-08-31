@@ -103,9 +103,9 @@ public class SpmUtilities {
     }*/
 
     public static long spmToMilis(int spm) {
-        if (spm < 10) {
+/*        if (spm < 10) {
             return 0;
-        }
+        }*/
 
         //int strokeRate = Integer.parseInt(spmString.substring(0, 2));
         Long strokeDuration = (long) (1 / (((double) spm) / 60) * 1000);

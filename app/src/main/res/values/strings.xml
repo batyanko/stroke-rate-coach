@@ -6,12 +6,20 @@
     <string name="initial_spm" translatable="false">22</string>
     <string name="default_kph">000.0 hours/hour</string>
     <string name="use_metric_units">Use metric units?</string>
-    <string name="wave_button_text">Malka Valna</string>
+    <string name="create_workout_button_label">Create workout</string>
     <string name="speed_label">Speed</string>
     <string name="waves_button_text">Waves</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Yaba Daba Doo</string>
+    <string name="workout_name_title">Workout name:</string>
+    <string name="workout_desc_tooltip">Add workout description?</string>
+    <string name="button_add_phase_label">+ Phase</string>
+    <string name="gear_title_text">strokes at spm</string>
+    <string name="phase_title_text">Phase</string>
+    <string name="tpp_title_text">Time</string>
+    <string name="dpp_title_text">Distance</string>
+    <string name="button_create_workout_label">Create Workout</string>
+    <string name="empty_data_notification">Skipping phases with empty data</string>
 
 
 </resources>

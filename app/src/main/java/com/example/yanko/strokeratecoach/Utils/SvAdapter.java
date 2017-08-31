@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.example.yanko.strokeratecoach.R;
 import com.example.yanko.strokeratecoach.WaveActivity;
+import com.example.yanko.strokeratecoach.data.WorkoutContract;
 
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
@@ -42,7 +43,7 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
 
 
     public interface ListItemClickListener {
-        void onListItemClick(int clickedItemIndex, int itemFunction, Cursor cursor);
+        void onListItemClick(long clickedItemIndex, int position, int itemFunction);
     }
 
     //////////////////
@@ -111,19 +112,19 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
 
         @Override
         public void onClick(View view) {
+            long clickedTag = (long)itemView.getTag();
             int clickedPosition = getAdapterPosition();
             int viewId = view.getId();
             if (viewId == favButtonId) {
-                mOnClickListener.onListItemClick(clickedPosition, WaveActivity.FAV_BUTTON_FUNCTION, mCursor);
+                mOnClickListener.onListItemClick(clickedTag, clickedPosition, WaveActivity.FAV_BUTTON_FUNCTION);
             } else if (viewId == engageButtonId) {
-                mOnClickListener.onListItemClick(clickedPosition, WaveActivity.ENGAGE_WORKOUT_FUNCTION, mCursor);
+                mOnClickListener.onListItemClick(clickedTag, clickedPosition, WaveActivity.ENGAGE_WORKOUT_FUNCTION);
             } else if (viewId == itemId){
-                mOnClickListener.onListItemClick(clickedPosition, WaveActivity.WORKOUT_ITEM_FUNCTION, mCursor);
+                mOnClickListener.onListItemClick(clickedTag, clickedPosition, WaveActivity.WORKOUT_ITEM_FUNCTION);
             }
-            Log.d("VIEW ID: ", viewId + "");
         }
 
-        public void bind(int position) {
+        private void bind(int position) {
 //            exerciseItem.setText(String.valueOf(position));
 
             ////////////////
@@ -153,9 +154,7 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
                 //Current local time?
                 String localTime = sdfSimple.format(currentEpoch + localOffset);
                 Log.d("DATE BENCH", "FINISH");
-                Log.d("FORMATTED BACK", localTime);
-                Log.d("Parsed: ", String.valueOf(dt.getTime()));
-
+                
                 exerciseName = mCursor.getString(mCursor.getColumnIndex(COLUMN_NAME)) +
                         " " +
                         localTime +
@@ -167,6 +166,8 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
 
 
             exerciseItem.setText(exerciseName);
+
+            this.itemView.setTag(mCursor.getLong(mCursor.getColumnIndex(WorkoutContract.PresetEntry1._ID)));
         }
 
         ///////////////////

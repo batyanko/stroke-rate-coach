@@ -14,6 +14,7 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,6 +30,7 @@ import com.example.yanko.strokeratecoach.SpeedActivity;
 import com.example.yanko.strokeratecoach.Utils.DialGridAdapter;
 import com.example.yanko.strokeratecoach.Utils.SvAdapter;
 import com.example.yanko.strokeratecoach.WaveActivity;
+import com.example.yanko.strokeratecoach.data.WorkoutContract;
 import com.example.yanko.strokeratecoach.data.WorkoutContract.PresetEntry1;
 import com.example.yanko.strokeratecoach.data.PresetDBHelper;
 
@@ -98,6 +100,13 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
      */
     private ViewPager mViewPager;
 
+    //Force workout ScrollView update, as it seems to persist after return from another activity.
+    @Override
+    public void onStart() {
+        super.onStart();
+        svAdapter.swapCursor(getAllPresets());
+    }
+
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
 
@@ -113,19 +122,21 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
 
     //OnClickListener for the Workout list items
     @Override
-    public void onListItemClick(int clickedItemIndex, int itemFunction, Cursor cursor) {
+    public void onListItemClick(long clickedItemId, int position, int itemFunction) {
 
         Log.d("BENCH onClick", "START");
-        mCursor = getPreset(clickedItemIndex + 1);
-        if (!mCursor.moveToPosition(0)) {
+        mCursor = getAllPresets();
+
+        if (!mCursor.moveToPosition(position)) {
+            Toast.makeText(getActivity(), "MOVEISFALSE", Toast.LENGTH_LONG).show();
             return;
         }
-        String message = "Eh?";
+        String message;
 
         if (itemFunction == WaveActivity.FAV_BUTTON_FUNCTION) {
-            message = "Fav yeah";
-            Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
-            Log.d("BENCH onClick", "FINISH");
+            Toast.makeText(getActivity(), "button works 8-)", Toast.LENGTH_LONG).show();
+            removePreset(clickedItemId);
+            svAdapter.swapCursor(getAllPresets());
 
         } else if (itemFunction == WaveActivity.WORKOUT_ITEM_FUNCTION) {
 
@@ -138,7 +149,6 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                     "\n" +
                     mCursor.getString(mCursor.getColumnIndex(PresetEntry1.COLUMN_DESC));
             Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
-            Log.d("BENCH onClick", "FINISH");
 
         } else if (itemFunction == WaveActivity.ENGAGE_WORKOUT_FUNCTION) {
             final int workoutType =
@@ -161,46 +171,16 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                 sppInts[i] = Integer.parseInt(spp[i]);
             }
 
-
-            Log.d("PARSED GEARS", gearInts[0] + " " + gearInts[1] + " " + gearInts[2] + " Length: " + gears.length);
-            Log.d("PARSED SPP", sppInts[0] + " " + sppInts[1] + " " + sppInts[2] + " Length: " + gears.length);
-
             WaveActivity.GEAR_SETTINGS = gearInts;
             WaveActivity.STROKES_PER_PHASE = sppInts;
 
 
-            //TODO take workouts from SQLite
-
-/*
-            switch (clickedItemIndex) {
-                case 0: {
-                    WaveActivity.GEAR_SETTINGS = WaveActivity.exerciseG1;
-                    WaveActivity.STROKES_PER_PHASE = WaveActivity.exerciseSPP1;
-                    break;
-                }
-                case 1: {
-                    WaveActivity.GEAR_SETTINGS = WaveActivity.exerciseG2;
-                    WaveActivity.STROKES_PER_PHASE = WaveActivity.exerciseSPP2;
-                    break;
-                }
-                case 2: {
-                    WaveActivity.GEAR_SETTINGS = WaveActivity.exerciseG3;
-                    WaveActivity.STROKES_PER_PHASE = WaveActivity.exerciseSPP3;
-                    break;
-                }
-                case 3: {
-                    WaveActivity.GEAR_SETTINGS = WaveActivity.exerciseG4;
-                    WaveActivity.STROKES_PER_PHASE = WaveActivity.exerciseSPP4;
-                    break;
-                }
-            }
-*/
 
             pref.edit().putInt(WaveActivity.OPERATION_SETTING, workoutType).apply();
             bool = pref.getBoolean(WaveActivity.SWITCH_SETTING, true);
             pref.edit().putBoolean(WaveActivity.SWITCH_SETTING, !bool).apply();
         }
-//        Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
+        Log.d("BENCH onClick", "FINISH");
     }
 
     private class SlidePagerAdapter extends PagerAdapter {
@@ -238,8 +218,6 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
 
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
-
-            Log.d("KYDE SME NIE?", "" + position);
 
             View view;
             GridView dialGrid;
@@ -286,7 +264,8 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                     LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
                     workoutRV.setLayoutManager(layoutManager);
                     workoutRV.setAdapter(svAdapter);
-                    svAdapter.swapCursor(getAllPresets());
+                    mCursor = getAllPresets();
+                    svAdapter.swapCursor(mCursor);
                     break;
                 }
                 default: {
@@ -308,7 +287,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
 
         @Override
         public void destroyItem(ViewGroup container, int position, Object object) {
-            container.removeView((View) object);
+            container.removeView(   (View) object);
         }
     }
 
@@ -350,7 +329,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         );
     }
 
-    private Cursor getPreset(int position) {
+    private Cursor getPreset(long position) {
         return mDb.query(
                 PresetEntry1.TABLE_NAME,
                 null,
@@ -362,10 +341,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         );
     }
 
-    private long addNewPreset(String name, int partySize) {
-        ContentValues cv = new ContentValues();
-        cv.put(PresetEntry1.COLUMN_NAME, name);
-//        cv.put(WaitlistContract.WaitlistEntry.COLUMN_PARTY_SIZE, partySize);
-        return mDb.insert(PresetEntry1.TABLE_NAME, null, cv);
+    private boolean removePreset(long position) {
+        return mDb.delete(PresetEntry1.TABLE_NAME, PresetEntry1._ID + "=" + position, null) > 0;
     }
 }

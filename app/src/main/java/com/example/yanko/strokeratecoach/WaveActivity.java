@@ -1,5 +1,6 @@
 package com.example.yanko.strokeratecoach;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.media.AudioManager;
@@ -68,7 +69,8 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     //UI elements
     private ProgressBar waveProgress;
     private Button waveButton;
-    private TextView textView;
+    private TextView spmTextView;
+    private TextView progressTextView;
 
     //TODO ??
     private int[] colors;
@@ -161,16 +163,17 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         waveProgress = (ProgressBar) findViewById(R.id.wave_progress_bar_2);
         waveProgress.setVisibility(View.INVISIBLE);
 
-        textView = (TextView) findViewById(R.id.SpmTextView_2);
+        spmTextView = (TextView) findViewById(R.id.SpmTextView_2);
+        progressTextView = (TextView) findViewById(R.id.progressTextView);
 
         toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
 
-        waveButton = (Button) findViewById(R.id.wave_button_2);
+        waveButton = (Button) findViewById(R.id.create_workout_button);
         waveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                phase = 0;
-                autoProgress();
+                Intent intent = new Intent(WaveActivity.this, EntryFormActivity.class);
+                startActivity(intent);
             }
         });
 
@@ -257,7 +260,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         timer.scheduleAtFixedRate(timerTask, 1, strokeDuration);
 
         spmString = String.valueOf(spm);
-        textView.setText(spmString);
+        spmTextView.setText(spmString);
     }
 
 
@@ -313,8 +316,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         }
 
         startPhase(ALL_PHASES[phase - 1],
-                GEAR_SETTINGS[gear],
-                color);
+                GEAR_SETTINGS[gear]);
     }
 
     /**
@@ -328,7 +330,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         phasesTotal = GEAR_SETTINGS.length;
 
         final int[] COLOR_PROGRESSION = new int[]{
-                Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW
+                Color.GREEN, Color.YELLOW
         };
 
         phase++;
@@ -337,10 +339,15 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
             workoutRunning = 0;
         }
 
+        if ((phase & 1) == 1) {
+            color = COLOR_PROGRESSION[0];
+        } else {
+            color = COLOR_PROGRESSION[1];
+        }
+
         startPhase(
                 STROKES_PER_PHASE[phase - 1],
-                GEAR_SETTINGS[phase - 1],
-                COLOR_PROGRESSION[phase - 1]
+                GEAR_SETTINGS[phase - 1]
         );
     }
 
@@ -348,14 +355,15 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
      * Initiate workout phase.
      * @param lengthTrigger phase length
      * @param spm           strokes per minute
-     * @param color         color for this phase
      */
-    private void startPhase(int lengthTrigger, int spm, int color) {
+    private void startPhase(int lengthTrigger, int spm) {
         strokeCountTrigger = lengthTrigger;
         this.spm = spm;
-        textView.setBackgroundColor(color);
+        spmTextView.setBackgroundColor(color);
         final String phase_progress = phase + "/" + phasesTotal;
-        waveButton.setText(phase_progress);
+//        waveButton.setText(phase_progress);
+        progressTextView.setText(phase_progress);
+        progressTextView.setVisibility(View.VISIBLE);
         waveProgress.setVisibility(View.VISIBLE);
         int progress = (int) (((float) phase / (float) phasesTotal) * 100);
         waveProgress.setProgress(progress);
@@ -371,8 +379,9 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         phase = 0;
         workoutRunning = 0;
         waveProgress.setVisibility(View.INVISIBLE);
-//        textView.setBackgroundResource(0);
-        textView.setBackgroundColor(Color.TRANSPARENT);
+        progressTextView.setVisibility(View.INVISIBLE);
+//        spmTextView.setBackgroundResource(0);
+        spmTextView.setBackgroundColor(Color.TRANSPARENT);
         stopTheTempo();
     }
 

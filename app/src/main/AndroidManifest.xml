@@ -11,22 +11,24 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme2">
         <activity android:name=".MainActivity">
+
+        </activity>
+        <activity
+            android:name=".SpeedActivity"
+            android:label="@string/speed_label"
+            android:parentActivityName=".WaveActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.yanko.strokeratecoach.MainActivity" />
+        </activity>
+        <activity android:name=".WaveActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".SpeedActivity"
-            android:label="@string/speed_label"
-            android:parentActivityName=".MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.yanko.strokeratecoach.MainActivity" />
-        </activity>
-        <activity android:name=".WaveActivity" />
-        <activity android:name=".EntryFormActivity"></activity>
+        <activity android:name=".EntryFormActivity"/>
     </application>
 
 </manifest>
