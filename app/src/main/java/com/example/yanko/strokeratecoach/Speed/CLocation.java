@@ -1,8 +1,16 @@
-package com.example.yanko.strokeratecoach.Speed;
-
-/**
- * Created by yanko on 3/29/17.
+/*
+ * The code below was taken from StackOverflow user ISURU
+ * (https://stackoverflow.com/users/3276345/isuru)
+ * as an answer to a question
+ * (https://stackoverflow.com/questions/15570542/determining-the-speed-of-a-vehicle-using-gps-in-android)
+ * by StackOverflow user John Kulova
+ * https://stackoverflow.com/users/1550867/john-kulova
+ * The code is licensed under CC BY-SA 3.0 ( http://creativecommons.org/licenses/by-sa/3.0/ ).
+ *
+ * Minor modifications: 2017 Yanko Georgiev
  */
+
+package com.example.yanko.strokeratecoach.Speed;
 
 import android.location.Location;
 
