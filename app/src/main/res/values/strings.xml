@@ -37,5 +37,4 @@
     <string name="button_create_workout_label">Create Workout</string>
     <string name="empty_data_notification">Skipping phases with empty data</string>
 
-
 </resources>

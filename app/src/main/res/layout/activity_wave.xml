@@ -26,7 +26,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="0dp"
-    tools:context="com.example.yanko.strokeratecoach.WaveActivity">
+    tools:context="com.batyanko.strokeratecoach.WaveActivity">
 
     <ProgressBar
         android:id="@+id/wave_progress_bar_2"

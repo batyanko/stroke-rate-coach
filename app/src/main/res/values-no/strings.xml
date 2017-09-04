@@ -19,4 +19,7 @@
     <string name="changer_button_text">Angi tempo</string>
     <string name="stopper_button_text">Stopp</string>
     <string name="speed_button_text">Hastighet</string>
+    <string name="big_wave_name">Stor Bølge</string>
+    <string name="button_add_phase_label">+ fase</string>
+    <string name="small_wave_name">Liten Bølge</string>
 </resources>

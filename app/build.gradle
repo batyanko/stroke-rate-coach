@@ -4,7 +4,7 @@ android {
     compileSdkVersion 26
     buildToolsVersion "25.0.3"
     defaultConfig {
-        applicationId "com.example.yanko.strokeratecoach"
+        applicationId "com.batyanko.strokeratecoach"
         minSdkVersion 14
         targetSdkVersion 26
         versionCode 1

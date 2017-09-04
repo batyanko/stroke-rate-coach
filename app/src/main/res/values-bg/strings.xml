@@ -19,4 +19,8 @@
     <string name="changer_button_text">Задай темпо</string>
     <string name="stopper_button_text">Стоп</string>
     <string name="speed_button_text">Скорост</string>
+    <string name="big_wave_desc">Голяма вълна от 20 до 60 загребока и обратно до 20.</string>
+    <string name="big_wave_name">Голяма вълна</string>
+    <string name="button_add_phase_label">+ отсечка</string>
+    <string name="small_wave_name">Малка вълна</string>
 </resources>
