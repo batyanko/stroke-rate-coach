@@ -46,6 +46,8 @@ import com.batyanko.strokeratecoach.Utils.SvAdapter;
 import com.batyanko.strokeratecoach.WaveActivity;
 import com.batyanko.strokeratecoach.data.WorkoutContract.PresetEntry1;
 import com.batyanko.strokeratecoach.data.PresetDBHelper;
+import com.batyanko.strokeratecoach.sync.BeeperIntentService;
+import com.batyanko.strokeratecoach.sync.BeeperTasks;
 
 
 /**
@@ -136,6 +138,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
     public void onListItemClick(long clickedItemId, int position, int itemFunction) {
 
         Log.d("BENCH onClick", "START");
+        //TODO get only clicked preset for efficiency
         mCursor = getAllPresets();
 
         if (!mCursor.moveToPosition(position)) {
@@ -182,14 +185,16 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                 sppInts[i] = Integer.parseInt(spp[i]);
             }
 
-            WaveActivity.GEAR_SETTINGS = gearInts;
+            //TODO delete redundant arrays
             WaveActivity.STROKES_PER_PHASE = sppInts;
+            WaveActivity.GEAR_SETTINGS = gearInts;
 
+            startBeeper(sppInts, gearInts);
 
-
-            pref.edit().putInt(WaveActivity.OPERATION_SETTING, workoutType).apply();
+            //TODO delete pref switches previously used to trigger workouts
+/*            pref.edit().putInt(WaveActivity.OPERATION_SETTING, workoutType).apply();
             bool = pref.getBoolean(WaveActivity.SWITCH_SETTING, true);
-            pref.edit().putBoolean(WaveActivity.SWITCH_SETTING, !bool).apply();
+            pref.edit().putBoolean(WaveActivity.SWITCH_SETTING, !bool).apply();*/
         }
         Log.d("BENCH onClick", "FINISH");
     }
@@ -251,9 +256,9 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                                 setSpmFromDigital(0, view);
                             } else if (position == 10) {
                                 //Hit the switch
-                                pref.edit().putInt(WaveActivity.OPERATION_SETTING, WaveActivity.WORKOUT_STOP).apply();
+/*                                pref.edit().putInt(WaveActivity.OPERATION_SETTING, WaveActivity.WORKOUT_STOP).apply();
                                 bool = pref.getBoolean(WaveActivity.SWITCH_SETTING, true);
-                                pref.edit().putBoolean(WaveActivity.SWITCH_SETTING, !bool).apply();
+                                pref.edit().putBoolean(WaveActivity.SWITCH_SETTING, !bool).apply();*/
 
 
 //                                pref.edit().putInt(WaveActivity.OPERATION_SETTING, WaveActivity.WORKOUT_STOP).apply();
@@ -309,7 +314,8 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
             spm = firstDigit * 10 + digitalInput;
 //            spmString = String.valueOf(spm);
 //            Log.d("SpmString / spm: ", spmString + " / " + spm);
-            pref.edit().putInt("spm", spm).apply();
+            int[] gearArray = new int[]{spm};
+            startBeeper(null, gearArray);
 //            startTheTempo();
             firstDigit = 0;
 
@@ -324,6 +330,19 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
 //            ConstraintLayout constraintLayout = (ConstraintLayout) findViewById(R.id.activity_main);
 //            Log.d("Constrai PostCreate???:", "" + constraintLayout.getHeight());
         }
+    }
+
+    public void startBeeper(int[] sppSettings, int[] gearSettings) {
+        Intent intent = new Intent(this.getActivity(), BeeperIntentService.class);
+        intent.setAction(BeeperTasks.ACTION_START_BEEP);
+        intent.putExtra(BeeperTasks.EXTRA_WORKOUT_SPP, sppSettings);
+        intent.putExtra(BeeperTasks.EXTRA_WORKOUT_GEARS, gearSettings);
+        this.getActivity().startService(intent);
+    }
+public void stopBeeper() {
+        Intent intent = new Intent(this.getActivity(), BeeperIntentService.class);
+        intent.setAction(BeeperTasks.ACTION_STOP_BEEP);
+        this.getActivity().startService(intent);
     }
 
     /////////////////

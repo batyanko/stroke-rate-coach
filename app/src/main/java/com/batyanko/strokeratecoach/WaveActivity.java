@@ -35,13 +35,14 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.batyanko.strokeratecoach.Fragments.SlideFragment;
-import com.batyanko.strokeratecoach.Utils.SpmUtilities;
 import com.batyanko.strokeratecoach.sync.BeeperIntentService;
 import com.batyanko.strokeratecoach.sync.BeeperTasks;
 
 import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import static android.text.TextUtils.join;
 
 public class WaveActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -69,6 +70,9 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 
     public static final int DEFAULT_RATE = 22;
     public static final String RATE_KEY = "rate";
+    public static final String TOTAL_STROKES = "total-strokes-in-workout";
+    public static final String TOTAL_STROKES_ELAPSED = "total-strokes-elapsed";
+    public static final String CURRENT_COLOR = "current-phase";
 
     //First digit of spm (Strokes per Minute) used to allow automatic spm
     // initialization upon dialing two digits
@@ -116,6 +120,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 
     static Runnable runForestRun;
 
+    //TODO delete redundant arrays
     public static int[] GEAR_SETTINGS = new int[]{
             40, 50, 60
     };
@@ -124,10 +129,15 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
             3, 3, 3
     };
 
+    public static int[][] PRESET_SETTINGS;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wave);
+
+        Log.d("INTHEBEGINNING", "" + BeeperTasks.spm);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.registerOnSharedPreferenceChangeListener(this);
@@ -146,8 +156,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 
         //Initialize spm at last setting, or default at 22
         pref = PreferenceManager.getDefaultSharedPreferences(this);
-
-        spm = pref.getInt("spm", 22);
+        spm = pref.getInt(SPM_SETTING, 22);
 
         //Initialize UI elements
 
@@ -155,6 +164,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         waveProgress.setVisibility(View.INVISIBLE);
 
         spmTextView = (TextView) findViewById(R.id.SpmTextView_2);
+        spmTextView.setText(String.valueOf(spm));
         progressTextView = (TextView) findViewById(R.id.progressTextView);
 
         toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
@@ -202,9 +212,11 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 
     @Override
     protected void onStart() {
-        startTheTempo();
-        Log.i("Stroke rate at start: ", "" + spm);
+//        startTheTempo();
         super.onStart();
+        if (PRESET_SETTINGS == null) {
+            Log.d("PRESETSETTINGS onStart", "null");
+        }
     }
 
     @Override
@@ -230,7 +242,8 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 
         strokeCount = 0;
 
-        strokeDuration = SpmUtilities.spmToMilis(spm);
+        //TODO cleanup...
+        /*strokeDuration = SpmUtilities.spmToMilis(spm);
 
         try {
             timer.cancel();
@@ -260,11 +273,10 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         timer.scheduleAtFixedRate(timerTask, 1, strokeDuration);
 
         spmString = String.valueOf(spm);
-        spmTextView.setText(spmString);
+        spmTextView.setText(spmString);*/
 
         Intent intent = new Intent(this, BeeperIntentService.class);
         intent.setAction(BeeperTasks.ACTION_START_BEEP);
-        Log.d("WOOSH", "--Regular Stuff--");
         startService(intent);
     }
 
@@ -382,13 +394,13 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
      * Reset the current workout and stop beeping.
      */
     public void endWorkout() {
-        phase = 0;
-        workoutRunning = 0;
+//        phase = 0;
+//        workoutRunning = 0;
         waveProgress.setVisibility(View.INVISIBLE);
         progressTextView.setVisibility(View.INVISIBLE);
 //        spmTextView.setBackgroundResource(0);
         spmTextView.setBackgroundColor(Color.TRANSPARENT);
-        stopTheTempo();
+//        stopTheTempo();
     }
 
 
@@ -422,6 +434,8 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         }
     }
 
+
+
     /**
      * Listen for preference changes from child fragments.
      * Acts as an indirect way to handle UI clicks in child fragments.
@@ -431,28 +445,67 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+        Log.d("WOOSH", "--onSharedPreferenceChanged--");
+
         if (s.equals(SPM_SETTING)) {
-            spm = sharedPreferences.getInt("spm", 22);
-            startTheTempo();
+            spm = sharedPreferences.getInt(SPM_SETTING, 22);
+            spmTextView.setText(String.valueOf(spm));
+//            startTheTempo();
         } else if (s.equals(SWITCH_SETTING)) {
-            switch (sharedPreferences.getInt(OPERATION_SETTING, 0)) {
+            int operation = sharedPreferences.getInt(OPERATION_SETTING, 0);
+            switch (operation) {
                 case WORKOUT_WAVE: {
-                    endWorkout();
-                    workoutRunning = 1;
-                    startTheTempo();
+//                    endWorkout();
+                    workoutRunning = WORKOUT_WAVE;
+                    onProgressChange();
+//                    startTheTempo();
                     break;
                 }
                 case WORKOUT_PROGRESS: {
-                    endWorkout();
-                    workoutRunning = 2;
-                    startTheTempo();
+//                    endWorkout();
+                    workoutRunning = WORKOUT_PROGRESS;
+                    onProgressChange();
+                    Log.d("THATOTHERA WaveActivity", "" + BeeperTasks.spm);
+
+//                    startTheTempo();
                     break;
                 }
-                default: {
+                case WORKOUT_STOP: {
+                    workoutRunning = WORKOUT_STOP;
                     endWorkout();
                     break;
                 }
             }
+        } else if (s.equals(TOTAL_STROKES_ELAPSED)) {
+            onProgressChange();
+//            progressTextView.setText(sharedPreferences.getInt(TOTAL_STROKES_ELAPSED, 0)
+//                    + " / " + sharedPreferences.getInt(TOTAL_STROKES, 0));
+        } else if (s.equals(CURRENT_COLOR)) {
+            Log.d("CURRENTCOLOR?", "" + sharedPreferences.getInt(CURRENT_COLOR, Color.TRANSPARENT));
+            spmTextView.setBackgroundColor(sharedPreferences.getInt(CURRENT_COLOR, Color.TRANSPARENT));
         }
+    }
+
+    //Initialize workout visuals
+    private void onProgressChange() {
+        if (workoutRunning == WORKOUT_STOP) {
+            return;
+        }
+        int[] progress = new int[2];
+        progress[0] = pref.getInt(TOTAL_STROKES_ELAPSED, 0);
+        progress[1] = pref.getInt(TOTAL_STROKES, 0);
+
+        if (progress[0] > progress[1]) {
+            //Take a break :3
+            return;
+        }
+
+        progressTextView.setText(progress[0] + " / " + progress[1]);
+        progressTextView.setVisibility(View.VISIBLE);
+
+        int progressPercent = (int) (((float) progress[0] / (float) progress[1]) * 100);
+        waveProgress.setProgress(progressPercent);
+        waveProgress.setVisibility(View.VISIBLE);
+
     }
 }

@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
- * Modifications Copyright (C) 2017 Yanko Georgiev
+ * Copyright (C) 2017 Yanko Georgiev
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +32,19 @@ public class BeeperIntentService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         String action = intent.getAction();
-        Log.d("WOOSH", "--Otherthreadly Stuff--");
-        BeeperTasks.executeTask(this, action);
+        int[] workoutSpp= intent.getIntArrayExtra(BeeperTasks.EXTRA_WORKOUT_SPP);
+        int[] workoutGeears= intent.getIntArrayExtra(BeeperTasks.EXTRA_WORKOUT_GEARS);
+        if (workoutSpp == null) {
+            Log.d("EXTRAARRAYS", "spp is null");
+        }
+        if (workoutGeears == null) {
+            Log.d("EXTRAARRAYS", "gears is null");
+        } else {
+            Log.d("EXTRAARRAYS", "" + workoutGeears[0]);
+        }
+        Log.d("WOOSH", "-- Here Be Otherthreadly Stuff--");
+        Log.d("HANDLED", "PASsS");
+        BeeperTasks.executeTask(this, action, workoutSpp, workoutGeears);
+        Log.d("HANDLED", "PASsS2");
     }
 }

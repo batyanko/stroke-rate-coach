@@ -19,7 +19,7 @@
     <string name="speed_button_text">speed</string>
     <string name="stopper_button_text">stop</string>
     <!--Depreciated: -->
-    <string name="initial_spm" translatable="false">22</string>
+    <string name="initial_spm" translatable="false">00</string>
     <string name="default_kph">000.0 hours/hour</string>
     <string name="use_metric_units">Use metric units?</string>
     <string name="create_workout_button_label">Create workout</string>
