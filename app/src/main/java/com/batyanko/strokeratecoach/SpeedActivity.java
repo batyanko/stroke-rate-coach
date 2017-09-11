@@ -137,7 +137,7 @@ public class SpeedActivity extends AppCompatActivity implements IBaseGpsListener
     @Override
     public void onLocationChanged(Location location) {
         // TODO Auto-generated method stub
-        Log.d("Location changed? ", "Yeeees");
+        Log.d("UPDATESPEED? ", "SpeedActivity");
         toneGen2.startTone(ToneGenerator.TONE_CDMA_EMERGENCY_RINGBACK, 150);
         if (location != null) {
             CLocation myLocation = new CLocation(location, this.useMetricUnits());

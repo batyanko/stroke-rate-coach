@@ -18,12 +18,14 @@ package com.batyanko.strokeratecoach;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.constraint.ConstraintLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
@@ -35,7 +37,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.batyanko.strokeratecoach.Fragments.SlideFragment;
-import com.batyanko.strokeratecoach.sync.BeeperIntentService;
+import com.batyanko.strokeratecoach.sync.BeeperService;
 import com.batyanko.strokeratecoach.sync.BeeperTasks;
 
 import java.util.Arrays;
@@ -66,13 +68,14 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     public static final int SPP_UNIT_SECONDS = 1;
     public static final int SPP_UNIT_METERS = 2;
 
-
+    public static final int MY_LOCATION_PERMISSION = 22;
 
     public static final int DEFAULT_RATE = 22;
     public static final String RATE_KEY = "rate";
-    public static final String TOTAL_STROKES = "total-strokes-in-workout";
-    public static final String TOTAL_STROKES_ELAPSED = "total-strokes-elapsed";
+    public static final String TOTAL_WORKOUT_LENGTH = "total-strokes-in-workout";
+    public static final String TOTAL_PROGRESS_ELAPSED = "total-strokes-elapsed";
     public static final String CURRENT_COLOR = "current-phase";
+    public static final String CURRENT_SPEED = "current-speed";
 
     //First digit of spm (Strokes per Minute) used to allow automatic spm
     // initialization upon dialing two digits
@@ -208,12 +211,24 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
             }
         };
 
+
+        PackageManager manager = getPackageManager();
+        int permission = manager.checkPermission("android.permission.ACCESS_FINE_LOCATION",
+                "com.batyanko.strokeratecoach");
+        boolean hasPermission = (permission == manager.PERMISSION_GRANTED);
+//
+        if (!hasPermission) {
+            Log.d("I CAN HAZ PERMISSION?", "NO!");
+            ActivityCompat.requestPermissions(this,
+                    new String[]{"android.permission.ACCESS_FINE_LOCATION"}, MY_LOCATION_PERMISSION);
+        }
     }
 
     @Override
     protected void onStart() {
 //        startTheTempo();
         super.onStart();
+        onProgressChange();
         if (PRESET_SETTINGS == null) {
             Log.d("PRESETSETTINGS onStart", "null");
         }
@@ -275,7 +290,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         spmString = String.valueOf(spm);
         spmTextView.setText(spmString);*/
 
-        Intent intent = new Intent(this, BeeperIntentService.class);
+        Intent intent = new Intent(this, BeeperService.class);
         intent.setAction(BeeperTasks.ACTION_START_BEEP);
         startService(intent);
     }
@@ -298,6 +313,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     }
 
     //TODO delete wave method, waves are currently saved in Progress format
+
     /**
      * Initiate a wave type of workout according to the active workout settings.
      */
@@ -370,6 +386,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 
     /**
      * Initiate workout phase.
+     *
      * @param lengthTrigger phase length
      * @param spm           strokes per minute
      */
@@ -386,7 +403,8 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         int progress = (int) (((float) phase / (float) phasesTotal) * 100);
         waveProgress.setProgress(progress);
         if (phase == phasesTotal) {
-            workoutRunning = 9;}
+            workoutRunning = 9;
+        }
         startTheTempo();
     }
 
@@ -399,16 +417,19 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         waveProgress.setVisibility(View.INVISIBLE);
         progressTextView.setVisibility(View.INVISIBLE);
 //        spmTextView.setBackgroundResource(0);
+        spmTextView.setText("0");
         spmTextView.setBackgroundColor(Color.TRANSPARENT);
 //        stopTheTempo();
     }
 
 
     //TODO delete redundant method, already used from SlideFragment
+
     /**
      * Handle digit input and set the spm accordingly.
-     * @param digitalInput  digit input
-     * @param view          reference to the view that represents the digit
+     *
+     * @param digitalInput digit input
+     * @param view         reference to the view that represents the digit
      */
     public void setSpmFromDigital(int digitalInput, View view) {
         if (firstDigit != 0) {
@@ -435,10 +456,10 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     }
 
 
-
     /**
      * Listen for preference changes from child fragments.
      * Acts as an indirect way to handle UI clicks in child fragments.
+     *
      * @param sharedPreferences a SharedPreferences that was changed
      * @param s                 key for the changed preference
      */
@@ -476,36 +497,54 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
                     break;
                 }
             }
-        } else if (s.equals(TOTAL_STROKES_ELAPSED)) {
+        } else if (s.equals(TOTAL_PROGRESS_ELAPSED)) {
             onProgressChange();
-//            progressTextView.setText(sharedPreferences.getInt(TOTAL_STROKES_ELAPSED, 0)
-//                    + " / " + sharedPreferences.getInt(TOTAL_STROKES, 0));
+//            progressTextView.setText(sharedPreferences.getInt(TOTAL_PROGRESS_ELAPSED, 0)
+//                    + " / " + sharedPreferences.getInt(TOTAL_WORKOUT_LENGTH, 0));
         } else if (s.equals(CURRENT_COLOR)) {
-            Log.d("CURRENTCOLOR?", "" + sharedPreferences.getInt(CURRENT_COLOR, Color.TRANSPARENT));
             spmTextView.setBackgroundColor(sharedPreferences.getInt(CURRENT_COLOR, Color.TRANSPARENT));
+        } else if (s.equals(TOTAL_PROGRESS_ELAPSED)) {
+            String currentDistance =
+                    sharedPreferences.getFloat(TOTAL_PROGRESS_ELAPSED, 42) +
+                            " / " +
+                            pref.getInt(TOTAL_WORKOUT_LENGTH, 0) +
+                            " at " +
+                            pref.getInt(CURRENT_SPEED, 0) +
+                            " kph";
+            progressTextView.setText(currentDistance);
+            progressTextView.setVisibility(View.VISIBLE);
         }
     }
 
     //Initialize workout visuals
     private void onProgressChange() {
+        Log.d("TEHPREFCOLOR", "onProgressChange");
         if (workoutRunning == WORKOUT_STOP) {
             return;
         }
         int[] progress = new int[2];
-        progress[0] = pref.getInt(TOTAL_STROKES_ELAPSED, 0);
-        progress[1] = pref.getInt(TOTAL_STROKES, 0);
+        progress[0] = pref.getInt(TOTAL_PROGRESS_ELAPSED, 0);
+        Log.d("TEHPREFCOLOR", "prog0 " + progress[0]);
+        progress[1] = pref.getInt(TOTAL_WORKOUT_LENGTH, 0);
+        Log.d("TEHPREFCOLOR", "prog1 " + progress[1]);
 
         if (progress[0] > progress[1]) {
             //Take a break :3
             return;
         }
 
-        progressTextView.setText(progress[0] + " / " + progress[1]);
+        progressTextView.setText(progress[0] +
+                " / " + progress[1] +
+                " at " +
+                pref.getFloat(CURRENT_SPEED, 0) +
+                " m/s");
         progressTextView.setVisibility(View.VISIBLE);
 
         int progressPercent = (int) (((float) progress[0] / (float) progress[1]) * 100);
         waveProgress.setProgress(progressPercent);
         waveProgress.setVisibility(View.VISIBLE);
+        Log.d("TEHPREFCOLOR", "" + pref.getInt(CURRENT_COLOR, Color.TRANSPARENT));
+        spmTextView.setBackgroundColor(pref.getInt(CURRENT_COLOR, Color.TRANSPARENT));
 
     }
 }

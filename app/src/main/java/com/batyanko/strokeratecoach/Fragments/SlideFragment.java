@@ -46,7 +46,7 @@ import com.batyanko.strokeratecoach.Utils.SvAdapter;
 import com.batyanko.strokeratecoach.WaveActivity;
 import com.batyanko.strokeratecoach.data.WorkoutContract.PresetEntry1;
 import com.batyanko.strokeratecoach.data.PresetDBHelper;
-import com.batyanko.strokeratecoach.sync.BeeperIntentService;
+import com.batyanko.strokeratecoach.sync.BeeperService;
 import com.batyanko.strokeratecoach.sync.BeeperTasks;
 
 
@@ -165,12 +165,14 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
             Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
 
         } else if (itemFunction == WaveActivity.ENGAGE_WORKOUT_FUNCTION) {
-            final int workoutType =
-                    mCursor.getInt(mCursor.getColumnIndex(PresetEntry1.COLUMN_WORKOUT_TYPE));
-            final String gearCSV =  mCursor.getString(mCursor.getColumnIndex(PresetEntry1.COLUMN_GEARS_CSV));
+            final int sppType =
+                    mCursor.getInt(mCursor.getColumnIndex(PresetEntry1.COLUMN_SPP_TYPE));
+            final String gearCSV = mCursor.getString(mCursor.getColumnIndex(PresetEntry1.COLUMN_GEARS_CSV));
             final String sppCSV = mCursor.getString(mCursor.getColumnIndex(PresetEntry1.COLUMN_SPP_CSV));
             final String[] gears = gearCSV.split("\\s*,\\s*");
             final String[] spp = sppCSV.split("\\s*,\\s*");
+
+            Log.d("SPPTYPEFROMDB", "" + sppType);
 
             //Number of phases must match number of gears
             if (gears.length != spp.length) {
@@ -179,8 +181,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
 
             int[] gearInts = new int[gears.length];
             int[] sppInts = new int[gears.length];
-            for (int i = 0; i < gearInts.length; i++)
-            {
+            for (int i = 0; i < gearInts.length; i++) {
                 gearInts[i] = Integer.parseInt(gears[i]);
                 sppInts[i] = Integer.parseInt(spp[i]);
             }
@@ -189,7 +190,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
             WaveActivity.STROKES_PER_PHASE = sppInts;
             WaveActivity.GEAR_SETTINGS = gearInts;
 
-            startBeeper(sppInts, gearInts);
+            startBeeper(sppInts, gearInts, sppType);
 
             //TODO delete pref switches previously used to trigger workouts
 /*            pref.edit().putInt(WaveActivity.OPERATION_SETTING, workoutType).apply();
@@ -303,7 +304,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
 
         @Override
         public void destroyItem(ViewGroup container, int position, Object object) {
-            container.removeView(   (View) object);
+            container.removeView((View) object);
         }
     }
 
@@ -315,7 +316,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
 //            spmString = String.valueOf(spm);
 //            Log.d("SpmString / spm: ", spmString + " / " + spm);
             int[] gearArray = new int[]{spm};
-            startBeeper(null, gearArray);
+            startBeeper(null, gearArray, BeeperTasks.SPP_TYPE_STROKES);
 //            startTheTempo();
             firstDigit = 0;
 
@@ -332,15 +333,17 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         }
     }
 
-    public void startBeeper(int[] sppSettings, int[] gearSettings) {
-        Intent intent = new Intent(this.getActivity(), BeeperIntentService.class);
+    public void startBeeper(int[] sppSettings, int[] gearSettings, int sppType) {
+        Intent intent = new Intent(this.getActivity(), BeeperService.class);
         intent.setAction(BeeperTasks.ACTION_START_BEEP);
         intent.putExtra(BeeperTasks.EXTRA_WORKOUT_SPP, sppSettings);
         intent.putExtra(BeeperTasks.EXTRA_WORKOUT_GEARS, gearSettings);
+        intent.putExtra(BeeperTasks.EXTRA_WORKOUT_SPP_TYPE, sppType);
         this.getActivity().startService(intent);
     }
-public void stopBeeper() {
-        Intent intent = new Intent(this.getActivity(), BeeperIntentService.class);
+
+    public void stopBeeper() {
+        Intent intent = new Intent(this.getActivity(), BeeperService.class);
         intent.setAction(BeeperTasks.ACTION_STOP_BEEP);
         this.getActivity().startService(intent);
     }
