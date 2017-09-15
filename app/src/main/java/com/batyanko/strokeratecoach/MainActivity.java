@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
     /* Global spm setting to hold current spm */
     public static int spm;
 
-    //Variables used in beeping timer setup
+    //Variables used in beeping workoutTimer setup
     long strokeDuration;
     String spmString;
     ToneGenerator toneGen1;

@@ -24,7 +24,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import com.batyanko.strokeratecoach.R;
-import com.batyanko.strokeratecoach.WaveActivity;
+import com.batyanko.strokeratecoach.sync.BeeperTasks;
 
 import static com.batyanko.strokeratecoach.data.WorkoutContract.*;
 
@@ -47,18 +47,16 @@ public class PresetDBHelper extends SQLiteOpenHelper {
         mContext = context;
     }
 
-    //TODO Make some NOT NULL
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         final String SQL_CREATE_PRESET_TABLE = "CREATE TABLE " + PresetEntry1.TABLE_NAME + " (" +
                 PresetEntry1._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-                PresetEntry1.COLUMN_NAME + " TEXT NOT NULL, " +
-                PresetEntry1.COLUMN_DESC + " TEXT DEFAULT 'No description.', " +
+                PresetEntry1.COLUMN_NAME + " TEXT DEFAULT 'Untitled', " +
+                PresetEntry1.COLUMN_DESC + " TEXT DEFAULT 'No description', " +
                 PresetEntry1.COLUMN_TIMESTAMP + " INTEGER DEFAULT CURRENT_TIMESTAMP, " +
-                PresetEntry1.COLUMN_WORKOUT_TYPE + " INTEGER, " +
-                PresetEntry1.COLUMN_SPP_TYPE + " INTEGER, " +
-                PresetEntry1.COLUMN_SPP_CSV + " TEXT, " +
-                PresetEntry1.COLUMN_GEARS_CSV + " TEXT" +
+                PresetEntry1.COLUMN_SPP_TYPE + " INTEGER DEFAULT 0, " +
+                PresetEntry1.COLUMN_SPP_CSV + " TEXT NOT NULL, " +
+                PresetEntry1.COLUMN_GEARS_CSV + " TEXT NOT NULL" +
                 "); ";
 
         //Initialize with factory presets
@@ -69,8 +67,7 @@ public class PresetDBHelper extends SQLiteOpenHelper {
                 mContext.getString(R.string.small_wave_desc),
                 mContext.getString(R.string.small_wave_spp),
                 mContext.getString(R.string.small_wave_gears),
-                WaveActivity.WORKOUT_PROGRESS,
-                WaveActivity.SPP_UNIT_STROKES
+                BeeperTasks.SPP_TYPE_STROKES
                 );
 
         addPreset(sqLiteDatabase,
@@ -79,8 +76,7 @@ public class PresetDBHelper extends SQLiteOpenHelper {
                 mContext.getString(R.string.big_wave_spp),
                 mContext.getString(R.string.big_wave_gears),
 
-                WaveActivity.WORKOUT_PROGRESS,
-                WaveActivity.SPP_UNIT_STROKES
+                BeeperTasks.SPP_TYPE_STROKES
         );
 
         addPreset(sqLiteDatabase,
@@ -88,8 +84,7 @@ public class PresetDBHelper extends SQLiteOpenHelper {
                 mContext.getString(R.string.progress50_desc),
                 mContext.getString(R.string.progress50_spp),
                 mContext.getString(R.string.progress50_gears),
-                WaveActivity.WORKOUT_PROGRESS,
-                WaveActivity.SPP_UNIT_STROKES
+                BeeperTasks.SPP_TYPE_METERS
         );
 
         Log.d("SQLite BENCH", "FINISH");
@@ -108,14 +103,13 @@ public class PresetDBHelper extends SQLiteOpenHelper {
     }
 
     private long addPreset(SQLiteDatabase db, String name, String description,
-                          String spp, String gears, int workoutType, int sppType) {
+                          String spp, String gears, int sppType) {
         ContentValues cv = new ContentValues();
         cv.put(PresetEntry1.COLUMN_NAME, name);
         cv.put(PresetEntry1.COLUMN_DESC, description);
         cv.put(PresetEntry1.COLUMN_SPP_CSV, spp);
         cv.put(PresetEntry1.COLUMN_GEARS_CSV, gears);
 //        cv.put(PresetEntry1.COLUMN_TIMESTAMP, time);
-        cv.put(PresetEntry1.COLUMN_WORKOUT_TYPE, workoutType);
         cv.put(PresetEntry1.COLUMN_SPP_TYPE, sppType);
         return db.insert(PresetEntry1.TABLE_NAME, null, cv);
     }

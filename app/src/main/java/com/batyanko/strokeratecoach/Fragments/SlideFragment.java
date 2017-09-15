@@ -172,10 +172,9 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
             final String[] gears = gearCSV.split("\\s*,\\s*");
             final String[] spp = sppCSV.split("\\s*,\\s*");
 
-            Log.d("SPPTYPEFROMDB", "" + sppType);
-
             //Number of phases must match number of gears
             if (gears.length != spp.length) {
+                Log.w(WaveActivity.TAG, "Gears count doesn't match SPP count");
                 return;
             }
 
@@ -186,16 +185,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                 sppInts[i] = Integer.parseInt(spp[i]);
             }
 
-            //TODO delete redundant arrays
-            WaveActivity.STROKES_PER_PHASE = sppInts;
-            WaveActivity.GEAR_SETTINGS = gearInts;
-
             startBeeper(sppInts, gearInts, sppType);
-
-            //TODO delete pref switches previously used to trigger workouts
-/*            pref.edit().putInt(WaveActivity.OPERATION_SETTING, workoutType).apply();
-            bool = pref.getBoolean(WaveActivity.SWITCH_SETTING, true);
-            pref.edit().putBoolean(WaveActivity.SWITCH_SETTING, !bool).apply();*/
         }
         Log.d("BENCH onClick", "FINISH");
     }
@@ -256,6 +246,8 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                             } else if (position == 9) {
                                 setSpmFromDigital(0, view);
                             } else if (position == 10) {
+                                Log.d("TEHACTION", "STOP?");
+                                stopBeeper();
                                 //Hit the switch
 /*                                pref.edit().putInt(WaveActivity.OPERATION_SETTING, WaveActivity.WORKOUT_STOP).apply();
                                 bool = pref.getBoolean(WaveActivity.SWITCH_SETTING, true);
@@ -289,15 +281,8 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                     view = getActivity().getLayoutInflater().inflate(R.layout.fragment_dial, container, false);
                 }
             }
-            /*
-            View view = getActivity().getLayoutInflater().inflate(R.layout.teh_content, container, false);
-                     */
 
             container.addView(view);
-
-/*            TextView textView = (TextView) getActivity().findViewById(R.id.text_content);
-            textView.setText(String.valueOf(position));*/
-
 
             return view;
         }
@@ -310,14 +295,10 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
 
     public void setSpmFromDigital(int digitalInput, View view) {
         if (firstDigit != 0) {
-//            endWorkout();
             firstDigitView.setBackgroundColor(Color.TRANSPARENT);
             spm = firstDigit * 10 + digitalInput;
-//            spmString = String.valueOf(spm);
-//            Log.d("SpmString / spm: ", spmString + " / " + spm);
             int[] gearArray = new int[]{spm};
             startBeeper(null, gearArray, BeeperTasks.SPP_TYPE_STROKES);
-//            startTheTempo();
             firstDigit = 0;
 
         } else {

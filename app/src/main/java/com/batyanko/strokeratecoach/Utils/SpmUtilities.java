@@ -16,8 +16,8 @@ public class SpmUtilities {
     private long strokeDuration;
 
     ToneGenerator toneGen1;
-    Timer timer;
-    TimerTask timerTask;
+    Timer workoutTimer;
+    TimerTask workoutTimerTask;
 
     private static int strokeCountTrigger = 0;
 
@@ -29,22 +29,21 @@ public class SpmUtilities {
         strokeDuration = SpmUtilities.spmToMilis(spm);
 
         try {
-            timer.cancel();
-            timerTask.cancel();
+            workoutTimer.cancel();
+            workoutTimerTask.cancel();
         } catch (IllegalStateException e) {
             Log.d("Exception", "Cancelled or scheduled");
         } catch (NullPointerException e) {
             Log.d("Exception", "Null pointer");
         }
 
-        timerTask = new TimerTask() {
+        workoutTimerTask = new TimerTask() {
             @Override
             public void run() {
                 toneGen1.startTone(ToneGenerator.TONE_CDMA_EMERGENCY_RINGBACK, 150);
                 strokeCount++;
                 if (strokeCountTrigger > 0 && strokeCount >= strokeCountTrigger) {
                     cancel();
-                    //TODO: Only change views on the UI thread
                     new Runnable() {
                         @Override
                         public void run() {
@@ -55,8 +54,8 @@ public class SpmUtilities {
             }
         };
 
-        timer = new java.util.Timer();
-        timer.scheduleAtFixedRate(timerTask, 1, strokeDuration);
+        workoutTimer = new java.util.Timer();
+        workoutTimer.scheduleAtFixedRate(workoutTimerTask, 1, strokeDuration);
 
         spmString = String.valueOf(spm);
         textView.setText(spmString);
@@ -66,10 +65,9 @@ public class SpmUtilities {
 
     public void setSpmFromDigital(int digitalInput, View view) {
         if (firstDigit != 0) {
-            MainActivity.endWorkout();
+            MainActivity.resetGUI();
             firstDigitView.setBackgroundColor(Color.TRANSPARENT);
             spm = firstDigit * 10 + digitalInput;
-            //TODO: make startTheTempo() use spm instead spmString
 //            spmString = String.valueOf(spm);
 //            Log.d("SpmString / spm: ", spmString + " / " + spm);
             pref.edit().putInt("spm", spm).apply();

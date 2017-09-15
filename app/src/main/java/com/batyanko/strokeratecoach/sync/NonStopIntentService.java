@@ -1,4 +1,14 @@
-//TODO kudos to https://stackoverflow.com/questions/6841212/can-an-intentservice-run-indefinitely
+/*
+ * The code below was taken from StackOverflow user Graeme
+ * (https://stackoverflow.com/users/726954/graeme)
+ * as an answer to a question
+ * (https://stackoverflow.com/questions/6841212/can-an-intentservice-run-indefinitely)
+ * by StackOverflow user Pathy
+ * (https://stackoverflow.com/users/864937/pathy)
+ * The code is licensed under CC BY-SA 3.0 ( http://creativecommons.org/licenses/by-sa/3.0/ ).
+ *
+ * Minor modifications: 2017 Yanko Georgiev
+ */
 
 package com.batyanko.strokeratecoach.sync;
 

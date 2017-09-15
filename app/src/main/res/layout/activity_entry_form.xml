@@ -22,33 +22,78 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <LinearLayout
+    <LinearLayout xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/entry_layout"
-        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         tools:context="com.batyanko.strokeratecoach.EntryFormActivity">
 
         <TextView
-            android:text="@string/workout_name_title"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:text="@string/workout_unit_choose_title"
+            />
+
+        <RadioGroup
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <android.support.v7.widget.AppCompatRadioButton
+                android:id="@+id/radio_strokes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/holo_green_light"
+                android:layout_weight="1"
+                android:onClick="onRadioButtonClicked"
+                android:text="@string/strokes" />
+
+            <android.support.v7.widget.AppCompatRadioButton
+                android:id="@+id/radio_meters"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/holo_orange_light"
+                android:layout_weight="1"
+                android:onClick="onRadioButtonClicked"
+                android:text="@string/meters" />
+
+            <android.support.v7.widget.AppCompatRadioButton
+                android:id="@+id/radio_seconds"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/holo_blue_light"
+                android:layout_weight="1"
+                android:onClick="onRadioButtonClicked"
+                android:text="@string/seconds" />
+
+        </RadioGroup>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/workout_name_title" />
+
         <EditText
             android:id="@+id/workout_name_et"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType=""
+            android:inputType="text|textCapWords"
 
             />
+
         <TextView
-            android:text="@string/workout_desc_tooltip"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:text="@string/workout_desc_tooltip" />
+
         <EditText
             android:id="@+id/workout_desc_et"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:inputType="text|textCapSentences" />
+
         <LinearLayout
             android:id="@+id/layout_dynamic"
             android:layout_width="match_parent"
