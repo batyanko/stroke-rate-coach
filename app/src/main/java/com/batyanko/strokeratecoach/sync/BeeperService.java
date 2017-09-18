@@ -21,20 +21,51 @@ package com.batyanko.strokeratecoach.sync;
  */
 
 import android.content.Intent;
+import android.location.LocationManager;
+import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
 public class BeeperService extends NonStopIntentService {
 
+    BeeperTasks beeperTasks;
+
     public BeeperService() {
         super("BeeperService");
+    }
+
+    public class BeeperBinder extends Binder {
+        public BeeperService getService() {
+            return BeeperService.this;
+        }
+    }
+
+    public void doEpicShit(Intent intent) {
+        if (intent == null || intent.getAction() == null) {
+            return;
+        }
+        String action = intent.getAction();
+        if (beeperTasks == null) {
+            beeperTasks = new BeeperTasks();
+        }
+        int[] workoutSpp = intent.getIntArrayExtra(BeeperTasks.EXTRA_WORKOUT_SPP);
+        int[] workoutGears = intent.getIntArrayExtra(BeeperTasks.EXTRA_WORKOUT_GEARS);
+        int sppType = intent.getIntExtra(BeeperTasks.EXTRA_WORKOUT_SPP_TYPE, 1);
+
+        beeperTasks.executeTask(this, action, workoutSpp, workoutGears, sppType);
+    }
+
+    public void stopShit(Intent intent) {
+
     }
 
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return mBinder;
     }
+
+    private final IBinder mBinder = new BeeperBinder();
 
     @Override
     protected void onHandleIntent(Intent intent) {
@@ -42,7 +73,7 @@ public class BeeperService extends NonStopIntentService {
             return;
         }
         String action = intent.getAction();
-        BeeperTasks beeperTasks = new BeeperTasks();
+        beeperTasks = new BeeperTasks();
         int[] workoutSpp = intent.getIntArrayExtra(BeeperTasks.EXTRA_WORKOUT_SPP);
         int[] workoutGears = intent.getIntArrayExtra(BeeperTasks.EXTRA_WORKOUT_GEARS);
         int sppType = intent.getIntExtra(BeeperTasks.EXTRA_WORKOUT_SPP_TYPE, 1);

@@ -120,7 +120,7 @@ public class EntryFormActivity extends AppCompatActivity {
                 ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         LinearLayout.LayoutParams pVertical = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        pHorizontal.width = 250;
+        pHorizontal.width = 300;
 
         if (ll != null && lb != null) {
             ll.removeView(lb);
@@ -135,7 +135,7 @@ public class EntryFormActivity extends AppCompatActivity {
         ll.addView(ld);
 
         //Add TextView title for SPP field
-        String SPPTitle = (numberOfLines + ": ");
+        String SPPTitle = (" " + numberOfLines + ": ");
         TextView SPPTitleView = new TextView(this);
         SPPTitleView.setLayoutParams(pHorizontalWrap);
         SPPTitleView.setText(SPPTitle);

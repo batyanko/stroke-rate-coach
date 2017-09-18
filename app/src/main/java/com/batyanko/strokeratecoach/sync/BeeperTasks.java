@@ -92,10 +92,11 @@ public class BeeperTasks {
 
     private Location startingLocation;
     private Location currentLocation;
-    private TehLocListener locListener;
     private static float currentSpeed;
     private static float locationAccuracy;
     private static final float ACCEPTABLE_ACCURACY = 21;
+    private TehLocListener locListener;
+    private LocationManager locationManager;
 
     private long startTime = System.currentTimeMillis();
     private int timerProgress;
@@ -103,6 +104,7 @@ public class BeeperTasks {
     void executeTask(BeeperService beeperService, String action,
                      int[] sppSettings, int[] gearSettings, int sppType) {
         if (action.equals(ACTION_START_BEEP)) {
+            pref = PreferenceManager.getDefaultSharedPreferences(beeperService);
             mSppType = sppType;
             initBeeper();
 
@@ -161,7 +163,6 @@ public class BeeperTasks {
     }
 
     private void startTheTempo(final BeeperService beeperService) {
-        pref = PreferenceManager.getDefaultSharedPreferences(beeperService);
         pref.edit().putInt(WaveActivity.SPM_SETTING, spm).apply();
         phaseProgress = 0;
 
@@ -285,8 +286,15 @@ public class BeeperTasks {
 
         pref = PreferenceManager.getDefaultSharedPreferences(beeperService);
         pref.edit().putInt(WaveActivity.OPERATION_SETTING, workoutRunning).apply();
+
+        pref.edit().putInt(WaveActivity.SPM_SETTING, 0).apply();
+
         Boolean bool = pref.getBoolean(WaveActivity.SWITCH_SETTING, true);
         pref.edit().putBoolean(WaveActivity.SWITCH_SETTING, !bool).apply();
+
+        Log.d("LOCSS", "Initialized.");
+        locationManager.removeUpdates(locListener);
+        locationManager = null;
 
         beeperService.stopSelf();
     }
@@ -356,9 +364,9 @@ public class BeeperTasks {
         startTheTempo(beeperService);
     }
 
-    private void initLocation(Context context) {
+    private void initLocation(BeeperService beeperService) {
 
-        PackageManager manager = context.getPackageManager();
+        PackageManager manager = beeperService.getPackageManager();
         int permission = manager.checkPermission("android.permission.ACCESS_FINE_LOCATION", "com.batyanko.strokeratecoach");
         boolean hasPermission = (permission == PackageManager.PERMISSION_GRANTED);
 //
@@ -367,15 +375,14 @@ public class BeeperTasks {
             return;
         }
 
-        LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-        locListener = new TehLocListener(context);
+        locationManager = (LocationManager) beeperService.getSystemService(Context.LOCATION_SERVICE);
+        locListener = new TehLocListener(beeperService);
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 200, 1, locListener);
-
-        //locListener.updateDistance(null);
+        Log.d("LOCSS", "Initialized.");
 
     }
 
-    private class TehLocListener implements IBaseGpsListener {
+    public class TehLocListener implements IBaseGpsListener {
 
         Context context;
 

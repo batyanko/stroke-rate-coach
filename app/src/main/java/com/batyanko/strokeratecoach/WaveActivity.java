@@ -16,12 +16,17 @@
 
 package com.batyanko.strokeratecoach;
 
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.renderscript.ScriptGroup;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -31,8 +36,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.batyanko.strokeratecoach.Fragments.SlideFragment;
+import com.batyanko.strokeratecoach.sync.BeeperService;
 import com.batyanko.strokeratecoach.sync.BeeperTasks;
 
 public class WaveActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -78,6 +85,9 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     public static int windowWidth;
     public static int windowHeight;
     public static int statusbarHeight;
+
+    private static BeeperService mBeeperService;
+    private static boolean mIsBound;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -158,7 +168,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     public void resetGUI() {
         waveProgress.setVisibility(View.INVISIBLE);
         progressTextView.setVisibility(View.INVISIBLE);
-        spmTextView.setText("0");
+//        spmTextView.setText("0");
         spmTextView.setBackgroundColor(Color.TRANSPARENT);
     }
 
@@ -176,7 +186,6 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         if (s.equals(SPM_SETTING)) {
             spm = sharedPreferences.getInt(SPM_SETTING, 22);
             spmTextView.setText(String.valueOf(spm));
-//            startTheTempo();
         } else if (s.equals(SWITCH_SETTING)) {
             int operation = sharedPreferences.getInt(OPERATION_SETTING, 0);
             switch (operation) {
@@ -226,4 +235,6 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         waveProgress.setVisibility(View.VISIBLE);
         spmTextView.setBackgroundColor(pref.getInt(CURRENT_COLOR, Color.TRANSPARENT));
     }
+
+
 }

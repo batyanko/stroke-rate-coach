@@ -17,12 +17,17 @@
 
 package com.batyanko.strokeratecoach.Fragments;
 
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -75,6 +80,10 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
 
     ViewGroup viewGroup;
 
+    private boolean mIsBound;
+    private BeeperService mBeeperService;
+    private Intent intent;
+
     public SlideFragment() {
         // Required empty public constructor
     }
@@ -86,6 +95,8 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         // Inflate the layout for this fragment
 
         pref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        intent = new Intent(this.getActivity(), BeeperService.class);
+//        doBindService(intent);
 
         dialAdapter = new DialGridAdapter(getContext());
 
@@ -243,6 +254,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
 
                             if (position < 9) {
                                 setSpmFromDigital(position + 1, view);
+                                Toast.makeText(getContext(), mBeeperService.toString(), Toast.LENGTH_SHORT).show();
                             } else if (position == 9) {
                                 setSpmFromDigital(0, view);
                             } else if (position == 10) {
@@ -256,8 +268,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
 
 //                                pref.edit().putInt(WaveActivity.OPERATION_SETTING, WaveActivity.WORKOUT_STOP).apply();
                             } else if (position == 11) {
-                                Intent intent = new Intent(getActivity(), SpeedActivity.class);
-                                startActivity(intent);
+                                stopBeeper();
                             }
                                 /* else if (position == 12) {
                                 Intent intent = new Intent(WaveActivity.this, Activity.class);
@@ -315,18 +326,48 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
     }
 
     public void startBeeper(int[] sppSettings, int[] gearSettings, int sppType) {
-        Intent intent = new Intent(this.getActivity(), BeeperService.class);
         intent.setAction(BeeperTasks.ACTION_START_BEEP);
         intent.putExtra(BeeperTasks.EXTRA_WORKOUT_SPP, sppSettings);
         intent.putExtra(BeeperTasks.EXTRA_WORKOUT_GEARS, gearSettings);
         intent.putExtra(BeeperTasks.EXTRA_WORKOUT_SPP_TYPE, sppType);
         this.getActivity().startService(intent);
+        doBindService(intent);
+//        mBeeperService.doEpicShit(intent);
+//        mBeeperService.doEpicShit(intent);
     }
 
+    //TODO Stop running service, instead of creating a new one
     public void stopBeeper() {
-        Intent intent = new Intent(this.getActivity(), BeeperService.class);
+//        Intent intent = new Intent(this.getActivity(), BeeperService.class);
         intent.setAction(BeeperTasks.ACTION_STOP_BEEP);
-        this.getActivity().startService(intent);
+        mBeeperService.doEpicShit(intent);
+    }
+
+    //Binding BeeperService
+    private ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            mBeeperService = ((BeeperService.BeeperBinder)iBinder).getService();
+            Toast.makeText(getContext(), "Bound!", Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            mBeeperService = null;
+            Toast.makeText(getContext(), "Unbound", Toast.LENGTH_SHORT).show();
+        }
+    };
+
+    public void doBindService(Intent intent) {
+        getActivity().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        mIsBound = true;
+    }
+
+    public void doUnbindService() {
+        if (mIsBound) {
+            getActivity().unbindService(mConnection);
+            mIsBound = false;
+        }
     }
 
     /////////////////

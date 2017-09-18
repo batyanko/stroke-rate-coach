@@ -32,7 +32,10 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
+            android:textSize="16sp"
+            android:textColor="@android:color/black"
+            android:background="@color/colorAccent"
+            android:padding="3dp"
             android:text="@string/workout_unit_choose_title"
             />
 
