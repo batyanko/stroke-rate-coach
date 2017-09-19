@@ -32,7 +32,7 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.batyanko.strokeratecoach.data.PresetDBHelper;
+import com.batyanko.strokeratecoach.data.WorkoutDBHelper;
 import com.batyanko.strokeratecoach.data.WorkoutContract;
 import com.batyanko.strokeratecoach.sync.BeeperTasks;
 
@@ -72,8 +72,8 @@ public class EntryFormActivity extends AppCompatActivity {
         sppEditTexts = new ArrayList<>();
         gearEditTexts = new ArrayList<>();
 
-        PresetDBHelper dbHelper = new PresetDBHelper(this);
-        mDb = dbHelper.getWritableDatabase();
+        WorkoutDBHelper presetDbHelper = new WorkoutDBHelper(this);
+        mDb = presetDbHelper.getWritableDatabase();
 
         radioStrokes = findViewById(R.id.radio_strokes);
         radioMeters = findViewById(R.id.radio_meters);
@@ -272,13 +272,13 @@ public class EntryFormActivity extends AppCompatActivity {
     private long addPreset(SQLiteDatabase db, String name, String description,
                            String spp, String gears, int sppType) {
         ContentValues cv = new ContentValues();
-        cv.put(WorkoutContract.PresetEntry1.COLUMN_NAME, name);
-        cv.put(WorkoutContract.PresetEntry1.COLUMN_DESC, description);
-        cv.put(WorkoutContract.PresetEntry1.COLUMN_SPP_CSV, spp);
-        cv.put(WorkoutContract.PresetEntry1.COLUMN_GEARS_CSV, gears);
-//        cv.put(PresetEntry1.COLUMN_TIMESTAMP, time);
-        cv.put(WorkoutContract.PresetEntry1.COLUMN_SPP_TYPE, sppType);
-        return db.insert(WorkoutContract.PresetEntry1.TABLE_NAME, null, cv);
+        cv.put(WorkoutContract.WorkoutEntry1.COLUMN_NAME, name);
+        cv.put(WorkoutContract.WorkoutEntry1.COLUMN_DESC, description);
+        cv.put(WorkoutContract.WorkoutEntry1.COLUMN_SPP_CSV, spp);
+        cv.put(WorkoutContract.WorkoutEntry1.COLUMN_GEARS_CSV, gears);
+//        cv.put(WorkoutEntry1.COLUMN_TIMESTAMP, time);
+        cv.put(WorkoutContract.WorkoutEntry1.COLUMN_SPP_TYPE, sppType);
+        return db.insert(WorkoutContract.WorkoutEntry1.TABLE_NAME_PRESETS, null, cv);
     }
 
     private int getSPPFromRadio() {

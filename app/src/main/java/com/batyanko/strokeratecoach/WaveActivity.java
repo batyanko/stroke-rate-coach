@@ -89,6 +89,8 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     private static BeeperService mBeeperService;
     private static boolean mIsBound;
 
+    private static Toast mToast;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -235,6 +237,4 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         waveProgress.setVisibility(View.VISIBLE);
         spmTextView.setBackgroundColor(pref.getInt(CURRENT_COLOR, Color.TRANSPARENT));
     }
-
-
 }

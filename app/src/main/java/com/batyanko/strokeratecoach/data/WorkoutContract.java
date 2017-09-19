@@ -23,8 +23,9 @@ import android.provider.BaseColumns;
  */
 
 public class WorkoutContract {
-    public static final class PresetEntry1 implements BaseColumns {
-        public static final String TABLE_NAME = "presets";
+    public static final class WorkoutEntry1 implements BaseColumns {
+        public static final String TABLE_NAME_PRESETS = "presets";
+        public static final String TABLE_NAME_HISTORY = "history";
         public static final String COLUMN_NAME = "preset_name";
         public static final String COLUMN_DESC = "preset_desc";
         public static final String COLUMN_TIMESTAMP = "date_added";

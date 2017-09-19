@@ -47,6 +47,7 @@ public class BeeperTasks {
     public static final String EXTRA_WORKOUT_SPP_TYPE = "workout-spp-type";
     public static final String ACTION_START_BEEP = "start-beep";
     public static final String ACTION_STOP_BEEP = "stop-beep";
+    public static final String ACTION_CHECK_SERVICE = "check-service";
 
     //SPP (strokes or stuff per phase) unit types
     public static final int SPP_TYPE_STROKES = 0;
@@ -60,21 +61,20 @@ public class BeeperTasks {
     public static int spm = 22;
 
     //Variables used in beeping workoutTimer setup
-    public static long strokeDuration;
+    private static long strokeDuration;
     public static String spmString;
-    public static ToneGenerator toneGen1;
+    private static ToneGenerator toneGen1;
 
-    public static Timer workoutTimer;
-    public static TimerTask workoutTimerTask;
-    public static Timer timeTimer;
-    public static TimerTask timeTimerTask;
+    private static Timer workoutTimer;
+    private static TimerTask workoutTimerTask;
+    private static Timer timeTimer;
+    private static TimerTask timeTimerTask;
 
     //autoWave values
     private static int workoutRunning;     //0=off, 1=autoWave, 2=autoProgress, 9=lastPhase
     private static int totalWorkoutCount;
     private static int phaseTrigger;
-    //phase = 0 = wave not running
-    private static int phase;
+    private static int phase;    //phase = 0 = wave not running
     private static int phasesTotal;
     private static int color;
     private static int phaseProgress;
@@ -95,8 +95,6 @@ public class BeeperTasks {
     private static float currentSpeed;
     private static float locationAccuracy;
     private static final float ACCEPTABLE_ACCURACY = 21;
-    private TehLocListener locListener;
-    private LocationManager locationManager;
 
     private long startTime = System.currentTimeMillis();
     private int timerProgress;
@@ -104,6 +102,7 @@ public class BeeperTasks {
     void executeTask(BeeperService beeperService, String action,
                      int[] sppSettings, int[] gearSettings, int sppType) {
         if (action.equals(ACTION_START_BEEP)) {
+            Log.d("TEHSERVICE", "at execute task");
             pref = PreferenceManager.getDefaultSharedPreferences(beeperService);
             mSppType = sppType;
             initBeeper();
@@ -127,7 +126,10 @@ public class BeeperTasks {
                 }
             }
         } else if (action.equals(ACTION_STOP_BEEP)) {
+            Log.d("TEHSERVICE", "at execute task");
             endWorkout(beeperService);
+        } else if (action.equals(ACTION_CHECK_SERVICE)) {
+            Log.d("TEHSERVICE", "at execute task");
         }
     }
 
@@ -163,6 +165,8 @@ public class BeeperTasks {
     }
 
     private void startTheTempo(final BeeperService beeperService) {
+        Log.d("TEHSERVICE", "at startTheTempo");
+
         pref.edit().putInt(WaveActivity.SPM_SETTING, spm).apply();
         phaseProgress = 0;
 
@@ -292,9 +296,11 @@ public class BeeperTasks {
         Boolean bool = pref.getBoolean(WaveActivity.SWITCH_SETTING, true);
         pref.edit().putBoolean(WaveActivity.SWITCH_SETTING, !bool).apply();
 
-        Log.d("LOCSS", "Initialized.");
-        locationManager.removeUpdates(locListener);
-        locationManager = null;
+        Log.d("LOCSS", "Stopping.");
+        if (beeperService.locationManager != null) {
+            beeperService.locationManager.removeUpdates(beeperService.locListener);
+            beeperService.locationManager = null;
+        }
 
         beeperService.stopSelf();
     }
@@ -374,10 +380,11 @@ public class BeeperTasks {
             Log.d("I CAN HAZ PERMISSION?", "NO!");
             return;
         }
+        Log.d("TEHSERVICE", "at initLocation");
 
-        locationManager = (LocationManager) beeperService.getSystemService(Context.LOCATION_SERVICE);
-        locListener = new TehLocListener(beeperService);
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 200, 1, locListener);
+        beeperService.locationManager = (LocationManager) beeperService.getSystemService(Context.LOCATION_SERVICE);
+        beeperService.locListener = new TehLocListener(beeperService);
+        beeperService.locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 200, 1, beeperService.locListener);
         Log.d("LOCSS", "Initialized.");
 
     }
@@ -405,7 +412,6 @@ public class BeeperTasks {
                     startingLocation = location;
                 } else {
                     locationAccuracy = location.getAccuracy();
-                    Log.d("UPDATESPEED", "Accuracy: " + locationAccuracy);
                     currentLocation = location;
                     currentSpeed = location.getSpeed();
                     phaseProgress = (int) location.distanceTo(startingLocation);

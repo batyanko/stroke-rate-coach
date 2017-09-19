@@ -20,15 +20,21 @@ package com.batyanko.strokeratecoach.sync;
  * Created by batyanko on 9/4/17.
  */
 
+import android.app.Activity;
 import android.content.Intent;
 import android.location.LocationManager;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 public class BeeperService extends NonStopIntentService {
 
     BeeperTasks beeperTasks;
+
+    public BeeperTasks.TehLocListener locListener;
+    public LocationManager locationManager;
+
 
     public BeeperService() {
         super("BeeperService");
@@ -36,21 +42,28 @@ public class BeeperService extends NonStopIntentService {
 
     public class BeeperBinder extends Binder {
         public BeeperService getService() {
+            Log.d("TEHSERVICE", "at BeeperBinder");
+
             return BeeperService.this;
         }
     }
 
     public void doEpicShit(Intent intent) {
         if (intent == null || intent.getAction() == null) {
+            Log.d("EPICSHIT", "null?");
             return;
         }
         String action = intent.getAction();
         if (beeperTasks == null) {
+            Log.d("EPICSHIT", "new BeeperTasks");
             beeperTasks = new BeeperTasks();
         }
+
         int[] workoutSpp = intent.getIntArrayExtra(BeeperTasks.EXTRA_WORKOUT_SPP);
         int[] workoutGears = intent.getIntArrayExtra(BeeperTasks.EXTRA_WORKOUT_GEARS);
         int sppType = intent.getIntExtra(BeeperTasks.EXTRA_WORKOUT_SPP_TYPE, 1);
+
+        Log.d("TEHSERVICE", "at doEpicShit");
 
         beeperTasks.executeTask(this, action, workoutSpp, workoutGears, sppType);
     }
@@ -72,11 +85,14 @@ public class BeeperService extends NonStopIntentService {
         if (intent == null || intent.getAction() == null) {
             return;
         }
+
         String action = intent.getAction();
         beeperTasks = new BeeperTasks();
         int[] workoutSpp = intent.getIntArrayExtra(BeeperTasks.EXTRA_WORKOUT_SPP);
         int[] workoutGears = intent.getIntArrayExtra(BeeperTasks.EXTRA_WORKOUT_GEARS);
         int sppType = intent.getIntExtra(BeeperTasks.EXTRA_WORKOUT_SPP_TYPE, 1);
+
+        Log.d("TEHSERVICE", "onHandleIntent");
 
         beeperTasks.executeTask(this, action, workoutSpp, workoutGears, sppType);
     }
