@@ -7,7 +7,7 @@ Feel free to contribute or request new features.
 App APK:
 https://drive.google.com/open?id=0BxroN2uvzu3QU0xKcUxuTlo0cjQ
 
-![](https://i.imgur.com/tdaZoaL.gif)
+![giphy](https://media.giphy.com/media/3ohhwMWj0F5ZDtj03K/giphy.gif)
 
 Current features:
 - Preset workouts, for example 4 legs of 50 strokes at SPM 22, 24, 26, 28
