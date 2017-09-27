@@ -17,11 +17,21 @@
 
 <resources>
     <string name="app_name">Stroke Rate Coach</string>
-    <string name="changer_button_text">Tempo einsetzen</string>
     <string name="stopper_button_text">Stopp</string>
     <string name="speed_button_text">Geschwindigkeit</string>
     <string name="big_wave_desc"></string>
     <string name="big_wave_name">Große Welle</string>
     <string name="button_add_phase_label">+ strecke</string>
     <string name="small_wave_name">Kleine Welle</string>
+    <string name="meters">Meter</string>
+    <string name="seconds">Sekunden</string>
+    <string name="create_workout_button_label">Übung erstellen</string>
+    <string name="strokes">Schlagzahl</string>
+    <string name="workout_name_title">Name dieser Übung</string>
+    <string name="workout_unit_choose_title">Wählen Sie eine Maßeinheit</string>
+    <string name="gear_title_text">mit SPM</string>
+    <string name="workout_desc_tooltip">Beschreibung (optional)</string>
+    <string name="speed_dial_title">Schnellauswahl</string>
+    <string name="workouts_title">Übungen</string>
+    <string name="history_title">Geschichte</string>
 </resources>

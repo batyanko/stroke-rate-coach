@@ -16,10 +16,20 @@
     -->
 <resources>
     <string name="app_name">Stroke Rate Coach</string>
-    <string name="changer_button_text">Angi tempo</string>
     <string name="stopper_button_text">Stopp</string>
     <string name="speed_button_text">Hastighet</string>
     <string name="big_wave_name">Stor Bølge</string>
     <string name="button_add_phase_label">+ fase</string>
     <string name="small_wave_name">Liten Bølge</string>
+    <string name="meters">meter</string>
+    <string name="seconds">sekunder</string>
+    <string name="create_workout_button_label">skape trening</string>
+    <string name="strokes">roingslag</string>
+    <string name="workout_name_title">Navn på treningen</string>
+    <string name="workout_unit_choose_title">Velg måleenheter</string>
+    <string name="gear_title_text">med SPM</string>
+    <string name="workout_desc_tooltip">Beskrivelse (valgfri)</string>
+    <string name="speed_dial_title">Hurtigvalg</string>
+    <string name="workouts_title">Trening</string>
+    <string name="history_title">Logg</string>
 </resources>

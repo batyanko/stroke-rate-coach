@@ -179,7 +179,7 @@ public class EntryFormActivity extends AppCompatActivity {
         createWorkoutButton = new Button(this);
         createWorkoutButton.setLayoutParams(pHorizontal);
         createWorkoutButton.setOnClickListener(CreateButtonListener);
-        createWorkoutButton.setText(R.string.button_create_workout_label);
+        createWorkoutButton.setText(R.string.create_workout_button_label);
 
         ll.addView(lb);
         lb.addView(addPhaseButton);

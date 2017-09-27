@@ -34,11 +34,10 @@
     <string name="phase_title_text">Phase</string>
     <string name="tpp_title_text">Time</string>
     <string name="dpp_title_text">Distance</string>
-    <string name="button_create_workout_label">Create Workout</string>
     <string name="empty_data_notification">Skipping phases with empty data</string>
     <string name="meters">Meters</string>
     <string name="seconds">Seconds</string>
-    <string name="strokes">Strokes</string>
+    <string name="strokes">strokes</string>
     <string name="workout_unit_choose_title">Choose workout unit:</string>
     <string name="empty_workout_warning">Empty workout not created.</string>
     <string name="missing_workout_type_warning">Please select workout unit (strokes, meters or seconds)</string>
@@ -50,5 +49,8 @@
     a 1,1 0 1,0 96,0
     a 1,1 0 1,0 -96,0
   </string>
+    <string name="speed_dial_title">Speed Dial</string>
+    <string name="workouts_title">Workouts</string>
+    <string name="history_title">History</string>
 
 </resources>

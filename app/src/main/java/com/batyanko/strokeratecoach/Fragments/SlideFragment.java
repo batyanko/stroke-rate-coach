@@ -46,6 +46,7 @@ import android.widget.Toast;
 
 import com.batyanko.strokeratecoach.R;
 import com.batyanko.strokeratecoach.Sliding.*;
+import com.batyanko.strokeratecoach.SpeedActivity;
 import com.batyanko.strokeratecoach.Utils.DialGridAdapter;
 import com.batyanko.strokeratecoach.Utils.SpmUtilities;
 import com.batyanko.strokeratecoach.Utils.SvAdapter;
@@ -251,15 +252,15 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0: {
-                    pageTitle = "Speed Dial";
+                    pageTitle = getString(R.string.speed_dial_title);
                     break;
                 }
                 case 1: {
-                    pageTitle = "Workouts";
+                    pageTitle = getString(R.string.workouts_title);
                     break;
                 }
                 case 2: {
-                    pageTitle = "History";
+                    pageTitle = getString(R.string.history_title);
                     break;
                 }
                 default: {
@@ -298,7 +299,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
 //                                checkBeeper();
                                 stopBeeper();
                             } else if (position == 11) {
-                                Intent intent = new Intent(SlideFragment.this.getActivity(), Activity.class);
+                                Intent intent = new Intent(SlideFragment.this.getActivity(), SpeedActivity.class);
                                 startActivity(intent);
                             }
                         }

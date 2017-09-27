@@ -58,6 +58,9 @@ public class DialGridAdapter extends BaseAdapter {
             view = inflater.inflate(R.layout.digit_view_item, null);
             TextView text = (TextView) view.findViewById(R.id.digit_item);
             text.setText(digitIds[position]);
+            if (position == 11) {
+                text.setTextSize(20);
+            }
 
 //            view.getLayoutParams().width = 30;
 //            view.getLayoutParams().height = 30;

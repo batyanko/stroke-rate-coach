@@ -203,21 +203,22 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
                 String sppType;
                 switch (gottenCursor.getInt(gottenCursor.getColumnIndex(COLUMN_SPP_TYPE))) {
                     case BeeperTasks.SPP_TYPE_STROKES: {
-                        sppType = "(Strokes) ";
+                        sppType = "(" + mContext.getString(R.string.strokes)+ ") ";
                         break;
                     }
                     case BeeperTasks.SPP_TYPE_METERS: {
-                        sppType = "(Meters) ";
+                        sppType = "(" + mContext.getString(R.string.meters) + ") ";
                         break;
                     }
                     case BeeperTasks.SPP_TYPE_SECONDS: {
-                        sppType = "(Seconds) ";
+                        sppType = "(" + mContext.getString(R.string.seconds) + " ";
                         break;
                     }
                     default: {
-                        sppType = "(Unknown)";
+                        sppType = "";
                     }
                 }
+                String at = mContext.getString(R.string.gear_title_text);
 
                 if (tableName.equals(WorkoutContract.WorkoutEntry1.TABLE_NAME_PRESETS)) {
                     scrollItemName = localDate +
@@ -226,7 +227,8 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
                             gottenCursor.getString(gottenCursor.getColumnIndex(COLUMN_NAME)) +
                             "\n" +
                             gottenCursor.getString(gottenCursor.getColumnIndex(COLUMN_SPP_CSV)) +
-                            " at " +
+                            " " +
+                            at +
                             gottenCursor.getString(gottenCursor.getColumnIndex(COLUMN_GEARS_CSV));
                 } else {
                     scrollItemName = localTime +
@@ -234,7 +236,8 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
                             sppType +
                             "\n" +
                             gottenCursor.getString(gottenCursor.getColumnIndex(COLUMN_SPP_CSV)) +
-                            " at " +
+                            " " +
+                            at +
                             gottenCursor.getString(gottenCursor.getColumnIndex(COLUMN_GEARS_CSV));
                 }
 
