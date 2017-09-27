@@ -75,7 +75,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
 
     DialGridAdapter dialAdapter;
     private SvAdapter presetsAdapter;
-    private SvAdapter historyAdapter;
+    public static SvAdapter historyAdapter;
 
     Cursor presetCursor;
     Cursor historyCursor;
@@ -83,14 +83,17 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
     RecyclerView workoutRV;
     RecyclerView historyRV;
 
-    private SQLiteDatabase workoutDb;
+    private static SQLiteDatabase workoutDb;
 
     ViewGroup viewGroup;
     private boolean mIsBound;
     private BeeperService mBeeperService;
 
     private Intent intent;
-    View lastClickedEngageButton;
+    public static View lastClickedEngageButton;
+
+    public int lastWorkoutId;
+    private boolean workoutIsRunning;
 
     public SlideFragment() {
         // Required empty public constructor
@@ -104,6 +107,8 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         pref = PreferenceManager.getDefaultSharedPreferences(getActivity());
         intent = new Intent(this.getActivity(), BeeperService.class);
 
+        workoutIsRunning = false;
+
         dialAdapter = new DialGridAdapter(getContext());
 
         //////////////////////
@@ -114,7 +119,6 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         historyCursor = getAllHistory();
 
         presetsAdapter = new SvAdapter(getContext(), presetCursor, WorkoutContract.WorkoutEntry1.TABLE_NAME_PRESETS, this);
-        //TODO make history adapter
         historyAdapter = new SvAdapter(getContext(), historyCursor, WorkoutContract.WorkoutEntry1.TABLE_NAME_HISTORY, this);
 
         viewGroup = container;
@@ -134,8 +138,9 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
     @Override
     public void onStart() {
         super.onStart();
-        presetsAdapter.swapCursor(getAllPresets());
-        historyAdapter.swapCursor(getAllHistory());
+        //TODO take running workout status from beeper service
+        presetsAdapter.swapCursor(getAllPresets(), workoutIsRunning, lastWorkoutId);
+        historyAdapter.swapCursor(getAllHistory(), workoutIsRunning, lastWorkoutId);
     }
 
     @Override
@@ -153,14 +158,13 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
 
     //OnClickListener for the Workout list items
     @Override
-    public void onListItemClick(View view, long clickedItemId, int position, String tableName, int itemFunction) {
+    public void onListItemClick(View view, long clickedItemId, int position, String tableName, Cursor cursor, int itemFunction) {
 
 
         Log.d("BENCH onClick", "START");
         //TODO get only clicked preset for efficiency
-        Cursor gottenCursor = getAllRows(tableName);
 
-        if (!gottenCursor.moveToPosition(position)) {
+        if (!cursor.moveToPosition(position)) {
             Toast.makeText(getActivity(), "MOVEISFALSE", Toast.LENGTH_LONG).show();
             return;
         }
@@ -173,21 +177,21 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
 
             //refresh ScrollView after DB update
             if (tableName.equals(WorkoutEntry1.TABLE_NAME_PRESETS)) {
-                presetsAdapter.swapCursor(getAllPresets());
+                presetsAdapter.swapCursor(getAllPresets(), workoutIsRunning, lastWorkoutId);
             } else if (tableName.equals(WorkoutEntry1.TABLE_NAME_HISTORY)) {
-                historyAdapter.swapCursor(getAllHistory());
+                historyAdapter.swapCursor(getAllHistory(), workoutIsRunning, lastWorkoutId);
             }
 
         } else if (itemFunction == WaveActivity.WORKOUT_ITEM_FUNCTION) {
 
-            message = gottenCursor.getString(gottenCursor.getColumnIndex(WorkoutContract.WorkoutEntry1.COLUMN_NAME)) +
+            message = cursor.getString(cursor.getColumnIndex(WorkoutContract.WorkoutEntry1.COLUMN_NAME)) +
                     " : " +
                     "\n" +
-                    gottenCursor.getString(gottenCursor.getColumnIndex(WorkoutContract.WorkoutEntry1.COLUMN_SPP_CSV)) +
+                    cursor.getString(cursor.getColumnIndex(WorkoutContract.WorkoutEntry1.COLUMN_SPP_CSV)) +
                     " at " +
-                    gottenCursor.getString(gottenCursor.getColumnIndex(WorkoutContract.WorkoutEntry1.COLUMN_GEARS_CSV)) +
+                    cursor.getString(cursor.getColumnIndex(WorkoutContract.WorkoutEntry1.COLUMN_GEARS_CSV)) +
                     "\n" +
-                    gottenCursor.getString(gottenCursor.getColumnIndex(WorkoutContract.WorkoutEntry1.COLUMN_DESC));
+                    cursor.getString(cursor.getColumnIndex(WorkoutContract.WorkoutEntry1.COLUMN_DESC));
 
             Log.d("TEHPOSITION", "gotten on click: " + clickedItemId);
 
@@ -195,14 +199,15 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
 
         } else if (itemFunction == WaveActivity.ENGAGE_WORKOUT_FUNCTION) {
             stopBeeper();
-            view.setBackgroundResource(R.drawable.ic_menu_play_clip_negative);
+
             lastClickedEngageButton = view;
-            final String name = gottenCursor.getString(gottenCursor.getColumnIndex(WorkoutContract.WorkoutEntry1.COLUMN_NAME));
-            final String description = gottenCursor.getString(gottenCursor.getColumnIndex(WorkoutContract.WorkoutEntry1.COLUMN_DESC));
+            final String name = cursor.getString(cursor.getColumnIndex(WorkoutContract.WorkoutEntry1.COLUMN_NAME));
+            final String description = cursor.getString(cursor.getColumnIndex(WorkoutContract.WorkoutEntry1.COLUMN_DESC));
             final int sppType =
-                    gottenCursor.getInt(gottenCursor.getColumnIndex(WorkoutContract.WorkoutEntry1.COLUMN_SPP_TYPE));
-            final String gearCSV = gottenCursor.getString(gottenCursor.getColumnIndex(WorkoutContract.WorkoutEntry1.COLUMN_GEARS_CSV));
-            final String sppCSV = gottenCursor.getString(gottenCursor.getColumnIndex(WorkoutContract.WorkoutEntry1.COLUMN_SPP_CSV));
+                    cursor.getInt(cursor.getColumnIndex(WorkoutContract.WorkoutEntry1.COLUMN_SPP_TYPE));
+            lastWorkoutId = cursor.getInt(cursor.getColumnIndex(WorkoutEntry1._ID));
+            final String gearCSV = cursor.getString(cursor.getColumnIndex(WorkoutContract.WorkoutEntry1.COLUMN_GEARS_CSV));
+            final String sppCSV = cursor.getString(cursor.getColumnIndex(WorkoutContract.WorkoutEntry1.COLUMN_SPP_CSV));
             final String[] gears = gearCSV.split("\\s*,\\s*");
             final String[] spp = sppCSV.split("\\s*,\\s*");
 
@@ -220,9 +225,9 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
             }
 
             //Update History db table
+            lastClickedEngageButton.setBackgroundResource(R.drawable.ic_menu_play_clip_negative);
             addHistory(workoutDb, name, description, sppCSV, gearCSV, sppType);
-            historyAdapter.swapCursor(getAllHistory());
-
+            historyAdapter.swapCursor(getAllHistory(), true, lastWorkoutId);
             startBeeper(sppInts, gearInts, sppType);
         }
         Log.d("BENCH onClick", "FINISH");
@@ -307,7 +312,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                     workoutRV.setLayoutManager(layoutManager);
                     workoutRV.setAdapter(presetsAdapter);
                     presetCursor = getAllPresets();
-                    presetsAdapter.swapCursor(presetCursor);
+                    presetsAdapter.swapCursor(presetCursor, workoutIsRunning, lastWorkoutId);
                     break;
                 }
                 case 2: {
@@ -317,7 +322,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                     historyRV.setLayoutManager(layoutManager);
                     historyRV.setAdapter(historyAdapter);
                     historyCursor = getAllHistory();
-                    historyAdapter.swapCursor(historyCursor);
+                    historyAdapter.swapCursor(historyCursor, workoutIsRunning, lastWorkoutId);
                     break;
                 }
                 default: {
@@ -364,6 +369,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         intent.putExtra(BeeperTasks.EXTRA_WORKOUT_SPP_TYPE, sppType);
         this.getActivity().startService(intent);
         doBindService(intent);
+//        lastClickedEngageButton.setBackgroundResource(R.drawable.ic_menu_play_clip_negative);
     }
 
     public void stopBeeper() {
@@ -427,7 +433,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         );
     }
 
-    private Cursor getAllHistory() {
+    public static Cursor getAllHistory() {
         return workoutDb.query(
                 WorkoutContract.WorkoutEntry1.TABLE_NAME_HISTORY,
                 null,
@@ -435,7 +441,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                 null,
                 null,
                 null,
-                WorkoutContract.WorkoutEntry1.COLUMN_TIMESTAMP
+                WorkoutContract.WorkoutEntry1.COLUMN_TIMESTAMP + " DESC"
         );
     }
 

@@ -9,12 +9,12 @@ Feel free to contribute or request new features.
 Current features:
 - Preset workouts, for example 4 legs of 50 strokes at SPM 22, 24, 26, 28
 - Option to add new workouts
-- Background beeping service, allowing to combine with other sports apps
-- Workouts based on distance and time
+- Background beeping service, allowing combined use with other sports apps
+- Workouts based on distance (GPS Location) and time
 - Workout history/logbook
+- Countdown before starting workout
 
 Planned features:
-- Countdown before starting workout
 - Visual refinements
 
 Known bugs:

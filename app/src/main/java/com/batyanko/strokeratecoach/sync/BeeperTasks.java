@@ -64,11 +64,17 @@ public class BeeperTasks {
     private static long strokeDuration;
     public static String spmString;
     private static ToneGenerator toneGen1;
+    private static ToneGenerator countdownToneGen;
 
     private static Timer workoutTimer;
     private static TimerTask workoutTimerTask;
+
     private static Timer timeTimer;
     private static TimerTask timeTimerTask;
+
+    private static Timer countdownTimer;
+    private static TimerTask countdownTimerTask;
+
 
     //autoWave values
     private static int workoutRunning;     //0=off, 1=autoWave, 2=autoProgress, 9=lastPhase
@@ -96,8 +102,14 @@ public class BeeperTasks {
     private static float locationAccuracy;
     private static final float ACCEPTABLE_ACCURACY = 21;
 
+    //TODO make static?
     private long startTime = System.currentTimeMillis();
-    private int timerProgress;
+    private int timeTimerProgress;
+    private int countdownCyclesTotal;
+    private int countdownCycles;
+    private int countdownCycleDuration;
+    private int countdownDuration;
+    private static int beeps;
 
     void executeTask(BeeperService beeperService, String action,
                      int[] sppSettings, int[] gearSettings, int sppType) {
@@ -115,14 +127,15 @@ public class BeeperTasks {
             }
 
             if (gearSettings != null) {
-                //Manual SPM setting or preset workout
-                if (sppSettings == null) {
+                if (sppSettings == null) {  //Manual SPM setting
+                    flushUI();
                     spm = gearSettings[0];
                     startTheTempo(beeperService);
-                } else {
+                } else {                    //Preset workout
                     SPP_SETTINGS = sppSettings;
                     GEAR_SETTINGS = gearSettings;
-                    autoProgress(beeperService);
+                    startCountdown(beeperService);
+//                    autoProgress(beeperService);
                 }
             }
         } else if (action.equals(ACTION_STOP_BEEP)) {
@@ -138,13 +151,14 @@ public class BeeperTasks {
         resetVariables();
 
         toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
+        countdownToneGen = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
     }
 
     private void initTimeTimerTask() {
         timeTimerTask = new TimerTask() {
             @Override
             public void run() {
-                pref.edit().putInt(WaveActivity.PHASE_PROGRESS, timerProgress++).apply();
+                pref.edit().putInt(WaveActivity.PHASE_PROGRESS, timeTimerProgress++).apply();
             }
         };
     }
@@ -157,11 +171,28 @@ public class BeeperTasks {
         phase = 0;
         phasesTotal = 0;
         color = 0;
+        beeps = 0;
+
+        cancelTimer(workoutTimer, workoutTimerTask);
+        cancelTimer(timeTimer, timeTimerTask);
+        cancelTimer(countdownTimer, countdownTimerTask);
+
+        countdownCycles = 0;
+        countdownDuration = pref.getInt(WaveActivity.COUNTDOWN_DURATION, 3000);
+        //TODO add setting for countdown cycle length / frequency?
+        countdownCycleDuration = 100;
+        countdownCyclesTotal = countdownDuration/ countdownCycleDuration;
 
         phaseProgress = 0;
-        locationAccuracy = 500;     //Init at an extremely inaccurate value
+        locationAccuracy = 500;     //Init at an extremely inaccurate value, i.e. no accuracy
 
         startTime = System.currentTimeMillis();
+    }
+
+    private void flushUI() {
+        pref.edit().putInt(WaveActivity.OPERATION_SETTING, workoutRunning).apply();
+        Boolean bool = pref.getBoolean(WaveActivity.SWITCH_SETTING, true);
+        pref.edit().putBoolean(WaveActivity.SWITCH_SETTING, !bool).apply();
     }
 
     private void startTheTempo(final BeeperService beeperService) {
@@ -174,7 +205,7 @@ public class BeeperTasks {
 
         cancelTimer(workoutTimer, workoutTimerTask);
         if (mSppType == SPP_TYPE_SECONDS) {
-            timerProgress = 0;
+            timeTimerProgress = 0;
             cancelTimer(timeTimer, timeTimerTask);
             initTimeTimerTask();
             timeTimer = new Timer();
@@ -256,6 +287,7 @@ public class BeeperTasks {
                     }
                 }
                 pref.edit().putFloat(WaveActivity.CURRENT_SPEED, currentSpeed).apply();
+                pref.edit().putInt(WaveActivity.BEEP, ++beeps).apply();
                 Log.d("TEHBEEP", "BEEP!");
                 toneGen1.startTone(ToneGenerator.TONE_CDMA_EMERGENCY_RINGBACK, 150);
             }
@@ -288,13 +320,10 @@ public class BeeperTasks {
         cancelTimer(workoutTimer, workoutTimerTask);
         cancelTimer(timeTimer, timeTimerTask);
 
-        pref = PreferenceManager.getDefaultSharedPreferences(beeperService);
-        pref.edit().putInt(WaveActivity.OPERATION_SETTING, workoutRunning).apply();
-
+//        pref = PreferenceManager.getDefaultSharedPreferences(beeperService);
         pref.edit().putInt(WaveActivity.SPM_SETTING, 0).apply();
 
-        Boolean bool = pref.getBoolean(WaveActivity.SWITCH_SETTING, true);
-        pref.edit().putBoolean(WaveActivity.SWITCH_SETTING, !bool).apply();
+        flushUI();
 
         Log.d("LOCSS", "Stopping.");
         if (beeperService.locationManager != null) {
@@ -338,7 +367,7 @@ public class BeeperTasks {
 
     private void startPhase(int lengthTrigger, int tempo, BeeperService beeperService) {
 
-        pref = PreferenceManager.getDefaultSharedPreferences(beeperService);
+//        pref = PreferenceManager.getDefaultSharedPreferences(beeperService);
         phaseTrigger = lengthTrigger;
         spm = tempo;
         //Length in the respective unit (strokes, meters or seconds)
@@ -368,6 +397,34 @@ public class BeeperTasks {
         pref.edit().putBoolean(WaveActivity.SWITCH_SETTING, !bool).apply();
 
         startTheTempo(beeperService);
+    }
+
+    //TODO cancel countdown on interrupt
+    private void startCountdown(final BeeperService beeperService) {
+
+//        pref.edit().putInt(WaveActivity.COUNTDOWN_RUNNING, 1).apply();
+
+        countdownTimerTask = new TimerTask() {
+
+            @Override
+            public void run() {
+                if (countdownCycles % 10 == 0) {
+                    pref.edit().putInt(WaveActivity.COUNTDOWN_DURATION_LEFT, countdownDuration-countdownCycles*100).apply();
+                    Log.d("CountdownDigits", "" + (countdownDuration-countdownCycles*100));
+                }
+                if (++countdownCycles >= countdownCyclesTotal)
+                {
+                    pref.edit().putInt(WaveActivity.COUNTDOWN_DURATION_LEFT, 0).apply();
+                    autoProgress(beeperService);
+                    cancelTimer(countdownTimer, this);
+                } else
+                    countdownToneGen.startTone(ToneGenerator.TONE_CDMA_INTERCEPT, 100);
+            }
+        };
+
+        countdownTimer = new Timer();
+        countdownTimer.scheduleAtFixedRate(countdownTimerTask, 1, countdownCycleDuration);
+
     }
 
     private void initLocation(BeeperService beeperService) {

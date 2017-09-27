@@ -16,24 +16,23 @@
 
 package com.batyanko.strokeratecoach;
 
-import android.content.ComponentName;
-import android.content.Context;
+import android.animation.AnimatorInflater;
+import android.animation.AnimatorSet;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.preference.PreferenceManager;
-import android.renderscript.ScriptGroup;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -41,6 +40,8 @@ import android.widget.Toast;
 import com.batyanko.strokeratecoach.Fragments.SlideFragment;
 import com.batyanko.strokeratecoach.sync.BeeperService;
 import com.batyanko.strokeratecoach.sync.BeeperTasks;
+
+import java.util.Random;
 
 public class WaveActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -68,14 +69,22 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     public static final String PHASE_PROGRESS = "total-strokes-elapsed";
     public static final String CURRENT_COLOR = "current-phase";
     public static final String CURRENT_SPEED = "current-speed";
+    public static final String COUNTDOWN_RUNNING = "countdown-running";
+    public static final String COUNTDOWN_DURATION = "countdown-duration";   //In ms
+    public static final String COUNTDOWN_DURATION_LEFT = "countdown-duration-left";   //In ms
+    public static final String BEEP = "beep";
 
     /* Global spm setting to hold current spm */
     public static int spm;
 
     //UI elements
     private ProgressBar waveProgress;
+    private TextView countdownView;
     private TextView spmTextView;
     private TextView progressTextView;
+
+    private ImageView water;
+
 
     private SharedPreferences pref;
 
@@ -91,6 +100,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 
     private static Toast mToast;
 
+    static int random;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -149,6 +159,9 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
             ActivityCompat.requestPermissions(this,
                     new String[]{"android.permission.ACCESS_FINE_LOCATION"}, MY_LOCATION_PERMISSION);
         }
+
+        countdownView = findViewById(R.id.countdown_text_view);
+        countdownView.setVisibility((View.INVISIBLE));
     }
 
     @Override
@@ -171,7 +184,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         waveProgress.setVisibility(View.INVISIBLE);
         progressTextView.setVisibility(View.INVISIBLE);
 //        spmTextView.setText("0");
-        spmTextView.setBackgroundColor(Color.TRANSPARENT);
+//        spmTextView.setBackgroundColor(Color.TRANSPARENT);
     }
 
     /**
@@ -205,7 +218,25 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         } else if (s.equals(PHASE_PROGRESS)) {
             onProgressChange();
         } else if (s.equals(CURRENT_COLOR)) {
-            spmTextView.setBackgroundColor(sharedPreferences.getInt(CURRENT_COLOR, Color.TRANSPARENT));
+            //TODO show color somewhere on the UI
+//            spmTextView.setBackgroundColor(sharedPreferences.getInt(CURRENT_COLOR, Color.TRANSPARENT));
+        } else if (s.equals(COUNTDOWN_DURATION_LEFT)) {
+            //TODO show a countdown
+            int durationLeft = sharedPreferences.getInt(COUNTDOWN_DURATION_LEFT, 0) / 1000;
+            String countdownString = durationLeft + "";
+            Log.d("TEHDURATION", durationLeft + "");
+            if (durationLeft == 0) {
+                countdownView.setVisibility(View.INVISIBLE);
+//                SlideFragment.lastClickedEngageButton.setBackgroundResource(R.drawable.ic_menu_play_clip_negative);
+            } else {
+                countdownView.setText(countdownString);
+                countdownView.bringToFront();
+//                countdownView.requestLayout();
+                countdownView.setVisibility(View.VISIBLE);
+            }
+        } else if (s.equals(BEEP)) {
+            Log.d("BEEP", "beep");
+            spmTextView.startAnimation(AnimationUtils.loadAnimation(WaveActivity.this, R.anim.on_click));
         }
     }
 
@@ -235,6 +266,11 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         int progressPercent = (int) (((float) progress[0] / (float) progress[1]) * 100);
         waveProgress.setProgress(progressPercent);
         waveProgress.setVisibility(View.VISIBLE);
-        spmTextView.setBackgroundColor(pref.getInt(CURRENT_COLOR, Color.TRANSPARENT));
+//        spmTextView.setBackgroundColor(pref.getInt(CURRENT_COLOR, Color.TRANSPARENT));
+    }
+
+    public void onSpmClicked(View view) {
+//        view.performClick();
+        spmTextView.startAnimation(AnimationUtils.loadAnimation(WaveActivity.this, R.anim.on_click));
     }
 }

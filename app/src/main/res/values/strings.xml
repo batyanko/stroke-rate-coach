@@ -44,4 +44,11 @@
     <string name="missing_workout_type_warning">Please select workout unit (strokes, meters or seconds)</string>
     <string name="entry_form_label">Enter new workout</string>
 
+    <string name="path_circle">
+    M 50,50
+    m -48,0
+    a 1,1 0 1,0 96,0
+    a 1,1 0 1,0 -96,0
+  </string>
+
 </resources>

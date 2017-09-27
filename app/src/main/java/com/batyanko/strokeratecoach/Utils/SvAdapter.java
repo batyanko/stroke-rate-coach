@@ -68,9 +68,11 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
     private Cursor gottenCursor;
     private Cursor historyCursor;
     private Context mContext;
+    private boolean workoutIsRunning;
+    private int workoutId;
 
     public interface ListItemClickListener {
-        void onListItemClick(View vie, long clickedItemIndex, int position, String tableName, int itemFunction);
+        void onListItemClick(View vie, long clickedItemIndex, int position, String tableName, Cursor cursor, int itemFunction);
     }
 
     /**
@@ -81,6 +83,7 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
         gottenCursor = cursor;
         this.tableName = tableName;
         mOnClickListener = listener;
+        workoutIsRunning = false;
     }
 
     /**
@@ -150,11 +153,11 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
                 Log.d("TEHCURSOR", historyCursor.toString());
             }
             if (viewId == favButtonId) {
-                mOnClickListener.onListItemClick(view, clickedTag, clickedPosition, tableName, WaveActivity.FAV_BUTTON_FUNCTION);
+                mOnClickListener.onListItemClick(view, clickedTag, clickedPosition, tableName, gottenCursor, WaveActivity.FAV_BUTTON_FUNCTION);
             } else if (viewId == engageButtonId) {
-                mOnClickListener.onListItemClick(view, clickedTag, clickedPosition, tableName, WaveActivity.ENGAGE_WORKOUT_FUNCTION);
+                mOnClickListener.onListItemClick(view, clickedTag, clickedPosition, tableName, gottenCursor, WaveActivity.ENGAGE_WORKOUT_FUNCTION);
             } else if (viewId == itemId) {
-                mOnClickListener.onListItemClick(view, clickedTag, clickedPosition, tableName, WaveActivity.WORKOUT_ITEM_FUNCTION);
+                mOnClickListener.onListItemClick(view, clickedTag, clickedPosition, tableName, gottenCursor, WaveActivity.WORKOUT_ITEM_FUNCTION);
             }
         }
 
@@ -166,8 +169,15 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
             if (!gottenCursor.moveToPosition(position))
                 return;
 
+            Log.d("WORKOUTID", "WORKOUTID" + workoutId + "");
+            Log.d("WORKOUTID", "GOTTENID" + gottenCursor.getInt(gottenCursor.getColumnIndex(WorkoutContract.WorkoutEntry1._ID)) + "");
+            if (workoutIsRunning && gottenCursor
+                    .getInt(gottenCursor.getColumnIndex(WorkoutContract.WorkoutEntry1._ID)) == workoutId) {
+                engageButton.setBackgroundResource(R.drawable.emo_im_tongue_sticking_out);
+            } else {
+                engageButton.setBackgroundResource(R.drawable.ic_menu_play_clip);
+            }
             favButton.setBackgroundResource(R.drawable.dialog_ic_close_focused_holo_light);
-            engageButton.setBackgroundResource(R.drawable.ic_menu_play_clip);
             favButton.setOnClickListener(this);
             exerciseItem.setOnClickListener(this);
             engageButton.setOnClickListener(this);
@@ -242,8 +252,10 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
         //SQLite stuff
     }
 
-    public void swapCursor(Cursor newCursor) {
+    public void swapCursor(Cursor newCursor, boolean workoutIsRunning, int workoutId) {
         // Always close the previous gottenCursor first
+        this.workoutIsRunning = workoutIsRunning;
+        this.workoutId = workoutId;
         if (gottenCursor != null) gottenCursor.close();
         gottenCursor = newCursor;
         if (newCursor != null) {
