@@ -4,12 +4,15 @@ PROJECT IS IN DEVELOPMENT.
 
 Feel free to contribute or request new features.
 
-![imgur](https://i.imgur.com/tdaZoaL.gif)
+App APK:
+https://drive.google.com/open?id=0BxroN2uvzu3QU0xKcUxuTlo0cjQ
+
+![](https://i.imgur.com/tdaZoaL.gif)
 
 Current features:
 - Preset workouts, for example 4 legs of 50 strokes at SPM 22, 24, 26, 28
 - Option to add new workouts
-- Background beeping service, allowing combined use with other sports apps
+- Background beeping service allowing combined use with other sports apps
 - Workouts based on distance (GPS Location) and time
 - Workout history/logbook
 - Countdown before starting workout
@@ -19,7 +22,6 @@ Planned features:
 
 Known bugs:
 - you tell me.
-
 
 ## Motivation
 

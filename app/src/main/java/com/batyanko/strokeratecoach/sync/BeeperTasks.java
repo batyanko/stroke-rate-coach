@@ -100,7 +100,7 @@ public class BeeperTasks {
     private Location currentLocation;
     private static float currentSpeed;
     private static float locationAccuracy;
-    private static final float ACCEPTABLE_ACCURACY = 21;
+    private static final float ACCEPTABLE_ACCURACY = 5;
 
     //TODO make static?
     private long startTime = System.currentTimeMillis();
