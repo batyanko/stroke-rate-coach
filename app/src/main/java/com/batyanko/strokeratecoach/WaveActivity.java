@@ -74,6 +74,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     public static final String COUNTDOWN_DURATION_LEFT = "countdown-duration-left";   //In ms
     public static final String BEEP = "beep";
 
+
     /* Global spm setting to hold current spm */
     public static int spm;
 
@@ -256,11 +257,17 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
             return;
         }
 
+        float rowingSpeed = (1/(pref.getFloat(CURRENT_SPEED, 0))) * 500;
+        int rowingSpeedInt = (int)(rowingSpeed/60);
+        String remainder = "" + (((int)rowingSpeed)%60);
+        if (remainder.length() == 1) remainder = "0" + remainder;
+        String rowingSpeedString = rowingSpeedInt + ":" + remainder;
+
         progressTextView.setText(progress[0] +
                 " / " + progress[1] +
                 " at " +
-                pref.getFloat(CURRENT_SPEED, 0) +
-                " m/s");
+                rowingSpeedString +
+                "/500m");
         progressTextView.setVisibility(View.VISIBLE);
 
         int progressPercent = (int) (((float) progress[0] / (float) progress[1]) * 100);

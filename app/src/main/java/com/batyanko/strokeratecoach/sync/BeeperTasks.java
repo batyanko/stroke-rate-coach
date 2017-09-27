@@ -98,9 +98,15 @@ public class BeeperTasks {
 
     private Location startingLocation;
     private Location currentLocation;
-    private static float currentSpeed;
-    private static float locationAccuracy;
     private static final float ACCEPTABLE_ACCURACY = 5;
+    private static float locationAccuracy;
+    private static float currentSpeed;
+    private static float[] averageSpeedPool;
+    private static float averageSpeed;
+    private static int speedCycleCount;
+    //TODO add preference for sample count
+    private static int speedSampleCount = 10;
+    private static boolean speedPoolIsFull;
 
     //TODO make static?
     private long startTime = System.currentTimeMillis();
@@ -118,9 +124,10 @@ public class BeeperTasks {
             pref = PreferenceManager.getDefaultSharedPreferences(beeperService);
             mSppType = sppType;
             initBeeper();
+            initLocation(beeperService);
 
             if (mSppType == SPP_TYPE_METERS) {
-                initLocation(beeperService);
+//                initLocation(beeperService);
             }
             if (mSppType == SPP_TYPE_SECONDS) {
                 initTimeTimerTask();
@@ -172,6 +179,9 @@ public class BeeperTasks {
         phasesTotal = 0;
         color = 0;
         beeps = 0;
+        averageSpeedPool = new float[speedSampleCount];
+        speedCycleCount = 0;
+        speedPoolIsFull = false;
 
         cancelTimer(workoutTimer, workoutTimerTask);
         cancelTimer(timeTimer, timeTimerTask);
@@ -286,10 +296,11 @@ public class BeeperTasks {
                         }
                     }
                 }
-                pref.edit().putFloat(WaveActivity.CURRENT_SPEED, currentSpeed).apply();
+                toneGen1.startTone(ToneGenerator.TONE_CDMA_EMERGENCY_RINGBACK, 150);
+                updateAverageSpeed();
                 pref.edit().putInt(WaveActivity.BEEP, ++beeps).apply();
                 Log.d("TEHBEEP", "BEEP!");
-                toneGen1.startTone(ToneGenerator.TONE_CDMA_EMERGENCY_RINGBACK, 150);
+
             }
         };
         workoutTimer = new Timer();
@@ -446,6 +457,27 @@ public class BeeperTasks {
 
     }
 
+    private void updateAverageSpeed() {
+        averageSpeedPool[speedCycleCount] = currentSpeed;
+        Log.d("SPEEDCYCLE", "" + speedCycleCount);
+        Log.d("POOLISFULL", " " + speedPoolIsFull);
+        if (speedCycleCount == 9) {
+            speedCycleCount = 0;
+            speedPoolIsFull = true;
+            Log.d("REACH9", "check");
+        } else speedCycleCount++;
+        if (speedPoolIsFull) {
+            float z = 0;
+            for(float x : averageSpeedPool) {
+                z+=x;
+                Log.d("TEHZ", "" + z);
+            }
+            z/=10;
+            Log.d("TEHZ final", "" + z);
+            pref.edit().putFloat(WaveActivity.CURRENT_SPEED, z).apply();
+        }
+    }
+
     public class TehLocListener implements IBaseGpsListener {
 
         Context context;
@@ -471,6 +503,7 @@ public class BeeperTasks {
                     locationAccuracy = location.getAccuracy();
                     currentLocation = location;
                     currentSpeed = location.getSpeed();
+
                     phaseProgress = (int) location.distanceTo(startingLocation);
                     Log.d("UPDATESPEED", "" + phaseProgress);
                 }
