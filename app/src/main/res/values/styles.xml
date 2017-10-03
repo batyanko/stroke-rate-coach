@@ -12,4 +12,8 @@
     <style name="AppTheme2" parent="Theme.AppCompat.Light.NoActionBar">
     </style>
 
+    <style name="waveProgress">
+        <!--<item name="progressDrawable">@</item>-->
+    </style>
+
 </resources>

@@ -87,6 +87,10 @@ public class BeeperService extends NonStopIntentService {
         }
 
         String action = intent.getAction();
+        if (action.equals(BeeperTasks.ACTION_JUST_BIND)) {
+            return;
+        }
+
         beeperTasks = new BeeperTasks();
         int[] workoutSpp = intent.getIntArrayExtra(BeeperTasks.EXTRA_WORKOUT_SPP);
         int[] workoutGears = intent.getIntArrayExtra(BeeperTasks.EXTRA_WORKOUT_GEARS);

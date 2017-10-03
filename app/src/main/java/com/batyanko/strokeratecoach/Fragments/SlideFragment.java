@@ -100,6 +100,10 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         // Required empty public constructor
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -378,8 +382,10 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
             lastClickedEngageButton.setBackgroundResource(R.drawable.ic_menu_play_clip);
         }
         if (mBeeperService == null) {
+            Log.d("ONDESTROY", "beeperNULL");
             return;
         }
+        Log.d("ONDESTROY", "beeper");
         intent.setAction(BeeperTasks.ACTION_STOP_BEEP);
         mBeeperService.doEpicShit(intent);
     }

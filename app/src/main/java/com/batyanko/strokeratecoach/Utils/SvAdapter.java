@@ -218,7 +218,7 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
                         sppType = "";
                     }
                 }
-                String at = mContext.getString(R.string.gear_title_text);
+                String at = mContext.getString(R.string.gear_title_text) + " ";
 
                 if (tableName.equals(WorkoutContract.WorkoutEntry1.TABLE_NAME_PRESETS)) {
                     scrollItemName = localDate +

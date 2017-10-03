@@ -24,7 +24,9 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -33,6 +35,10 @@ import com.batyanko.strokeratecoach.Speed.IBaseGpsListener;
 import com.batyanko.strokeratecoach.Utils.SpmUtilities;
 import com.batyanko.strokeratecoach.WaveActivity;
 
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -48,36 +54,38 @@ public class BeeperTasks {
     public static final String ACTION_START_BEEP = "start-beep";
     public static final String ACTION_STOP_BEEP = "stop-beep";
     public static final String ACTION_CHECK_SERVICE = "check-service";
+    public static final String ACTION_JUST_BIND = "just-bind";
 
     //SPP (strokes or stuff per phase) unit types
     public static final int SPP_TYPE_STROKES = 0;
     public static final int SPP_TYPE_METERS = 1;
-    public static final int SPP_TYPE_SECONDS = 2;
 
+
+    public static final int SPP_TYPE_SECONDS = 2;
 
     //VALUES FROM WaveActivity
 
     /* Global spm setting to hold current spm */
     public static int spm = 22;
-
     //Variables used in beeping workoutTimer setup
     private static long strokeDuration;
     public static String spmString;
     private static ToneGenerator toneGen1;
+
     private static ToneGenerator countdownToneGen;
-
     private static Timer workoutTimer;
+
     private static TimerTask workoutTimerTask;
-
     private static Timer timeTimer;
+
     private static TimerTask timeTimerTask;
-
     private static Timer countdownTimer;
+
+
     private static TimerTask countdownTimerTask;
-
-
     //autoWave values
     private static int workoutRunning;     //0=off, 1=autoWave, 2=autoProgress, 9=lastPhase
+    private static int countdownRunning;    //0=off, 1=on
     private static int totalWorkoutCount;
     private static int phaseTrigger;
     private static int phase;    //phase = 0 = wave not running
@@ -96,20 +104,24 @@ public class BeeperTasks {
 
     //END OF COPIED VALUES
 
-    private Location startingLocation;
-    private Location currentLocation;
+    private CLocation currentLocation;
+    private CLocation startingPhaseLocation;
     private static final float ACCEPTABLE_ACCURACY = 5;
     private static float locationAccuracy;
     private static float currentSpeed;
-    private static float[] averageSpeedPool;
-    private static float averageSpeed;
-    private static int speedCycleCount;
+
+    private CLocation[] locationPool;
+
+    private static float averageSpeed;  //In m/s
+
+    private static int locCycleCount;
     //TODO add preference for sample count
-    private static int speedSampleCount = 10;
-    private static boolean speedPoolIsFull;
+    private static final int SPEED_SAMPLE_COUNT = 10;
+
+    private static boolean locationPoolIsFull;
 
     //TODO make static?
-    private long startTime = System.currentTimeMillis();
+    private long startTime;
     private int timeTimerProgress;
     private int countdownCyclesTotal;
     private int countdownCycles;
@@ -121,9 +133,8 @@ public class BeeperTasks {
                      int[] sppSettings, int[] gearSettings, int sppType) {
         if (action.equals(ACTION_START_BEEP)) {
             Log.d("TEHSERVICE", "at execute task");
-            pref = PreferenceManager.getDefaultSharedPreferences(beeperService);
             mSppType = sppType;
-            initBeeper();
+            initBeeper(beeperService);
             initLocation(beeperService);
 
             if (mSppType == SPP_TYPE_METERS) {
@@ -135,6 +146,7 @@ public class BeeperTasks {
 
             if (gearSettings != null) {
                 if (sppSettings == null) {  //Manual SPM setting
+                    //TODO show speed?
                     flushUI();
                     spm = gearSettings[0];
                     startTheTempo(beeperService);
@@ -153,9 +165,9 @@ public class BeeperTasks {
         }
     }
 
-    private void initBeeper() {
+    private void initBeeper(BeeperService beeperService) {
 
-        resetVariables();
+        resetVariables(beeperService);
 
         toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
         countdownToneGen = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
@@ -170,8 +182,11 @@ public class BeeperTasks {
         };
     }
 
-    private void resetVariables() {
+    private void resetVariables(BeeperService beeperService) {
+        pref = PreferenceManager.getDefaultSharedPreferences(beeperService);
+
         workoutRunning = 0;     //0=off, 1=autoWave, 2=autoProgress, 9=lastPhase
+        countdownRunning = 0;
         phaseProgress = 0;
         totalWorkoutCount = 0;
         phaseTrigger = 0;
@@ -179,19 +194,19 @@ public class BeeperTasks {
         phasesTotal = 0;
         color = 0;
         beeps = 0;
-        averageSpeedPool = new float[speedSampleCount];
-        speedCycleCount = 0;
-        speedPoolIsFull = false;
+        locationPool = new CLocation[SPEED_SAMPLE_COUNT];
+        locCycleCount = 0;
+        locationPoolIsFull = false;
 
         cancelTimer(workoutTimer, workoutTimerTask);
         cancelTimer(timeTimer, timeTimerTask);
         cancelTimer(countdownTimer, countdownTimerTask);
 
         countdownCycles = 0;
-        countdownDuration = pref.getInt(WaveActivity.COUNTDOWN_DURATION, 3000);
         //TODO add setting for countdown cycle length / frequency?
+        countdownDuration = pref.getInt(WaveActivity.COUNTDOWN_DURATION, 3000);
         countdownCycleDuration = 100;
-        countdownCyclesTotal = countdownDuration/ countdownCycleDuration;
+        countdownCyclesTotal = countdownDuration / countdownCycleDuration;
 
         phaseProgress = 0;
         locationAccuracy = 500;     //Init at an extremely inaccurate value, i.e. no accuracy
@@ -201,6 +216,7 @@ public class BeeperTasks {
 
     private void flushUI() {
         pref.edit().putInt(WaveActivity.OPERATION_SETTING, workoutRunning).apply();
+        pref.edit().putInt(WaveActivity.COUNTDOWN_DURATION_LEFT, countdownRunning).apply();
         Boolean bool = pref.getBoolean(WaveActivity.SWITCH_SETTING, true);
         pref.edit().putBoolean(WaveActivity.SWITCH_SETTING, !bool).apply();
     }
@@ -250,7 +266,7 @@ public class BeeperTasks {
                         case SPP_TYPE_METERS: {
                             if (phaseProgress > phaseTrigger) {
                                 cancel();
-                                startingLocation = currentLocation;
+                                startingPhaseLocation = currentLocation;
                                 phaseProgress = 0;
                                 switch (workoutRunning) {
                                     case 2:
@@ -327,9 +343,10 @@ public class BeeperTasks {
      * Reset the current workout and stop beeping.
      */
     private void endWorkout(BeeperService beeperService) {
-        resetVariables();
+        resetVariables(beeperService);
         cancelTimer(workoutTimer, workoutTimerTask);
         cancelTimer(timeTimer, timeTimerTask);
+        cancelTimer(countdownTimer, countdownTimerTask);
 
 //        pref = PreferenceManager.getDefaultSharedPreferences(beeperService);
         pref.edit().putInt(WaveActivity.SPM_SETTING, 0).apply();
@@ -377,6 +394,8 @@ public class BeeperTasks {
     }
 
     private void startPhase(int lengthTrigger, int tempo, BeeperService beeperService) {
+        //Init starting time for time-based workouts
+        startTime = System.currentTimeMillis();
 
 //        pref = PreferenceManager.getDefaultSharedPreferences(beeperService);
         phaseTrigger = lengthTrigger;
@@ -403,7 +422,6 @@ public class BeeperTasks {
         pref.edit().putInt(WaveActivity.TOTAL_WORKOUT_LENGTH, totalWorkoutLength).apply();
 
 
-
         Boolean bool = pref.getBoolean(WaveActivity.SWITCH_SETTING, true);
         pref.edit().putBoolean(WaveActivity.SWITCH_SETTING, !bool).apply();
 
@@ -420,11 +438,10 @@ public class BeeperTasks {
             @Override
             public void run() {
                 if (countdownCycles % 10 == 0) {
-                    pref.edit().putInt(WaveActivity.COUNTDOWN_DURATION_LEFT, countdownDuration-countdownCycles*100).apply();
-                    Log.d("CountdownDigits", "" + (countdownDuration-countdownCycles*100));
+                    pref.edit().putInt(WaveActivity.COUNTDOWN_DURATION_LEFT, countdownDuration - countdownCycles * 100).apply();
+                    Log.d("CountdownDigits", "" + (countdownDuration - countdownCycles * 100));
                 }
-                if (++countdownCycles >= countdownCyclesTotal)
-                {
+                if (++countdownCycles >= countdownCyclesTotal) {
                     pref.edit().putInt(WaveActivity.COUNTDOWN_DURATION_LEFT, 0).apply();
                     autoProgress(beeperService);
                     cancelTimer(countdownTimer, this);
@@ -458,23 +475,46 @@ public class BeeperTasks {
     }
 
     private void updateAverageSpeed() {
-        averageSpeedPool[speedCycleCount] = currentSpeed;
-        Log.d("SPEEDCYCLE", "" + speedCycleCount);
-        Log.d("POOLISFULL", " " + speedPoolIsFull);
-        if (speedCycleCount == 9) {
-            speedCycleCount = 0;
-            speedPoolIsFull = true;
-            Log.d("REACH9", "check");
-        } else speedCycleCount++;
-        if (speedPoolIsFull) {
-            float z = 0;
+        if (currentLocation == null) return;
+        locationPool[locCycleCount] = currentLocation;
+
+        //TESTING
+        for (CLocation i : locationPool) {
+            Log.d("SPEEDCYCLE array", "" + i);
+        }
+        Log.d("SPEEDCYCLE", "" + locCycleCount);
+        Log.d("SPEEDCYCLE POOLISFULL", " " + locationPoolIsFull);
+        if (locCycleCount == 9) {
+            locCycleCount = 0;
+            locationPoolIsFull = true;
+            Log.d("SPEEDCYCLE REACH9", "check");
+        } else locCycleCount++;
+        if (locationPoolIsFull && locationPool[locCycleCount] != null) {
+            Log.d("SPEEDCYCLE", "poolisfull");
+            long timeDiffMillis;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                timeDiffMillis =
+                        (currentLocation.getElapsedRealtimeNanos() - locationPool[locCycleCount].getElapsedRealtimeNanos())/1000000;
+                Log.d("TEHFLOAT", "timediff1: " + timeDiffMillis);
+
+            } else {
+                timeDiffMillis =
+                        currentLocation.getTime() - locationPool[locCycleCount].getTime();
+                Log.d("TEHFLOAT", "timediff2" + (int)timeDiffMillis);
+            }
+            averageSpeed = (currentLocation.distanceTo(locationPool[locCycleCount]) / (((float)timeDiffMillis)/1000));
+            Log.d("TEHFLOAT", "distance: " + currentLocation.distanceTo(locationPool[locCycleCount]));
+            Log.d("TEHFLOAT", "timediffMillis: " + (float)timeDiffMillis);
+            Log.d("TEHFLOAT", "AVG speed" + (int)averageSpeed);
+
+/*            float z = 0;
             for(float x : averageSpeedPool) {
                 z+=x;
-                Log.d("TEHZ", "" + z);
+                Log.d("SPEEDCYCLE TEHZ", "" + z);
             }
             z/=10;
-            Log.d("TEHZ final", "" + z);
-            pref.edit().putFloat(WaveActivity.CURRENT_SPEED, z).apply();
+            Log.d("SPEEDCYCLE TEHZfinal(", "" + z);*/
+            pref.edit().putFloat(WaveActivity.CURRENT_SPEED, averageSpeed).apply();
         }
     }
 
@@ -488,23 +528,44 @@ public class BeeperTasks {
             this.context = context;
         }
 
-        private void updateDistance(CLocation location) {
-            Log.d("UPDATESPEED", "YEP");
-
-
-//                location.setUseMetricunits(true);
+        private void updateLocation(CLocation location) {
+            location.setUseMetricunits(true);
             locationAccuracy = location.getAccuracy();
             Log.d("UPDATESPEED", "Accuracy: " + locationAccuracy);
             if (locationAccuracy <= ACCEPTABLE_ACCURACY) {
 
-                if (startingLocation == null) {
-                    startingLocation = location;
+                //TESTING
+                long getNanos = 0;
+                long gettime = location.getTime();
+                long currNanoTime = 0;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                    getNanos = location.getElapsedRealtimeNanos();
+                    currNanoTime = SystemClock.elapsedRealtimeNanos();
+                }
+                long currTime = System.currentTimeMillis();
+
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.US);
+                SimpleDateFormat sdfSimple = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+                ParsePosition pp = new ParsePosition(0);
+                Date dtCurr = new Date(currTime);
+                Date dtLoc = new Date(gettime);
+
+                Log.d("SPEEDCYCLE TIMEACC", "--------------------");
+                Log.d("SPEEDCYCLE TIMEACC", "currtime: " + currTime + " " + sdf.format(dtCurr));
+                Log.d("SPEEDCYCLE TIMEACC", "currnanotime: " + currNanoTime);
+                Log.d("SPEEDCYCLE TIMEACC", "gettime: " + gettime + " " + sdf.format(dtLoc));
+                Log.d("SPEEDCYCLE TIMEACC", "gettimeDIF: " + (currTime - gettime));
+                Log.d("SPEEDCYCLE TIMEACC", "getNanos: " + getNanos);
+                Log.d("SPEEDCYCLE TIMEACC", "nanosDIF: " + (currNanoTime - getNanos));
+
+                if (startingPhaseLocation == null) {
+                    startingPhaseLocation = location;
                 } else {
                     locationAccuracy = location.getAccuracy();
                     currentLocation = location;
                     currentSpeed = location.getSpeed();
 
-                    phaseProgress = (int) location.distanceTo(startingLocation);
+                    phaseProgress = (int) location.distanceTo(startingPhaseLocation);
                     Log.d("UPDATESPEED", "" + phaseProgress);
                 }
             }
@@ -521,7 +582,7 @@ public class BeeperTasks {
             Log.d("UPDATESPEED", "onLocationChanged");
             if (location != null) {
                 CLocation myLocation = new CLocation(location, this.useMetricUnits());
-                this.updateDistance(myLocation);
+                this.updateLocation(myLocation);
             }
 
         }
@@ -539,8 +600,8 @@ public class BeeperTasks {
         @Override
         public void onStatusChanged(String provider, int status, Bundle extras) {
             /*if (status == LocationProvider.AVAILABLE) {
-                if (startingLocation == null) {
-                    startingLocation
+                if (startingPhaseLocation == null) {
+                    startingPhaseLocation
                 }
             }*/
         }

@@ -26,18 +26,25 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="0dp"
+    android:clipToPadding="false"
     tools:context="com.batyanko.strokeratecoach.WaveActivity">
+
+
 
     <TextView
         android:id="@+id/countdown_text_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:gravity="center"
         android:textSize="96sp"
         android:fontFamily="serif"
         android:elevation="3dp"
         android:textColor="#00076b"
-        android:background="@drawable/water"
+        android:background="@drawable/ic_tracing_smooth_2"
+        android:layout_marginLeft="-64dp"
+        android:layout_marginRight="-64dp"
+        android:layout_marginTop="-64dp"
+        android:layout_marginBottom="-64dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -48,6 +55,7 @@
         android:id="@+id/wave_progress_bar_2"
         style="@android:style/Widget.ProgressBar.Horizontal"
         android:layout_width="0dp"
+        android:progressDrawable="@drawable/wave_progress"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginLeft="8dp"
