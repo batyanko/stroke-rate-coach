@@ -4,9 +4,9 @@ PROJECT IS IN DEVELOPMENT. Feel free to contribute or request new features.
 
 Get the .apk here:
 
-https://drive.google.com/open?id=0BxroN2uvzu3QU0xKcUxuTlo0cjQ
+https://drive.google.com/open?id=0BxroN2uvzu3QSFpzcm1tYjVjOFE
 
-![giphy](https://media.giphy.com/media/3ohhwMWj0F5ZDtj03K/giphy.gif)
+![giphy](https://media.giphy.com/media/3ohhwfjMYeAgHFsYYU/giphy.gif)
 
 Current features:
 - Preset workouts, for example 4 legs of 50 strokes at SPM 22, 24, 26, 28
@@ -20,7 +20,8 @@ Planned features:
 - Visual refinements
 
 Known bugs:
-- you tell me.
+- Location listener sometimes persists in the background on API 22
+- you tell me
 
 ## Motivation
 

@@ -19,13 +19,21 @@ package com.batyanko.strokeratecoach;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.LinearGradient;
+import android.graphics.RadialGradient;
+import android.graphics.Shader;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.constraint.ConstraintLayout;
+import android.support.constraint.ConstraintSet;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -84,6 +92,8 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     private TextView countdownView;
     private TextView spmTextView;
     private TextView progressTextView;
+
+    private TextView gradView;
 
     private ImageView water;
 
@@ -165,8 +175,12 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
                     new String[]{"android.permission.ACCESS_FINE_LOCATION"}, MY_LOCATION_PERMISSION);
         }
 
+
         countdownView = findViewById(R.id.countdown_text_view);
-        countdownView.setVisibility((View.INVISIBLE));
+//        countdownView.setVisibility((View.INVISIBLE));
+
+        gradView = findViewById(R.id.that_gradient);
+        gradView.setVisibility(View.INVISIBLE);
 
         //Bind to service if already running (in case of screen rotation / onDestroy)
 
@@ -184,6 +198,26 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     @Override
     protected void onResume() {
         super.onResume();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+//        Animation animation = new AlphaAnimation(1,0);
+//        animation.setDuration(2000);
+
+            countdownView.animate().alpha(0f).setDuration(1000).withEndAction(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.d("ALPHAA", "" + countdownView.getAlpha());
+                            countdownView.setAlpha(1);
+                            countdownView.setVisibility(View.INVISIBLE);
+                        }
+                    }
+            );
+        } else {
+            countdownView.setVisibility(View.INVISIBLE);
+        }
+//        countdownView.startAnimation(animation);
+
         if (pref.getInt(OPERATION_SETTING, 0) == WORKOUT_PROGRESS) {
             //Bind to service if a workout is running
             Intent intent = new Intent(this, BeeperService.class);
@@ -213,6 +247,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         waveProgress.setVisibility(View.INVISIBLE);
         progressTextView.setVisibility(View.INVISIBLE);
         waveButton.setVisibility(View.VISIBLE);
+        gradView.setVisibility(View.INVISIBLE);
 //        spmTextView.setText("0");
 //        spmTextView.setBackgroundColor(Color.TRANSPARENT);
     }
@@ -259,12 +294,15 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
             Log.d("TEHDURATION", durationLeft + "");
             if (durationLeft == 0) {
                 countdownView.setVisibility(View.INVISIBLE);
+                gradView.setVisibility(View.INVISIBLE);
 //                SlideFragment.lastClickedEngageButton.setBackgroundResource(R.drawable.ic_menu_play_clip_negative);
             } else {
-                countdownView.setText(countdownString);
+                gradView.setText(countdownString);
                 countdownView.bringToFront();
 //                countdownView.requestLayout();
                 countdownView.setVisibility(View.VISIBLE);
+                gradView.setVisibility(View.VISIBLE);
+                gradView.bringToFront();
                 Log.d("ANIMATEE", "values: " + duration + " " + durationLeft);
                 if (durationLeft == duration) {
                     Log.d("ANIMATEE", "check");
