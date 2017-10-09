@@ -28,7 +28,7 @@
     <string name="strokes">загребоци</string>
     <string name="workout_name_title">Име на тренировката</string>
     <string name="workout_unit_choose_title">Изберете мерна единица за тази тренировка</string>
-    <string name="gear_title_text">на темпо</string>
+    <string name="gear_title_text">на</string>
     <string name="workout_desc_tooltip">Описание (по желание)</string>
     <string name="speed_dial_title">Бърз набор</string>
     <string name="workouts_title">Тренировки</string>

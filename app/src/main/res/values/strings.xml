@@ -30,7 +30,7 @@
     <string name="workout_name_title">Workout name:</string>
     <string name="workout_desc_tooltip">Add workout description?</string>
     <string name="button_add_phase_label">+ Phase</string>
-    <string name="gear_title_text">strokes at spm</string>
+    <string name="gear_title_text">at</string>
     <string name="phase_title_text">Phase</string>
     <string name="tpp_title_text">Time</string>
     <string name="dpp_title_text">Distance</string>

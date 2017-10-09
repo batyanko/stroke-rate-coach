@@ -122,8 +122,8 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
     }
 
     public class ExerciseViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        private TextView exerciseItem;
-        private Button favButton;
+        private TextView exerciseText;
+        private Button delButton;
         private TextView engageButton;
         private final int itemId;
         private final int favButtonId;
@@ -133,12 +133,12 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
         public ExerciseViewHolder(View itemView) {
             super(itemView);
 
-            exerciseItem = (TextView) itemView.findViewById(R.id.exercise_text);
-            favButton = (Button) itemView.findViewById(R.id.fav_button);
+            exerciseText = (TextView) itemView.findViewById(R.id.exercise_text);
+            delButton = (Button) itemView.findViewById(R.id.del_button);
             engageButton = (Button) itemView.findViewById(R.id.engage_button);
             //TODO Make sure IDs are unique?
-            itemId = exerciseItem.getId();
-            favButtonId = favButton.getId();
+            itemId = exerciseText.getId();
+            favButtonId = delButton.getId();
             engageButtonId = engageButton.getId();
         }
 
@@ -162,7 +162,7 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
         }
 
         private void bind(int position) {
-//            exerciseItem.setText(String.valueOf(position));
+//            exerciseText.setText(String.valueOf(position));
 
             ////////////////
             //SQLite stuff
@@ -174,12 +174,15 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
             if (workoutIsRunning && gottenCursor
                     .getInt(gottenCursor.getColumnIndex(WorkoutContract.WorkoutEntry1._ID)) == workoutId) {
                 engageButton.setBackgroundResource(R.drawable.emo_im_tongue_sticking_out);
+
             } else {
-                engageButton.setBackgroundResource(R.drawable.ic_menu_play_clip);
+//                engageButton.setBackgroundResource(android.R.drawable.ic_media_play);
+                engageButton.setBackgroundResource(R.drawable.ic_play_2);
             }
-            favButton.setBackgroundResource(R.drawable.dialog_ic_close_focused_holo_light);
-            favButton.setOnClickListener(this);
-            exerciseItem.setOnClickListener(this);
+//            delButton.setBackgroundResource(R.drawable.dialog_ic_close_focused_holo_light);
+            delButton.setBackgroundResource(R.drawable.ic_delete);
+            delButton.setOnClickListener(this);
+            exerciseText.setOnClickListener(this);
             engageButton.setOnClickListener(this);
 
             String scrollItemName;
@@ -246,9 +249,10 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
             }
 
 
-            exerciseItem.setText(scrollItemName);
+            exerciseText.setText(scrollItemName);
 
             this.itemView.setTag(gottenCursor.getLong(gottenCursor.getColumnIndex(WorkoutContract.WorkoutEntry1._ID)));
+            Log.d("TEHWIDTH", "" + delButton.getWidth());
         }
 
         ///////////////////

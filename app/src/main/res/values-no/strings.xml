@@ -27,7 +27,7 @@
     <string name="strokes">roingslag</string>
     <string name="workout_name_title">Navn på treningen</string>
     <string name="workout_unit_choose_title">Velg måleenheter</string>
-    <string name="gear_title_text">med SPM</string>
+    <string name="gear_title_text">med</string>
     <string name="workout_desc_tooltip">Beskrivelse (valgfri)</string>
     <string name="speed_dial_title">Hurtigvalg</string>
     <string name="workouts_title">Trening</string>

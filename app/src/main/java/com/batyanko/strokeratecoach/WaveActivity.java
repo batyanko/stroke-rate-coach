@@ -19,21 +19,14 @@ package com.batyanko.strokeratecoach;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.LinearGradient;
-import android.graphics.RadialGradient;
-import android.graphics.Shader;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.constraint.ConstraintLayout;
-import android.support.constraint.ConstraintSet;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -93,7 +86,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     private TextView spmTextView;
     private TextView progressTextView;
 
-    private TextView gradView;
+    private TextView countdownDigit;
 
     private ImageView water;
 
@@ -116,11 +109,16 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     static int random;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d("BENCHMARKING", "0");
+
         super.onCreate(savedInstanceState);
+        Log.d("BENCHMARKING", "0.5");
+
         setContentView(R.layout.activity_wave);
 
         Log.d("INTHEBEGINNING", "" + BeeperTasks.spm);
 
+        Log.d("BENCHMARKING", "1");
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.registerOnSharedPreferenceChangeListener(this);
 
@@ -129,6 +127,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         transaction.replace(R.id.slide_frame_layout, slideFragment);
         //TODO add to back stack?
         transaction.commit();
+        Log.d("BENCHMARKING", "2");
 
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
@@ -139,6 +138,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         pref = PreferenceManager.getDefaultSharedPreferences(this);
         spm = pref.getInt(SPM_SETTING, 0);
 
+        Log.d("BENCHMARKING", "3");
         //Initialize UI elements
 
         waveProgress = (ProgressBar) findViewById(R.id.wave_progress_bar_2);
@@ -157,6 +157,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
             }
         });
         waveButton.setVisibility(View.VISIBLE);
+        Log.d("BENCHMARKING", "4");
 
         int resource = getResources().getIdentifier("status_bar_height", "dimen", "android");
         if (resource > 0) {
@@ -175,24 +176,23 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
                     new String[]{"android.permission.ACCESS_FINE_LOCATION"}, MY_LOCATION_PERMISSION);
         }
 
+        Log.d("BENCHMARKING", "5");
 
         countdownView = findViewById(R.id.countdown_text_view);
 //        countdownView.setVisibility((View.INVISIBLE));
 
-        gradView = findViewById(R.id.that_gradient);
-        gradView.setVisibility(View.INVISIBLE);
+        countdownDigit = findViewById(R.id.countdown_digit);
+        countdownDigit.setVisibility(View.INVISIBLE);
 
         //Bind to service if already running (in case of screen rotation / onDestroy)
-
-
-
-
+        Log.d("BENCHMARKING", "6");
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         onProgressChange();
+        Log.d("BENCHMARKING", "7");
     }
 
     @Override
@@ -224,6 +224,12 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
             intent.setAction(BeeperTasks.ACTION_JUST_BIND);
             slideFragment.doBindService(intent);
         }
+        Log.d("BENCHMARKING", "8");
+    }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
     }
 
     @Override
@@ -247,7 +253,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         waveProgress.setVisibility(View.INVISIBLE);
         progressTextView.setVisibility(View.INVISIBLE);
         waveButton.setVisibility(View.VISIBLE);
-        gradView.setVisibility(View.INVISIBLE);
+        countdownDigit.setVisibility(View.INVISIBLE);
 //        spmTextView.setText("0");
 //        spmTextView.setBackgroundColor(Color.TRANSPARENT);
     }
@@ -264,6 +270,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
 
         if (s.equals(SPM_SETTING)) {
+            Log.d("BENCHMARKING", "pref changed and registered");
             spm = sharedPreferences.getInt(SPM_SETTING, 22);
             spmTextView.setText(String.valueOf(spm));
         } else if (s.equals(SWITCH_SETTING)) {
@@ -294,22 +301,22 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
             Log.d("TEHDURATION", durationLeft + "");
             if (durationLeft == 0) {
                 countdownView.setVisibility(View.INVISIBLE);
-                gradView.setVisibility(View.INVISIBLE);
+                countdownDigit.setVisibility(View.INVISIBLE);
 //                SlideFragment.lastClickedEngageButton.setBackgroundResource(R.drawable.ic_menu_play_clip_negative);
             } else {
-                gradView.setText(countdownString);
+                countdownDigit.setText(countdownString);
                 countdownView.bringToFront();
 //                countdownView.requestLayout();
                 countdownView.setVisibility(View.VISIBLE);
-                gradView.setVisibility(View.VISIBLE);
-                gradView.bringToFront();
+                countdownDigit.setVisibility(View.VISIBLE);
+                countdownDigit.bringToFront();
                 Log.d("ANIMATEE", "values: " + duration + " " + durationLeft);
                 if (durationLeft == duration) {
                     Log.d("ANIMATEE", "check");
                     AnimationSet animationSet = new AnimationSet(true);
                     /*Animation animationOut = AnimationUtils.loadAnimation(WaveActivity.this, R.anim.alpha_fade);
                     Animation animationIn = AnimationUtils.loadAnimation(WaveActivity.this, R.anim.alpha_fade_in);*/
-                    Animation animationIn = new ScaleAnimation(0, 1, 0, 1, windowWidth-20, windowHeight*3/4);
+                    Animation animationIn = new ScaleAnimation(0, 1, 0, 1, 20, windowHeight*3/4);
                     Animation animationOut = new AlphaAnimation(1,0);
                     animationOut.setDuration(duration*1000 - 100);
                     animationOut.setStartOffset(100);

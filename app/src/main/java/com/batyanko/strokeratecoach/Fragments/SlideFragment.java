@@ -42,6 +42,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.batyanko.strokeratecoach.R;
@@ -95,6 +96,8 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
 
     public int lastWorkoutId;
     private boolean workoutIsRunning;
+
+    private View lastDigitView;
 
     public SlideFragment() {
         // Required empty public constructor
@@ -348,6 +351,8 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
 
     public void setSpmFromDigital(int digitalInput, View view) {
         if (firstDigit != 0) {
+            firstDigitView.animate().scaleX(1);
+            firstDigitView.animate().scaleY(1);
             firstDigitView.setBackgroundColor(Color.TRANSPARENT);
             spm = firstDigit * 10 + digitalInput;
             int[] gearArray = new int[]{spm};
@@ -357,7 +362,10 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         } else {
             firstDigit = digitalInput;
             firstDigitView = view;
-            view.setBackgroundColor(Color.RED);
+
+            view.animate().scaleX(1.1f).setDuration(50).start();
+            view.animate().scaleY(1.1f).setDuration(50).start();
+            view.setBackgroundColor(0xff33b5e5);
 
 //            Log.d("GridHeight!!!: ", "" + dialGrid.getHeight());
 //            Log.d("WindowHeight!!!: ", "" + windowHeight);
