@@ -41,10 +41,10 @@
         android:elevation="3dp"
         android:textColor="#00076b"
         android:background="@drawable/ic_tracing_smooth_2"
-        android:layout_marginLeft="-64dp"
-        android:layout_marginRight="-64dp"
-        android:layout_marginTop="-64dp"
-        android:layout_marginBottom="-64dp"
+        android:layout_marginLeft="-20dp"
+        android:layout_marginRight="-20dp"
+        android:layout_marginTop="-20dp"
+        android:layout_marginBottom="-20dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -62,8 +62,8 @@
         android:lineSpacingExtra="0dp"
         android:elevation="3dp"
         android:background="@android:color/holo_blue_light"
-        android:layout_marginLeft="-64dp"
-        android:layout_marginRight="-64dp"
+        android:layout_marginLeft="-20dp"
+        android:layout_marginRight="-20dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -211,3 +211,10 @@ android:focusable="true"
 
 
 </android.support.constraint.ConstraintLayout>
+
+<!--
+
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+
+-->

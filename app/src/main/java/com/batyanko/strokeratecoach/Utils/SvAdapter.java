@@ -28,6 +28,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.batyanko.strokeratecoach.R;
@@ -124,7 +125,7 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
     public class ExerciseViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private TextView exerciseText;
         private Button delButton;
-        private TextView engageButton;
+        private ImageView engageButton;
         private final int itemId;
         private final int favButtonId;
         private final int engageButtonId;
@@ -135,7 +136,7 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
 
             exerciseText = (TextView) itemView.findViewById(R.id.exercise_text);
             delButton = (Button) itemView.findViewById(R.id.del_button);
-            engageButton = (Button) itemView.findViewById(R.id.engage_button);
+            engageButton = (ImageView) itemView.findViewById(R.id.engage_button);
             //TODO Make sure IDs are unique?
             itemId = exerciseText.getId();
             favButtonId = delButton.getId();
@@ -173,11 +174,11 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
             Log.d("WORKOUTID", "GOTTENID" + gottenCursor.getInt(gottenCursor.getColumnIndex(WorkoutContract.WorkoutEntry1._ID)) + "");
             if (workoutIsRunning && gottenCursor
                     .getInt(gottenCursor.getColumnIndex(WorkoutContract.WorkoutEntry1._ID)) == workoutId) {
-                engageButton.setBackgroundResource(R.drawable.emo_im_tongue_sticking_out);
+                engageButton.setBackgroundResource(R.drawable.ic_play_2_negative);
 
             } else {
 //                engageButton.setBackgroundResource(android.R.drawable.ic_media_play);
-                engageButton.setBackgroundResource(R.drawable.ic_play_2);
+                engageButton.setBackgroundResource(R.drawable.ic_play_2_new);
             }
 //            delButton.setBackgroundResource(R.drawable.dialog_ic_close_focused_holo_light);
             delButton.setBackgroundResource(R.drawable.ic_delete);

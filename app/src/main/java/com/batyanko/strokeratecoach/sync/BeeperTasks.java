@@ -168,9 +168,12 @@ public class BeeperTasks {
     private void initBeeper(BeeperService beeperService) {
 
         resetVariables(beeperService);
-
-        toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
-        countdownToneGen = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
+        try {
+            toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
+            countdownToneGen = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
+        } catch (RuntimeException exception) {
+            Log.e("That Exception", "Generator got generated");
+        }
     }
 
     private void initTimeTimerTask() {
@@ -494,18 +497,18 @@ public class BeeperTasks {
             long timeDiffMillis;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
                 timeDiffMillis =
-                        (currentLocation.getElapsedRealtimeNanos() - locationPool[locCycleCount].getElapsedRealtimeNanos())/1000000;
+                        (currentLocation.getElapsedRealtimeNanos() - locationPool[locCycleCount].getElapsedRealtimeNanos()) / 1000000;
                 Log.d("TEHFLOAT", "timediff1: " + timeDiffMillis);
 
             } else {
                 timeDiffMillis =
                         currentLocation.getTime() - locationPool[locCycleCount].getTime();
-                Log.d("TEHFLOAT", "timediff2" + (int)timeDiffMillis);
+                Log.d("TEHFLOAT", "timediff2" + (int) timeDiffMillis);
             }
-            averageSpeed = (currentLocation.distanceTo(locationPool[locCycleCount]) / (((float)timeDiffMillis)/1000));
+            averageSpeed = (currentLocation.distanceTo(locationPool[locCycleCount]) / (((float) timeDiffMillis) / 1000));
             Log.d("TEHFLOAT", "distance: " + currentLocation.distanceTo(locationPool[locCycleCount]));
-            Log.d("TEHFLOAT", "timediffMillis: " + (float)timeDiffMillis);
-            Log.d("TEHFLOAT", "AVG speed" + (int)averageSpeed);
+            Log.d("TEHFLOAT", "timediffMillis: " + (float) timeDiffMillis);
+            Log.d("TEHFLOAT", "AVG speed" + (int) averageSpeed);
 
 /*            float z = 0;
             for(float x : averageSpeedPool) {

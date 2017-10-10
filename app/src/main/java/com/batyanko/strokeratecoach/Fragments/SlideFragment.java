@@ -17,7 +17,6 @@
 
 package com.batyanko.strokeratecoach.Fragments;
 
-import android.app.Activity;
 import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
@@ -42,14 +41,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.batyanko.strokeratecoach.R;
 import com.batyanko.strokeratecoach.Sliding.*;
 import com.batyanko.strokeratecoach.SpeedActivity;
 import com.batyanko.strokeratecoach.Utils.DialGridAdapter;
-import com.batyanko.strokeratecoach.Utils.SpmUtilities;
 import com.batyanko.strokeratecoach.Utils.SvAdapter;
 import com.batyanko.strokeratecoach.Utils.WaveUtilities;
 import com.batyanko.strokeratecoach.WaveActivity;
@@ -233,7 +230,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
             }
 
             //Update History db table
-            lastClickedEngageButton.setBackgroundResource(R.drawable.ic_menu_play_clip_negative);
+            lastClickedEngageButton.setBackgroundResource(R.drawable.ic_play_2_negative);
             addHistory(workoutDb, name, description, sppCSV, gearCSV, sppType);
             historyAdapter.swapCursor(getAllHistory(), true, lastWorkoutId);
             startBeeper(sppInts, gearInts, sppType);
@@ -387,7 +384,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
 
     public void stopBeeper() {
         if (lastClickedEngageButton != null) {
-            lastClickedEngageButton.setBackgroundResource(R.drawable.ic_menu_play_clip);
+            lastClickedEngageButton.setBackgroundResource(R.drawable.ic_play_2_new);
         }
         if (mBeeperService == null) {
             Log.d("ONDESTROY", "beeperNULL");
