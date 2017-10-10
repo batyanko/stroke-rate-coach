@@ -82,7 +82,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     //UI elements
     private ProgressBar waveProgress;
     private Button waveButton;
-    private TextView countdownView;
+    private ImageView countdownView;
     private TextView spmTextView;
     private TextView progressTextView;
 
@@ -178,7 +178,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 
         Log.d("BENCHMARKING", "5");
 
-        countdownView = findViewById(R.id.countdown_text_view);
+        countdownView = findViewById(R.id.countdown_image_view);
 //        countdownView.setVisibility((View.INVISIBLE));
 
         countdownDigit = findViewById(R.id.countdown_digit);
@@ -203,12 +203,12 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 //        Animation animation = new AlphaAnimation(1,0);
 //        animation.setDuration(2000);
 
-            countdownView.animate().alpha(0f).setDuration(1000).withEndAction(
+            countdownView.animate().alpha(0f).setDuration(2000).withEndAction(
                     new Runnable() {
                         @Override
                         public void run() {
                             Log.d("ALPHAA", "" + countdownView.getAlpha());
-                            countdownView.setAlpha(1);
+                            countdownView.setAlpha(1f);
                             countdownView.setVisibility(View.INVISIBLE);
                         }
                     }
@@ -322,8 +322,9 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
                     animationOut.setStartOffset(100);
                     animationIn.setDuration(100);
                     animationSet.addAnimation(animationIn);
-                    animationSet.addAnimation(animationOut);
+//                    animationSet.addAnimation(animationOut);
                     countdownView.startAnimation(animationSet);
+                    countdownDigit.startAnimation(animationSet);
                 }
             }
         } else if (s.equals(BEEP)) {

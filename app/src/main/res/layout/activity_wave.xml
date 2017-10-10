@@ -31,20 +31,20 @@
 
 
 
-    <TextView
-        android:id="@+id/countdown_text_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+    <ImageView
+        android:id="@+id/countdown_image_view"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
         android:gravity="center"
         android:textSize="192sp"
         android:fontFamily="serif"
         android:elevation="3dp"
         android:textColor="#00076b"
-        android:background="@drawable/ic_tracing_smooth_2"
-        android:layout_marginLeft="-20dp"
-        android:layout_marginRight="-20dp"
-        android:layout_marginTop="-20dp"
-        android:layout_marginBottom="-20dp"
+        android:src="@drawable/ic_background"
+        android:layout_marginLeft="-64dp"
+        android:layout_marginRight="-64dp"
+        android:layout_marginTop="-64dp"
+        android:layout_marginBottom="-64dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"

@@ -123,7 +123,9 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
     }
 
     public class ExerciseViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        private TextView exerciseText;
+        private TextView workoutTitle;
+        private TextView workoutDate;
+        private TextView workoutDesc;
         private Button delButton;
         private ImageView engageButton;
         private final int itemId;
@@ -134,11 +136,13 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
         public ExerciseViewHolder(View itemView) {
             super(itemView);
 
-            exerciseText = (TextView) itemView.findViewById(R.id.exercise_text);
+            workoutTitle = (TextView) itemView.findViewById(R.id.workout_title);
+            workoutDate = (TextView) itemView.findViewById(R.id.workout_date);
+            workoutDesc = (TextView) itemView.findViewById(R.id.exercise_text);
             delButton = (Button) itemView.findViewById(R.id.del_button);
             engageButton = (ImageView) itemView.findViewById(R.id.engage_button);
             //TODO Make sure IDs are unique?
-            itemId = exerciseText.getId();
+            itemId = workoutDesc.getId();
             favButtonId = delButton.getId();
             engageButtonId = engageButton.getId();
         }
@@ -163,7 +167,7 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
         }
 
         private void bind(int position) {
-//            exerciseText.setText(String.valueOf(position));
+//            workoutDesc.setText(String.valueOf(position));
 
             ////////////////
             //SQLite stuff
@@ -183,7 +187,7 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
 //            delButton.setBackgroundResource(R.drawable.dialog_ic_close_focused_holo_light);
             delButton.setBackgroundResource(R.drawable.ic_delete);
             delButton.setOnClickListener(this);
-            exerciseText.setOnClickListener(this);
+            workoutDesc.setOnClickListener(this);
             engageButton.setOnClickListener(this);
 
             String scrollItemName;
@@ -192,16 +196,19 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
 
             Log.d("DATE BENCH", "START");
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.US);
+            SimpleDateFormat sdfTime = new SimpleDateFormat("yyyy-MM-dd',' hh:mm:ss", Locale.US);
             SimpleDateFormat sdfSimple = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
             ParsePosition pp = new ParsePosition(0);
             Date dt = sdf.parse(timestampFromSQLite, pp);
+            String localDate = "";
+            String localTime = "";
             if (dt != null) {
                 long currentEpoch = dt.getTime();
 
                 long localOffset = TimeZone.getDefault().getOffset(currentEpoch);
                 //Current local time?
-                    String localDate = sdfSimple.format(currentEpoch + localOffset);
-                    String localTime = sdf.format(currentEpoch + localOffset);
+                    localDate = sdfSimple.format(currentEpoch + localOffset);
+                    localTime = sdfTime.format(currentEpoch + localOffset);
                 Log.d("DATE BENCH", "FINISH");
 
                 String sppType;
@@ -225,18 +232,15 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
                 String at = mContext.getString(R.string.gear_title_text) + " ";
 
                 if (tableName.equals(WorkoutContract.WorkoutEntry1.TABLE_NAME_PRESETS)) {
-                    scrollItemName = localDate +
-                            ": " +
+                    scrollItemName =
                             sppType +
-                            gottenCursor.getString(gottenCursor.getColumnIndex(COLUMN_NAME)) +
                             "\n" +
                             gottenCursor.getString(gottenCursor.getColumnIndex(COLUMN_SPP_CSV)) +
                             " " +
                             at +
                             gottenCursor.getString(gottenCursor.getColumnIndex(COLUMN_GEARS_CSV));
                 } else {
-                    scrollItemName = localTime +
-                            " " +
+                    scrollItemName =
                             sppType +
                             "\n" +
                             gottenCursor.getString(gottenCursor.getColumnIndex(COLUMN_SPP_CSV)) +
@@ -250,7 +254,9 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
             }
 
 
-            exerciseText.setText(scrollItemName);
+            workoutDesc.setText(scrollItemName);
+            workoutTitle.setText(gottenCursor.getString(gottenCursor.getColumnIndex(COLUMN_NAME)));
+            workoutDate.setText(localDate);
 
             this.itemView.setTag(gottenCursor.getLong(gottenCursor.getColumnIndex(WorkoutContract.WorkoutEntry1._ID)));
             Log.d("TEHWIDTH", "" + delButton.getWidth());
