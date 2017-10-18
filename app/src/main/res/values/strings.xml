@@ -35,8 +35,8 @@
     <string name="tpp_title_text">Time</string>
     <string name="dpp_title_text">Distance</string>
     <string name="empty_data_notification">Skipping phases with empty data</string>
-    <string name="meters">Meters</string>
-    <string name="seconds">Seconds</string>
+    <string name="meters">metres</string>
+    <string name="seconds">seconds</string>
     <string name="strokes">strokes</string>
     <string name="workout_unit_choose_title">Choose workout unit:</string>
     <string name="empty_workout_warning">Empty workout not created.</string>

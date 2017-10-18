@@ -16,32 +16,49 @@
 
 package com.batyanko.strokeratecoach;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.ColorDrawable;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
 import android.view.animation.ScaleAnimation;
+import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.batyanko.strokeratecoach.Fragments.SlideFragment;
+import com.batyanko.strokeratecoach.Utils.SpeedViewAdapter;
 import com.batyanko.strokeratecoach.sync.BeeperService;
 import com.batyanko.strokeratecoach.sync.BeeperTasks;
+
+import static java.lang.Float.parseFloat;
 
 public class WaveActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -69,7 +86,10 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     public static final String PHASE_PROGRESS = "total-strokes-elapsed";
     public static final String CURRENT_COLOR = "current-phase";
     public static final String CURRENT_SPEED = "current-speed";
-    public static final String WORKOUT_RUNNING = "workout-running"; //OPERATION duplicate
+    public static final String SPEED_LIMIT = "speed-limit";
+    public static final String SPEED_UNIT = "speed-unit";
+    public static final String SPEED_MS = "m/s";
+    public static final String SPEED_500M = "/500m";
     public static final String COUNTDOWN_RUNNING = "countdown-running";
     public static final String COUNTDOWN_DURATION = "countdown-duration";   //In ms
     public static final String COUNTDOWN_DURATION_LEFT = "countdown-duration-left";   //In ms
@@ -81,12 +101,16 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 
     //UI elements
     private ProgressBar waveProgress;
-    private Button waveButton;
+    private Button createButton;
     private ImageView countdownView;
     private TextView spmTextView;
     private TextView progressTextView;
 
     private TextView countdownDigit;
+
+    private TextView speedView;
+    private TextView speedLimitView;
+    private Spinner speedUnitSpinner;
 
     private ImageView water;
 
@@ -107,6 +131,13 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 
     private SlideFragment slideFragment;
     static int random;
+
+    EditText speedLimitEditText;
+
+    private AsyncTask asyncTask = null;
+    boolean upIsTouched = false;
+    boolean downIsTouched = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d("BENCHMARKING", "0");
@@ -115,12 +146,11 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         Log.d("BENCHMARKING", "0.5");
 
         setContentView(R.layout.activity_wave);
+        final ViewGroup viewGroup = (ViewGroup) findViewById(R.id.activity_wave);
 
         Log.d("INTHEBEGINNING", "" + BeeperTasks.spm);
 
         Log.d("BENCHMARKING", "1");
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        prefs.registerOnSharedPreferenceChangeListener(this);
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         slideFragment = new SlideFragment();
@@ -136,6 +166,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 
         //Initialize spm at last setting, or default at 0
         pref = PreferenceManager.getDefaultSharedPreferences(this);
+        pref.registerOnSharedPreferenceChangeListener(this);
         spm = pref.getInt(SPM_SETTING, 0);
 
         Log.d("BENCHMARKING", "3");
@@ -148,15 +179,112 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         spmTextView.setText(String.valueOf(spm));
         progressTextView = (TextView) findViewById(R.id.progressTextView);
 
-        waveButton = (Button) findViewById(R.id.create_workout_button);
-        waveButton.setOnClickListener(new View.OnClickListener() {
+        speedView = (TextView) findViewById(R.id.speed_view);
+
+        String[] speeds = {SPEED_500M, SPEED_MS};
+        speedUnitSpinner = (Spinner) findViewById(R.id.speed_unit);
+        final SpeedViewAdapter myAdapter = new SpeedViewAdapter(this, R.layout.spinner_tv, speeds);
+        speedUnitSpinner.setAdapter(myAdapter);
+        speedUnitSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+                String string = myAdapter.getItem(position);
+                if (string != null && (string.equals(SPEED_MS) || string.equals(SPEED_500M))) {
+                    pref.edit().putString(SPEED_UNIT, string).apply();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+
+        });
+        String selectedString = (String) ((Spinner) findViewById(R.id.speed_unit)).getSelectedItem();
+
+        speedLimitView = (TextView) findViewById(R.id.speed_limit_view);
+        String speedLimit = "" + pref.getInt(SPEED_LIMIT, 42);
+        speedLimit = getSpeedString(speedLimit);
+        speedLimitView.setText(speedLimit);
+        speedLimitView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                LayoutInflater inflater = (LayoutInflater) WaveActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                float density = WaveActivity.this.getResources().getDisplayMetrics().density;
+                View speedLimitPopupLayout = inflater.inflate(R.layout.speed_limit_layout, null);
+
+                final PopupWindow popupWindow = new PopupWindow(speedLimitPopupLayout, windowWidth, LinearLayout.LayoutParams.WRAP_CONTENT, true);
+                popupWindow.setBackgroundDrawable(new ColorDrawable(getResources().getColor(android.R.color.holo_blue_light)));
+
+                popupWindow.showAsDropDown(speedLimitView);
+                popupWindow.showAtLocation(speedLimitPopupLayout, Gravity.CENTER, 0, (int) density * 100);
+
+
+
+                speedLimitEditText = speedLimitPopupLayout.findViewById(R.id.speed_limit_edit_text);
+                Button setLimit = speedLimitPopupLayout.findViewById(R.id.speed_limit_setter_button);
+                Button saveAndExit = (Button) speedLimitPopupLayout.findViewById(R.id.speed_limit_confirm_button);
+                ImageView up = speedLimitPopupLayout.findViewById(R.id.increase_speed);
+                ImageView down = speedLimitPopupLayout.findViewById(R.id.decrease_speed);
+
+                String speedLimit = "" + pref.getInt(SPEED_LIMIT, 42);
+                speedLimit = getSpeedString(speedLimit);
+                speedLimitEditText.setText(speedLimit);
+                speedLimitEditText.selectAll();
+
+                setLimit.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        float speedLimitFloat = Float.parseFloat(speedLimitEditText.getText().toString());
+                        pref.edit().putInt(SPEED_LIMIT, (int)(speedLimitFloat*100)).apply();
+                    }
+                });
+
+                up.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View view, MotionEvent motionEvent) {
+                        if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                            upIsTouched = true;
+                            incrementSpeedTrigger();
+                        } else  if (motionEvent.getAction() == MotionEvent.ACTION_UP){
+                            upIsTouched = false;
+                        }
+                        return true;
+                    }
+                });
+                down.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View view, MotionEvent motionEvent) {
+                        if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                            downIsTouched = true;
+                            incrementSpeedTrigger();
+                        } else  if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                            downIsTouched = false;
+                        }
+                        return true;
+                    }
+                });
+
+
+                saveAndExit.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        popupWindow.dismiss();
+                    }
+                });
+
+            }
+        });
+
+        createButton = (Button) findViewById(R.id.create_workout_button);
+        createButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(WaveActivity.this, EntryFormActivity.class);
                 startActivity(intent);
             }
         });
-        waveButton.setVisibility(View.VISIBLE);
+        createButton.setVisibility(View.VISIBLE);
         Log.d("BENCHMARKING", "4");
 
         int resource = getResources().getIdentifier("status_bar_height", "dimen", "android");
@@ -186,6 +314,8 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 
         //Bind to service if already running (in case of screen rotation / onDestroy)
         Log.d("BENCHMARKING", "6");
+
+        flushGUI();
     }
 
     @Override
@@ -241,18 +371,33 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        prefs.unregisterOnSharedPreferenceChangeListener(this);
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+        pref.unregisterOnSharedPreferenceChangeListener(this);
         Log.d("ONDESTROY", "DESTROY");
     }
 
     /**
      * Reset the GUI at workout's end.
      */
-    public void resetGUI() {
-        waveProgress.setVisibility(View.INVISIBLE);
-        progressTextView.setVisibility(View.INVISIBLE);
-        waveButton.setVisibility(View.VISIBLE);
+    public void flushGUI() {
+
+        Log.d("flushh", "" + "flushGUI");
+        if (pref.getInt(OPERATION_SETTING, WORKOUT_STOP) == WORKOUT_PROGRESS) {
+            Log.d("flushh", "" + "workout progress");
+            waveProgress.setVisibility(View.VISIBLE);
+            progressTextView.setVisibility(View.VISIBLE);
+            createButton.setVisibility(View.INVISIBLE);
+            speedUnitSpinner.setVisibility(View.VISIBLE);
+            speedView.setVisibility(View.VISIBLE);
+            speedLimitView.setVisibility(View.VISIBLE);
+        } else {
+            waveProgress.setVisibility(View.INVISIBLE);
+            progressTextView.setVisibility(View.INVISIBLE);
+            createButton.setVisibility(View.VISIBLE);
+            speedUnitSpinner.setVisibility(View.INVISIBLE);
+            speedView.setVisibility(View.INVISIBLE);
+            speedLimitView.setVisibility(View.INVISIBLE);
+        }
         countdownDigit.setVisibility(View.INVISIBLE);
 //        spmTextView.setText("0");
 //        spmTextView.setBackgroundColor(Color.TRANSPARENT);
@@ -283,19 +428,19 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
                 }
                 case WORKOUT_STOP: {
                     workoutRunning = WORKOUT_STOP;
-                    resetGUI();
+                    flushGUI();
                     break;
                 }
             }
-        } else if (s.equals(PHASE_PROGRESS)) {
+        } else if (s.equals(PHASE_PROGRESS) || s.equals(SPEED_UNIT)) {
             onProgressChange();
         } else if (s.equals(CURRENT_COLOR)) {
             //TODO show color somewhere on the UI
 //            spmTextView.setBackgroundColor(sharedPreferences.getInt(CURRENT_COLOR, Color.TRANSPARENT));
         } else if (s.equals(COUNTDOWN_DURATION_LEFT)) {
             //TODO show a countdown
-            waveButton.setVisibility(View.INVISIBLE);
-            int duration = sharedPreferences.getInt(COUNTDOWN_DURATION, 3000) / 1000;
+            createButton.setVisibility(View.INVISIBLE);
+            int duration = sharedPreferences.getInt(COUNTDOWN_DURATION, 1000) / 1000;
             int durationLeft = sharedPreferences.getInt(COUNTDOWN_DURATION_LEFT, 0) / 1000;
             String countdownString = durationLeft + "";
             Log.d("TEHDURATION", durationLeft + "");
@@ -316,9 +461,9 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
                     AnimationSet animationSet = new AnimationSet(true);
                     /*Animation animationOut = AnimationUtils.loadAnimation(WaveActivity.this, R.anim.alpha_fade);
                     Animation animationIn = AnimationUtils.loadAnimation(WaveActivity.this, R.anim.alpha_fade_in);*/
-                    Animation animationIn = new ScaleAnimation(0, 1, 0, 1, 20, windowHeight*3/4);
-                    Animation animationOut = new AlphaAnimation(1,0);
-                    animationOut.setDuration(duration*1000 - 100);
+                    Animation animationIn = new ScaleAnimation(0, 1, 0, 1, 20, windowHeight * 3 / 4);
+                    Animation animationOut = new AlphaAnimation(1, 0);
+                    animationOut.setDuration(duration * 1000 - 100);
                     animationOut.setStartOffset(100);
                     animationIn.setDuration(100);
                     animationSet.addAnimation(animationIn);
@@ -326,6 +471,20 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
                     countdownView.startAnimation(animationSet);
                     countdownDigit.startAnimation(animationSet);
                 }
+            }
+        } else if (s.equals(SPEED_LIMIT)) {
+            String speedLimit = "" + pref.getInt(SPEED_LIMIT, 42);
+            if (speedLimit.length() > 4) {
+                pref.edit().putInt(SPEED_LIMIT, 9999).apply();
+            }
+
+            speedLimit = getSpeedString(speedLimit);
+
+            Log.d("SPEED_LIMIT", speedLimit);
+            speedLimitView.setText(speedLimit);
+            if (speedLimitEditText != null) {
+                speedLimitEditText.setText(speedLimit);
+                speedLimitEditText.selectAll();
             }
         } else if (s.equals(BEEP)) {
             Log.d("BEEP", "beep");
@@ -349,29 +508,45 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
             return;
         }
 
+        float currentSpeed = pref.getFloat(CURRENT_SPEED, 0);
         String rowingSpeedString;
-        float rowingSpeed = (1/(pref.getFloat(CURRENT_SPEED, 0))) * 500;
-        if (rowingSpeed > 500) {
-            rowingSpeedString = "0:00";
+        if (pref.getString(SPEED_UNIT, SPEED_MS).equals(SPEED_500M)) {
+            float rowingSpeed = (1 / (currentSpeed)) * 500;
+            if (rowingSpeed > 500) {
+                rowingSpeedString = "0:00";
+            } else {
+                int rowingSpeedMins = (int) (rowingSpeed / 60);
+                String remainder = "" + (((int) rowingSpeed) % 60);
+                if (remainder.length() == 1) remainder = "0" + remainder;
+                rowingSpeedString = rowingSpeedMins + ":" + remainder;
+            }
         } else {
-            int rowingSpeedMins = (int)(rowingSpeed/60);
-            String remainder = "" + (((int)rowingSpeed)%60);
-            if (remainder.length() == 1) remainder = "0" + remainder;
-            rowingSpeedString = rowingSpeedMins + ":" + remainder;
+            rowingSpeedString = "" + currentSpeed;
+            if (rowingSpeedString.length() >= 5) {
+                rowingSpeedString = rowingSpeedString.substring(0, 4);
+            }
         }
 
-        Log.d("MATHTEST", "" + (int)(100%60));
+        Log.d("MATHTEST", "" + (int) (100 % 60));
 
-        progressTextView.setText(progress[0] +
+        String progressViewText = progress[0] +
                 " / " + progress[1] +
                 " @ " +
                 rowingSpeedString +
-                "/500m");
-        progressTextView.setVisibility(View.VISIBLE);
+                "/500m";
+        progressTextView.setText(progressViewText);
+
+        speedView.setText(rowingSpeedString);
 
         int progressPercent = (int) (((float) progress[0] / (float) progress[1]) * 100);
         waveProgress.setProgress(progressPercent);
-        waveProgress.setVisibility(View.VISIBLE);
+
+        flushGUI();
+//        speedView.setVisibility(View.VISIBLE);
+//        speedUnitSpinner.setVisibility(View.VISIBLE);
+//        speedLimitView.setVisibility(View.VISIBLE);
+//        progressTextView.setVisibility(View.VISIBLE);
+//        waveProgress.setVisibility(View.VISIBLE);
 //        spmTextView.setBackgroundColor(pref.getInt(CURRENT_COLOR, Color.TRANSPARENT));
     }
 
@@ -380,5 +555,67 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         spmTextView.startAnimation(AnimationUtils.loadAnimation(WaveActivity.this, R.anim.on_click));
     }
 
+    private void incrementSpeedTrigger() {
+        asyncTask = new AsyncTask<Void, Void, Void>() {
+
+            @Override
+            protected Void doInBackground(Void... voids) {
+                //in cm
+                int speedLimit;
+                while (upIsTouched) {
+                    speedLimit = pref.getInt(SPEED_LIMIT, 0);
+                    pref.edit().putInt(SPEED_LIMIT, speedLimit + 1).apply();
+                    try {
+                        Thread.sleep(90);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                while (downIsTouched) {
+                    speedLimit = pref.getInt(SPEED_LIMIT, 0);
+                    pref.edit().putInt(SPEED_LIMIT, speedLimit - 1).apply();
+                    try {
+                        Thread.sleep(90);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                return null;
+            }
+        }.execute();
+    }
+
+    public String getSpeedString(String speedLimit) {
+        String s1, s2, s3, s4;
+        switch (speedLimit.length()) {
+            case 4:
+                s1 = speedLimit.substring(0,1);
+                s2 = speedLimit.substring(1,2);
+                s3 = speedLimit.substring(2,3);
+                s4 = speedLimit.substring(3);
+                break;
+            case 3:
+                s1 = " ";
+                s2 = speedLimit.substring(0,1);
+                s3 = speedLimit.substring(1,2);
+                s4 = speedLimit.substring(2,3);
+                break;
+            case 2:
+                s1 = " ";
+                s2 = "0";
+                s3 = speedLimit.substring(0,1);
+                s4 = speedLimit.substring(1,2);
+                break;
+            case 1:
+                s1 = " ";
+                s2 = "0";
+                s3 = "0";
+                s4 = speedLimit.substring(0,1);
+                break;
+            default:
+                s1 = s2 = s3 = s4 = "0";
+        }
+        return s1 + s2 + "." + s3 + s4;
+    }
 
 }

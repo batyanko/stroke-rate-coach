@@ -65,7 +65,7 @@ public class SpmUtilities {
 
     public void setSpmFromDigital(int digitalInput, View view) {
         if (firstDigit != 0) {
-            MainActivity.resetGUI();
+            MainActivity.flushGUI();
             firstDigitView.setBackgroundColor(Color.TRANSPARENT);
             spm = firstDigit * 10 + digitalInput;
 //            spmString = String.valueOf(spm);

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="12dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:text="Minimum Speed Warning"
+            android:textSize="16dp" />
+
+        <android.support.v7.widget.SwitchCompat
+            android:id="@+id/speed_limit_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true" />
+
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="12dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:padding="12dp"
+            android:orientation="vertical"
+            >
+
+            <EditText
+                android:id="@+id/speed_limit_edit_text"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:selectAllOnFocus="true" />
+
+            <Button
+                android:id="@+id/speed_limit_setter_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Set limit"
+                />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:orientation="vertical">
+
+            <ImageButton
+                android:id="@+id/increase_speed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="up"
+                android:src="@drawable/ic_up" />
+
+            <ImageButton
+                android:id="@+id/decrease_speed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="down"
+                android:src="@drawable/ic_down" />
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/speed_limit_confirm_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Save and Exit" />
+</LinearLayout>

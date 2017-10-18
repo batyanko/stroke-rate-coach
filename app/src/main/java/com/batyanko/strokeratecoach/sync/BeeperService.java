@@ -102,7 +102,16 @@ public class BeeperService extends NonStopIntentService {
     }
 
     @Override
+    public boolean stopService(Intent name) {
+        Log.d("Servicee onStop", "check");
+        beeperTasks.executeTask(this, BeeperTasks.ACTION_STOP_BEEP, null, null, 0);
+        return super.stopService(name);
+    }
+
+    @Override
     public void onDestroy() {
+        Log.d("Servicee onDestroy", "check");
+        beeperTasks.executeTask(this, BeeperTasks.ACTION_STOP_BEEP, null, null, 0);
         stopSelf();
         super.onDestroy();
     }

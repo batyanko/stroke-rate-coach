@@ -162,6 +162,11 @@ public class BeeperTasks {
             endWorkout(beeperService);
         } else if (action.equals(ACTION_CHECK_SERVICE)) {
             Log.d("TEHSERVICE", "at execute task");
+            Log.d("workoutRunning at check", "" + workoutRunning);
+            if (pref == null) {
+                pref = PreferenceManager.getDefaultSharedPreferences(beeperService);
+            }
+            pref.edit().putInt(WaveActivity.OPERATION_SETTING, workoutRunning).apply();
         }
     }
 
@@ -207,9 +212,15 @@ public class BeeperTasks {
 
         countdownCycles = 0;
         //TODO add setting for countdown cycle length / frequency?
-        countdownDuration = pref.getInt(WaveActivity.COUNTDOWN_DURATION, 3000);
+        countdownDuration = pref.getInt(WaveActivity.COUNTDOWN_DURATION, 1000);
         countdownCycleDuration = 100;
         countdownCyclesTotal = countdownDuration / countdownCycleDuration;
+
+        //Init speed unit setting if necessary
+        String speedUnit = pref.getString(WaveActivity.SPEED_UNIT, "");
+        if (!speedUnit.equals(WaveActivity.SPEED_500M) && !speedUnit.equals(WaveActivity.SPEED_MS)) {
+            pref.edit().putString(WaveActivity.SPEED_UNIT, WaveActivity.SPEED_MS).apply();
+        }
 
         phaseProgress = 0;
         locationAccuracy = 500;     //Init at an extremely inaccurate value, i.e. no accuracy
@@ -346,6 +357,7 @@ public class BeeperTasks {
      * Reset the current workout and stop beeping.
      */
     private void endWorkout(BeeperService beeperService) {
+        Log.d("flushh", "endWorkout");
         resetVariables(beeperService);
         cancelTimer(workoutTimer, workoutTimerTask);
         cancelTimer(timeTimer, timeTimerTask);

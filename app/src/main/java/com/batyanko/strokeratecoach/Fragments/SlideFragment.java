@@ -303,8 +303,9 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
 //                                checkBeeper();
                                 stopBeeper();
                             } else if (position == 11) {
-                                Intent intent = new Intent(SlideFragment.this.getActivity(), SpeedActivity.class);
-                                startActivity(intent);
+                                checkBeeper(intent);
+//                                Intent intent = new Intent(SlideFragment.this.getActivity(), SpeedActivity.class);
+//                                startActivity(intent);
                             }
                         }
                     });
@@ -395,7 +396,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         mBeeperService.doEpicShit(intent);
     }
 
-    public void checkBeeper() {
+    public void checkBeeper(Intent intent) {
         intent.setAction(BeeperTasks.ACTION_CHECK_SERVICE);
         mBeeperService.doEpicShit(intent);
     }
@@ -408,6 +409,10 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
 
             Log.d("mBeeperService", "" + mBeeperService);
 
+            //Check if Service is running and flush UI
+            checkBeeper(intent);
+            Boolean bool = pref.getBoolean(WaveActivity.SWITCH_SETTING, true);
+            pref.edit().putBoolean(WaveActivity.SWITCH_SETTING, !bool).apply();
 //            Toast.makeText(getContext(), "Bound!", Toast.LENGTH_SHORT).show();
         }
 
