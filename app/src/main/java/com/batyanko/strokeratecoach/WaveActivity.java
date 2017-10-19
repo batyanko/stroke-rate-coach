@@ -56,6 +56,7 @@ import android.widget.Toast;
 import com.batyanko.strokeratecoach.Fragments.SlideFragment;
 import com.batyanko.strokeratecoach.Utils.SpeedViewAdapter;
 import com.batyanko.strokeratecoach.sync.BeeperService;
+import com.batyanko.strokeratecoach.sync.BeeperServiceUtils;
 import com.batyanko.strokeratecoach.sync.BeeperTasks;
 
 import static java.lang.Float.parseFloat;
@@ -352,8 +353,9 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
             //Bind to service if a workout is running
             Intent intent = new Intent(this, BeeperService.class);
             intent.setAction(BeeperTasks.ACTION_JUST_BIND);
-            slideFragment.doBindService(intent);
+            BeeperServiceUtils.doBindService(intent, this, BeeperServiceUtils.getServiceConnection());
         }
+
         Log.d("BENCHMARKING", "8");
     }
 
@@ -486,6 +488,8 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
                 speedLimitEditText.setText(speedLimit);
                 speedLimitEditText.selectAll();
             }
+        } else if (s.equals(CURRENT_SPEED)){
+
         } else if (s.equals(BEEP)) {
             Log.d("BEEP", "beep");
             spmTextView.startAnimation(AnimationUtils.loadAnimation(WaveActivity.this, R.anim.on_click));

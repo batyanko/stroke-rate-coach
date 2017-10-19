@@ -17,7 +17,6 @@
 
 package com.batyanko.strokeratecoach.Fragments;
 
-import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -27,7 +26,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -45,7 +43,6 @@ import android.widget.Toast;
 
 import com.batyanko.strokeratecoach.R;
 import com.batyanko.strokeratecoach.Sliding.*;
-import com.batyanko.strokeratecoach.SpeedActivity;
 import com.batyanko.strokeratecoach.Utils.DialGridAdapter;
 import com.batyanko.strokeratecoach.Utils.SvAdapter;
 import com.batyanko.strokeratecoach.Utils.WaveUtilities;
@@ -54,6 +51,7 @@ import com.batyanko.strokeratecoach.data.WorkoutContract;
 import com.batyanko.strokeratecoach.data.WorkoutContract.WorkoutEntry1;
 import com.batyanko.strokeratecoach.data.WorkoutDBHelper;
 import com.batyanko.strokeratecoach.sync.BeeperService;
+import com.batyanko.strokeratecoach.sync.BeeperServiceUtils;
 import com.batyanko.strokeratecoach.sync.BeeperTasks;
 
 
@@ -87,6 +85,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
     ViewGroup viewGroup;
     private boolean mIsBound;
     private BeeperService mBeeperService;
+    private ServiceConnection mConnection;
 
     private Intent intent;
     public static View lastClickedEngageButton;
@@ -103,6 +102,8 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mBeeperService = BeeperServiceUtils.getBeeperService();
+        mConnection = BeeperServiceUtils.getServiceConnection();
     }
 
     @Override
@@ -373,17 +374,17 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         }
     }
 
-    public void startBeeper(int[] sppSettings, int[] gearSettings, int sppType) {
+    private void startBeeper(int[] sppSettings, int[] gearSettings, int sppType) {
         intent.setAction(BeeperTasks.ACTION_START_BEEP);
         intent.putExtra(BeeperTasks.EXTRA_WORKOUT_SPP, sppSettings);
         intent.putExtra(BeeperTasks.EXTRA_WORKOUT_GEARS, gearSettings);
         intent.putExtra(BeeperTasks.EXTRA_WORKOUT_SPP_TYPE, sppType);
         this.getActivity().startService(intent);
-        doBindService(intent);
+        BeeperServiceUtils.doBindService(intent, getActivity(), mConnection);
 //        lastClickedEngageButton.setBackgroundResource(R.drawable.ic_menu_play_clip_negative);
     }
 
-    public void stopBeeper() {
+    private void stopBeeper() {
         if (lastClickedEngageButton != null) {
             lastClickedEngageButton.setBackgroundResource(R.drawable.ic_play_2_new);
         }
@@ -396,34 +397,12 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         mBeeperService.doEpicShit(intent);
     }
 
-    public void checkBeeper(Intent intent) {
+    private void checkBeeper(Intent intent) {
         intent.setAction(BeeperTasks.ACTION_CHECK_SERVICE);
         mBeeperService.doEpicShit(intent);
     }
 
-    //Binding BeeperService
-    private ServiceConnection mConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            mBeeperService = ((BeeperService.BeeperBinder) iBinder).getService();
-
-            Log.d("mBeeperService", "" + mBeeperService);
-
-            //Check if Service is running and flush UI
-            checkBeeper(intent);
-            Boolean bool = pref.getBoolean(WaveActivity.SWITCH_SETTING, true);
-            pref.edit().putBoolean(WaveActivity.SWITCH_SETTING, !bool).apply();
-//            Toast.makeText(getContext(), "Bound!", Toast.LENGTH_SHORT).show();
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-            mBeeperService = null;
-//            Toast.makeText(getContext(), "Unbound", Toast.LENGTH_SHORT).show();
-        }
-    };
-
-    public void doBindService(Intent intent) {
+/*    public void doBindService(Intent intent) {
         getActivity().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
         mIsBound = true;
     }
@@ -433,7 +412,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
             getActivity().unbindService(mConnection);
             mIsBound = false;
         }
-    }
+    }*/
 
     /////////////////
     //DBStuff

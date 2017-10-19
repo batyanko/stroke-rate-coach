@@ -70,19 +70,21 @@ public class BeeperTasks {
     //Variables used in beeping workoutTimer setup
     private static long strokeDuration;
     public static String spmString;
-    private static ToneGenerator toneGen1;
-
+    private static ToneGenerator workoutToneGen;
     private static ToneGenerator countdownToneGen;
+    private static ToneGenerator warningToneGen;
+
     private static Timer workoutTimer;
-
     private static TimerTask workoutTimerTask;
+
     private static Timer timeTimer;
-
     private static TimerTask timeTimerTask;
+
     private static Timer countdownTimer;
-
-
     private static TimerTask countdownTimerTask;
+
+    private static TimerTask warningTimerTask;
+    private static Timer warningTimer;
     //autoWave values
     private static int workoutRunning;     //0=off, 1=autoWave, 2=autoProgress, 9=lastPhase
     private static int countdownRunning;    //0=off, 1=on
@@ -174,8 +176,9 @@ public class BeeperTasks {
 
         resetVariables(beeperService);
         try {
-            toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
+            workoutToneGen = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
             countdownToneGen = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
+            warningToneGen = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
         } catch (RuntimeException exception) {
             Log.e("That Exception", "Generator got generated");
         }
@@ -326,7 +329,7 @@ public class BeeperTasks {
                         }
                     }
                 }
-                toneGen1.startTone(ToneGenerator.TONE_CDMA_EMERGENCY_RINGBACK, 150);
+                workoutToneGen.startTone(ToneGenerator.TONE_CDMA_EMERGENCY_RINGBACK, 150);
                 updateAverageSpeed();
                 pref.edit().putInt(WaveActivity.BEEP, ++beeps).apply();
                 Log.d("TEHBEEP", "BEEP!");
@@ -335,6 +338,17 @@ public class BeeperTasks {
         };
         workoutTimer = new Timer();
         workoutTimer.scheduleAtFixedRate(workoutTimerTask, 1, strokeDuration);
+    }
+
+    private void startSpeedLimit(final BeeperService beeperService) {
+        warningTimerTask = new TimerTask() {
+            @Override
+            public void run() {
+                warningToneGen.startTone(ToneGenerator.TONE_CDMA_ABBR_REORDER, 150);
+            }
+        };
+        warningTimer = new Timer();
+        warningTimer.scheduleAtFixedRate(warningTimerTask, 1, 500);
     }
 
 
