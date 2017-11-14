@@ -2,7 +2,7 @@ Android rowing app that beeps at a desired stroke rate per minute (SPM).
 
 PROJECT IS IN DEVELOPMENT. Feel free to contribute or request new features.
 
-Get the .apk file here:
+Get the .apk here:
 
 https://drive.google.com/open?id=0BxroN2uvzu3QSFpzcm1tYjVjOFE
 
