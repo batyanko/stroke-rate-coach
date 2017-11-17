@@ -21,7 +21,9 @@ public class BeeperServiceUtils {
     private static boolean mIsBound = false;
 
     public static BeeperService getBeeperService() {
-        createServiceConnection();
+        if (mBeeperService == null) {
+	        createServiceConnection();
+        }
         return mBeeperService;
     }
     public static ServiceConnection getServiceConnection() {

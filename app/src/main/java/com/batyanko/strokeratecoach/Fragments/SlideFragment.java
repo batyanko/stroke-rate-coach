@@ -388,6 +388,10 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         if (lastClickedEngageButton != null) {
             lastClickedEngageButton.setBackgroundResource(R.drawable.ic_play_2_new);
         }
+
+        mBeeperService = BeeperServiceUtils.getBeeperService();
+        mConnection = BeeperServiceUtils.getServiceConnection();
+
         if (mBeeperService == null) {
             Log.d("ONDESTROY", "beeperNULL");
             return;
