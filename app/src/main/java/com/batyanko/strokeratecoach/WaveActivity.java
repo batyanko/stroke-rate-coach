@@ -135,7 +135,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 
     EditText speedLimitEditText;
 
-    private AsyncTask asyncTask = null;
+    private static AsyncTask asyncTask = null;
     boolean upIsTouched = false;
     boolean downIsTouched = false;
 
@@ -334,7 +334,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 //        Animation animation = new AlphaAnimation(1,0);
 //        animation.setDuration(2000);
 
-            countdownView.animate().alpha(0f).setDuration(2000).withEndAction(
+            countdownView.animate().alpha(0f).setDuration(3000).withEndAction(
                     new Runnable() {
                         @Override
                         public void run() {
@@ -442,7 +442,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         } else if (s.equals(COUNTDOWN_DURATION_LEFT)) {
             //TODO show a countdown
             createButton.setVisibility(View.INVISIBLE);
-            int duration = sharedPreferences.getInt(COUNTDOWN_DURATION, 1000) / 1000;
+            int duration = sharedPreferences.getInt(COUNTDOWN_DURATION, 3000) / 1000;
             int durationLeft = sharedPreferences.getInt(COUNTDOWN_DURATION_LEFT, 0) / 1000;
             String countdownString = durationLeft + "";
             Log.d("TEHDURATION", durationLeft + "");
@@ -534,10 +534,10 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         Log.d("MATHTEST", "" + (int) (100 % 60));
 
         String progressViewText = progress[0] +
-                " / " + progress[1] +
+                " / " + progress[1]/* +
                 " @ " +
                 rowingSpeedString +
-                "/500m";
+                "/500m"*/;
         progressTextView.setText(progressViewText);
 
         speedView.setText(rowingSpeedString);

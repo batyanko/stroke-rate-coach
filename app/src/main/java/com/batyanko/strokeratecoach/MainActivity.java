@@ -41,6 +41,7 @@ import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
 
+//TODO Remove MainActivity in favor if WaveActivity
 public class MainActivity extends AppCompatActivity {
 
     public static final int DEFAULT_RATE = 22;

@@ -215,7 +215,7 @@ public class BeeperTasks {
 
         countdownCycles = 0;
         //TODO add setting for countdown cycle length / frequency?
-        countdownDuration = pref.getInt(WaveActivity.COUNTDOWN_DURATION, 1000);
+        countdownDuration = pref.getInt(WaveActivity.COUNTDOWN_DURATION, 3000);
         countdownCycleDuration = 100;
         countdownCyclesTotal = countdownDuration / countdownCycleDuration;
 

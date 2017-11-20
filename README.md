@@ -6,7 +6,7 @@ Get the .apk here:
 
 https://drive.google.com/open?id=0BxroN2uvzu3QSFpzcm1tYjVjOFE
 
-![giphy](https://media.giphy.com/media/3ohhwfjMYeAgHFsYYU/giphy.gif)
+![giphy](https://media.giphy.com/media/l2QDTA6kVfu2mKRDa/giphy.gif)
 
 Current features:
 - Preset workouts, for example 4 legs of 50 strokes at SPM 22, 24, 26, 28
