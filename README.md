@@ -4,8 +4,7 @@ PROJECT IS IN DEVELOPMENT. Feel free to contribute or request new features.
 
 Get the .apk here:
 
-https://drive.google.com/open?id=1zh9wZEysVNrdqUm0mcsOExT0wBA47ag_
-
+[https://drive.google.com/open?id=1zh9wZEysVNrdqUm0mcsOExT0wBA47ag_](https://drive.google.com/open?id=1zh9wZEysVNrdqUm0mcsOExT0wBA47ag_)
 ![giphy](https://media.giphy.com/media/l2QDTA6kVfu2mKRDa/giphy.gif)
 
 Current features:
