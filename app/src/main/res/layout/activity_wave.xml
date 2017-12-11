@@ -31,25 +31,7 @@
 
 
 
-    <ImageView
-        android:id="@+id/countdown_image_view"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:gravity="center"
-        android:textSize="192sp"
-        android:fontFamily="serif"
-        android:elevation="3dp"
-        android:textColor="#00076b"
-        android:src="@drawable/ic_background"
-        android:layout_marginLeft="-64dp"
-        android:layout_marginRight="-64dp"
-        android:layout_marginTop="-64dp"
-        android:layout_marginBottom="-64dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        />
+
 
     <TextView
         android:id="@+id/countdown_digit"
@@ -61,7 +43,8 @@
         android:includeFontPadding="false"
         android:lineSpacingExtra="0dp"
         android:elevation="3dp"
-        android:background="@android:color/holo_blue_light"
+        android:background="@color/blueAppColor"
+        android:textColor="@android:color/white"
         android:layout_marginLeft="-20dp"
         android:layout_marginRight="-20dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -94,6 +77,8 @@
         android:layout_marginStart="0dp"
         android:text="@string/create_workout_button_label"
         android:textSize="22sp"
+        android:background="@drawable/ic_rectangle"
+        android:textColor="@android:color/white"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/wave_progress_bar_2" />
@@ -130,6 +115,7 @@
         android:layout_marginTop="8dp"
         android:textAlignment="center"
         android:textSize="24sp"
+        android:textColor="@android:color/white"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -240,6 +226,25 @@
         tools:layout_editor_absoluteX="0dp"
         tools:layout_editor_absoluteY="57dp" />
 
+    <ImageView
+        android:id="@+id/countdown_image_view"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:gravity="center"
+        android:textSize="192sp"
+        android:fontFamily="serif"
+        android:elevation="3dp"
+        android:textColor="#00076b"
+        android:src="@drawable/ic_background"
+        android:layout_marginLeft="-64dp"
+        android:layout_marginRight="-64dp"
+        android:layout_marginTop="-64dp"
+        android:layout_marginBottom="-64dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        />
 
 </android.support.constraint.ConstraintLayout>
 

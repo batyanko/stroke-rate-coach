@@ -27,6 +27,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.PagerAdapter;
@@ -34,6 +35,8 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -77,8 +80,9 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
     Cursor presetCursor;
     Cursor historyCursor;
 
-    RecyclerView workoutRV;
-    RecyclerView historyRV;
+    public RecyclerView presetRV;
+    public RecyclerView historyRV;
+    public GridView dialGrid;
 
     private static SQLiteDatabase workoutDb;
 
@@ -95,6 +99,17 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
 
     private View lastDigitView;
 
+    /*TypedValue typedValue;
+    @ColorInt
+    int color;
+*/
+
+    public SlidingTabLayout mSlidingTabLayout;
+    /**
+     * A {@link ViewPager} which will be used in conjunction with the {@link SlidingTabLayout} above.
+     */
+    private ViewPager mViewPager;
+
     public SlideFragment() {
         // Required empty public constructor
     }
@@ -110,6 +125,13 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        //TODO delete as we are not using android theme?
+        /*//Get style background color
+        typedValue = new TypedValue();
+        getActivity().getTheme().resolveAttribute(R.attr.colorBackgroundFloating, typedValue, true);
+        color = typedValue.data;
+        Log.d("Teh color", ""+color);
+*/
         pref = PreferenceManager.getDefaultSharedPreferences(getActivity());
         intent = new Intent(this.getActivity(), BeeperService.class);
 
@@ -128,25 +150,10 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         historyAdapter = new SvAdapter(getContext(), historyCursor, WorkoutContract.WorkoutEntry1.TABLE_NAME_HISTORY, this);
 
         viewGroup = container;
-        return inflater.inflate(R.layout.fragment_slide, container, false);
+//        viewGroup.setBackgroundColor(color);
+        return inflater.inflate(R.layout.fragment_slide, viewGroup, false);
 
 
-    }
-
-    private SlidingTabLayout mSlidingTabLayout;
-
-    /**
-     * A {@link ViewPager} which will be used in conjunction with the {@link SlidingTabLayout} above.
-     */
-    private ViewPager mViewPager;
-
-    //Force workout ScrollView update, as it seems to persist after return from another activity.
-    @Override
-    public void onStart() {
-        super.onStart();
-        //TODO take running workout status from beeper service
-        presetsAdapter.swapCursor(getAllPresets(), workoutIsRunning, lastWorkoutId);
-        historyAdapter.swapCursor(getAllHistory(), workoutIsRunning, lastWorkoutId);
     }
 
     @Override
@@ -160,6 +167,17 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         // it's PagerAdapter set.
         mSlidingTabLayout = (SlidingTabLayout) view.findViewById(R.id.sliding_tabs);
         mSlidingTabLayout.setViewPager(mViewPager);
+
+//        mSlidingTabLayout.setDividerColors(getActivity().getResources().getColor(R.color.));
+    }
+
+    //Force workout ScrollView update, as it seems to persist after return from another activity.
+    @Override
+    public void onStart() {
+        super.onStart();
+        //TODO take running workout status from beeper service
+        presetsAdapter.swapCursor(getAllPresets(), workoutIsRunning, lastWorkoutId);
+        historyAdapter.swapCursor(getAllHistory(), workoutIsRunning, lastWorkoutId);
     }
 
     //OnClickListener for the Workout list items
@@ -281,7 +299,6 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         public Object instantiateItem(ViewGroup container, int position) {
 
             View view;
-            GridView dialGrid;
 
 
             switch (position) {
@@ -289,7 +306,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                     view = getActivity().getLayoutInflater().inflate(R.layout.fragment_dial, container, false);
                     dialGrid = (GridView) view.findViewById(R.id.dial_grid_frag);
                     dialGrid.setAdapter(dialAdapter);
-
+                    dialGrid.setBackgroundColor(pref.getInt(WaveActivity.THEME_COLOR, 0xfffafafa));
                     //Define dial grid button functions
                     dialGrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
@@ -304,7 +321,11 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
 //                                checkBeeper();
                                 stopBeeper();
                             } else if (position == 11) {
-                                checkBeeper(intent);
+//                                getActivity().setTheme(R.style.AppThemeLight);
+                                final Context contextThemeWrapper = new ContextThemeWrapper(getActivity(), R.style.Theme_AppCompat_Light);
+                                contextThemeWrapper.setTheme(R.style.AppThemeLight);
+
+//                                checkBeeper(intent);
 //                                Intent intent = new Intent(SlideFragment.this.getActivity(), SpeedActivity.class);
 //                                startActivity(intent);
                             }
@@ -314,10 +335,11 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                 }
                 case 1: {
                     view = getActivity().getLayoutInflater().inflate(R.layout.fragment_presets, container, false);
-                    workoutRV = (RecyclerView) view.findViewById(R.id.preset_rv);
+                    presetRV = (RecyclerView) view.findViewById(R.id.preset_rv);
                     LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
-                    workoutRV.setLayoutManager(layoutManager);
-                    workoutRV.setAdapter(presetsAdapter);
+                    presetRV.setLayoutManager(layoutManager);
+                    presetRV.setAdapter(presetsAdapter);
+                    presetRV.setBackgroundColor(pref.getInt(WaveActivity.THEME_COLOR, 0xfffafafa));
                     presetCursor = getAllPresets();
                     presetsAdapter.swapCursor(presetCursor, workoutIsRunning, lastWorkoutId);
                     break;
@@ -328,6 +350,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                     LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
                     historyRV.setLayoutManager(layoutManager);
                     historyRV.setAdapter(historyAdapter);
+                    historyRV.setBackgroundColor(pref.getInt(WaveActivity.THEME_COLOR, 0xfffafafa));
                     historyCursor = getAllHistory();
                     historyAdapter.swapCursor(historyCursor, workoutIsRunning, lastWorkoutId);
                     break;
@@ -362,9 +385,9 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
             firstDigit = digitalInput;
             firstDigitView = view;
 
-            view.animate().scaleX(1.1f).setDuration(50).start();
-            view.animate().scaleY(1.1f).setDuration(50).start();
-            view.setBackgroundColor(0xff33b5e5);
+            view.animate().scaleX(1.15f).setDuration(50).start();
+            view.animate().scaleY(1.15f).setDuration(50).start();
+            view.setBackgroundColor(getActivity().getResources().getColor(R.color.colorAccent));
 
 //            Log.d("GridHeight!!!: ", "" + dialGrid.getHeight());
 //            Log.d("WindowHeight!!!: ", "" + windowHeight);

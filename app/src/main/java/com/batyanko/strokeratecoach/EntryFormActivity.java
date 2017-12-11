@@ -17,7 +17,9 @@
 package com.batyanko.strokeratecoach;
 
 import android.content.ContentValues;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -41,8 +43,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import static android.text.TextUtils.join;
+import static com.batyanko.strokeratecoach.WaveActivity.THEME_COLOR;
 
-public class EntryFormActivity extends AppCompatActivity {
+public class EntryFormActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private EditText nameEt;
     private EditText descEt;
@@ -63,10 +66,18 @@ public class EntryFormActivity extends AppCompatActivity {
     List<EditText> sppEditTexts;
     List<EditText> gearEditTexts;
 
+    private SharedPreferences pref;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_entry_form);
+
+        pref = PreferenceManager.getDefaultSharedPreferences(this);
+        pref.registerOnSharedPreferenceChangeListener(this);
+
+        this.getWindow().getDecorView().setBackgroundColor(
+                pref.getInt(THEME_COLOR, getResources().getColor(R.color.backgroundLight)));
 
         numberOfLines = 0;
         sppEditTexts = new ArrayList<>();
@@ -87,28 +98,8 @@ public class EntryFormActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        pref.unregisterOnSharedPreferenceChangeListener(this);
         Log.d("DESTROY", "ON DESTROY");
-    }
-
-    public void onRadioButtonClicked(View view) {
-        boolean isChecked = ((RadioButton) view).isChecked();
-        switch (view.getId()) {
-            case R.id.radio_strokes:
-                if (isChecked) {
-                    Log.d("RADIOGAGA", "strokes");
-                    break;
-                }
-            case R.id.radio_meters:
-                if (isChecked) {
-                    Log.d("RADIOGAGA", "meters");
-                    break;
-                }
-            case R.id.radio_seconds:
-                if (isChecked) {
-                    Log.d("RADIOGAGA", "seconds");
-                    break;
-                }
-        }
     }
 
     private void addLine() {
@@ -168,6 +159,8 @@ public class EntryFormActivity extends AppCompatActivity {
 
         addPhaseButton = new Button(this);
         addPhaseButton.setLayoutParams(pHorizontal);
+        addPhaseButton.setBackgroundResource(R.drawable.ic_rectangle);
+        addPhaseButton.setTextColor(getResources().getColor(android.R.color.white));
         addPhaseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -177,7 +170,9 @@ public class EntryFormActivity extends AppCompatActivity {
         addPhaseButton.setText(R.string.button_add_phase_label);
 
         createWorkoutButton = new Button(this);
-        createWorkoutButton.setLayoutParams(pHorizontal);
+        createWorkoutButton.setLayoutParams(pVertical);
+        createWorkoutButton.setBackgroundResource(R.drawable.ic_rectangle);
+        createWorkoutButton.setTextColor(getResources().getColor(android.R.color.white));
         createWorkoutButton.setOnClickListener(CreateButtonListener);
         createWorkoutButton.setText(R.string.create_workout_button_label);
 
@@ -289,6 +284,14 @@ public class EntryFormActivity extends AppCompatActivity {
         } else if (radioSeconds.isChecked()) {
             return BeeperTasks.SPP_TYPE_SECONDS;
         } else return 9;
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+        if(s.equals(WaveActivity.THEME_COLOR)) {
+            int backgroundColor = pref.getInt(WaveActivity.THEME_COLOR, WaveActivity.THEME_LIGHT);
+            this.getWindow().getDecorView().setBackgroundColor(backgroundColor);
+        }
     }
 
     public class CustomWatcher implements TextWatcher {

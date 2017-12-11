@@ -18,7 +18,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.batyanko.strokeratecoach.Fragments.DialFragment">
+    tools:context="com.batyanko.strokeratecoach.Fragments.DialFragment"
+
+    >
 
     <GridView
         android:id="@+id/dial_grid_frag"

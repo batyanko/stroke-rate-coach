@@ -1,7 +1,9 @@
 package com.batyanko.strokeratecoach.Utils;
 
 import android.content.Context;
+import android.support.annotation.ColorInt;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +22,10 @@ public class DialGridAdapter extends BaseAdapter {
     private Context mContext;
     private String[] digitIds;
 
+    TypedValue typedValue;
+    @ColorInt
+    int color;
+
     public DialGridAdapter(Context c) {
         mContext = c;
         Log.d("Context in constr!!!!: ", mContext.getPackageName());
@@ -30,6 +36,11 @@ public class DialGridAdapter extends BaseAdapter {
                 "7", "8", "9",
                 "0", mContext.getString(R.string.stopper_button_text), " "
         };
+
+        //Get style background color
+        typedValue = new TypedValue();
+        mContext.getTheme().resolveAttribute(R.attr.colorBackgroundFloating, typedValue, true);
+        color = typedValue.data;
     }
 
     @Override

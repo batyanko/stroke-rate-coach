@@ -2,8 +2,21 @@
 <resources>
     <color name="colorPrimary">#3f51b5</color>
     <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorAccent">@android:color/holo_orange_light</color>
 
     <color name="normalButtonColor">#0000FF</color>
     <color name="activeButtonColor">#ffffff</color>
+    <color name="grey">#888888</color>
+
+    <color name="backgroundDark">#303030</color>
+    <color name="backgroundLight">#ffffff</color>
+
+    <color name="blueAppColor">@android:color/holo_blue_light</color>
+
+<!--
+    <color name="holo_blue_light">#ff33b5e5</color>
+    <color name="holo_blue_dark">#ff0099cc</color>
+    <color name="holo_blue_bright">#ff00ddff</color>
+-->
+
 </resources>

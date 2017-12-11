@@ -19,11 +19,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.batyanko.strokeratecoach.Fragments.SlideFragment"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    >
     <com.batyanko.strokeratecoach.Sliding.SlidingTabLayout
         android:id="@+id/sliding_tabs"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        style="@style/AppTheme"
         />
 
     <android.support.v4.view.ViewPager

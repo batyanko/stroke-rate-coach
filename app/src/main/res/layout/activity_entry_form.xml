@@ -27,13 +27,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        tools:context="com.batyanko.strokeratecoach.EntryFormActivity">
+        tools:context="com.batyanko.strokeratecoach.EntryFormActivity"
+        android:theme="@style/AppTheme">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="16sp"
-            android:textColor="@android:color/black"
+            android:textColor="@android:color/white"
             android:background="@color/colorAccent"
             android:padding="3dp"
             android:text="@string/workout_unit_choose_title"
@@ -42,7 +43,10 @@
         <RadioGroup
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:theme="@style/EntryFormRadioTheme"
+            android:textColor="@android:color/white"
+            >
 
             <android.support.v7.widget.AppCompatRadioButton
                 android:id="@+id/radio_strokes"
@@ -50,8 +54,9 @@
                 android:layout_height="wrap_content"
                 android:background="@android:color/holo_green_light"
                 android:layout_weight="1"
-                android:onClick="onRadioButtonClicked"
-                android:text="@string/strokes" />
+                android:text="@string/strokes"
+                android:textColor="@android:color/white"
+                />
 
             <android.support.v7.widget.AppCompatRadioButton
                 android:id="@+id/radio_meters"
@@ -59,8 +64,9 @@
                 android:layout_height="wrap_content"
                 android:background="@android:color/holo_orange_light"
                 android:layout_weight="1"
-                android:onClick="onRadioButtonClicked"
-                android:text="@string/meters" />
+                android:text="@string/meters"
+                android:textColor="@android:color/white"
+                />
 
             <android.support.v7.widget.AppCompatRadioButton
                 android:id="@+id/radio_seconds"
@@ -68,8 +74,9 @@
                 android:layout_height="wrap_content"
                 android:background="@android:color/holo_blue_light"
                 android:layout_weight="1"
-                android:onClick="onRadioButtonClicked"
-                android:text="@string/seconds" />
+                android:text="@string/seconds"
+                android:textColor="@android:color/white"
+                />
 
         </RadioGroup>
 

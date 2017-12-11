@@ -20,7 +20,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.*;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -28,8 +28,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.support.v7.widget.*;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
@@ -42,24 +41,13 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
 import android.view.animation.ScaleAnimation;
-import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.PopupWindow;
-import android.widget.ProgressBar;
-import android.widget.Spinner;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.*;
 
 import com.batyanko.strokeratecoach.Fragments.SlideFragment;
 import com.batyanko.strokeratecoach.Utils.SpeedViewAdapter;
 import com.batyanko.strokeratecoach.sync.BeeperService;
 import com.batyanko.strokeratecoach.sync.BeeperServiceUtils;
 import com.batyanko.strokeratecoach.sync.BeeperTasks;
-
-import static java.lang.Float.parseFloat;
 
 public class WaveActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -82,12 +70,14 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 
     public static final int MY_LOCATION_PERMISSION = 22;
 
+    //Shared preferences
     public static final String PHASE_LENGTH = "phase-length";
     public static final String TOTAL_WORKOUT_LENGTH = "total-workout-length";
     public static final String PHASE_PROGRESS = "total-strokes-elapsed";
     public static final String CURRENT_COLOR = "current-phase";
     public static final String CURRENT_SPEED = "current-speed";
     public static final String SPEED_LIMIT = "speed-limit";
+    public static final String SPEED_LIMIT_SWITCH = "speed-limit-switch";
     public static final String SPEED_UNIT = "speed-unit";
     public static final String SPEED_MS = "m/s";
     public static final String SPEED_500M = "/500m";
@@ -95,7 +85,10 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     public static final String COUNTDOWN_DURATION = "countdown-duration";   //In ms
     public static final String COUNTDOWN_DURATION_LEFT = "countdown-duration-left";   //In ms
     public static final String BEEP = "beep";
-
+    public static final String THEME = "theme";
+    public static final int THEME_DARK = 0;
+    public static final int THEME_LIGHT = 1;
+    public static final String THEME_COLOR = "theme-color";
 
     /* Global spm setting to hold current spm */
     public static int spm;
@@ -133,7 +126,11 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     private SlideFragment slideFragment;
     static int random;
 
-    EditText speedLimitEditText;
+    //SpeedLimit popup UI
+    private EditText speedLimitEditText;
+    private View speedLimitPopupLayout;
+    private PopupWindow popupWindow;
+    private SwitchCompat speedLimitSwitch;
 
     private static AsyncTask asyncTask = null;
     boolean upIsTouched = false;
@@ -172,6 +169,8 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 
         Log.d("BENCHMARKING", "3");
         //Initialize UI elements
+        this.getWindow().getDecorView().setBackgroundColor(
+                pref.getInt(THEME_COLOR, getResources().getColor(R.color.backgroundLight)));
 
         waveProgress = (ProgressBar) findViewById(R.id.wave_progress_bar_2);
         waveProgress.setVisibility(View.INVISIBLE);
@@ -204,7 +203,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         String selectedString = (String) ((Spinner) findViewById(R.id.speed_unit)).getSelectedItem();
 
         speedLimitView = (TextView) findViewById(R.id.speed_limit_view);
-        String speedLimit = "" + pref.getInt(SPEED_LIMIT, 42);
+        String speedLimit = "" + pref.getInt(SPEED_LIMIT, 0);
         speedLimit = getSpeedString(speedLimit);
         speedLimitView.setText(speedLimit);
         speedLimitView.setOnClickListener(new View.OnClickListener() {
@@ -212,23 +211,30 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
             public void onClick(View view) {
                 LayoutInflater inflater = (LayoutInflater) WaveActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 float density = WaveActivity.this.getResources().getDisplayMetrics().density;
-                View speedLimitPopupLayout = inflater.inflate(R.layout.speed_limit_layout, null);
+                speedLimitPopupLayout = inflater.inflate(R.layout.speed_limit_layout, null);
 
-                final PopupWindow popupWindow = new PopupWindow(speedLimitPopupLayout, windowWidth, LinearLayout.LayoutParams.WRAP_CONTENT, true);
-                popupWindow.setBackgroundDrawable(new ColorDrawable(getResources().getColor(android.R.color.holo_blue_light)));
+                popupWindow = new PopupWindow(speedLimitPopupLayout, windowWidth, LinearLayout.LayoutParams.WRAP_CONTENT, true);
+                popupWindow.setBackgroundDrawable(
+                        new ColorDrawable(pref.getInt(THEME_COLOR, getResources().getColor(R.color.backgroundLight))));
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    popupWindow.setElevation(100f);
+                }
 
                 popupWindow.showAsDropDown(speedLimitView);
                 popupWindow.showAtLocation(speedLimitPopupLayout, Gravity.CENTER, 0, (int) density * 100);
 
-
-
+                speedLimitSwitch =
+                        speedLimitPopupLayout.findViewById(R.id.speed_limit_switch);
                 speedLimitEditText = speedLimitPopupLayout.findViewById(R.id.speed_limit_edit_text);
-                Button setLimit = speedLimitPopupLayout.findViewById(R.id.speed_limit_setter_button);
-                Button saveAndExit = (Button) speedLimitPopupLayout.findViewById(R.id.speed_limit_confirm_button);
-                ImageView up = speedLimitPopupLayout.findViewById(R.id.increase_speed);
-                ImageView down = speedLimitPopupLayout.findViewById(R.id.decrease_speed);
+                final Button setLimit = speedLimitPopupLayout.findViewById(R.id
+                        .speed_limit_setter_button);
+                final Button saveAndExit = speedLimitPopupLayout.findViewById(R.id
+                        .speed_limit_confirm_button);
+                final ImageView up = speedLimitPopupLayout.findViewById(R.id.increase_speed);
+                final ImageView down = speedLimitPopupLayout.findViewById(R.id.decrease_speed);
 
-                String speedLimit = "" + pref.getInt(SPEED_LIMIT, 42);
+                String speedLimit = "" + pref.getInt(SPEED_LIMIT, 0);
                 speedLimit = getSpeedString(speedLimit);
                 speedLimitEditText.setText(speedLimit);
                 speedLimitEditText.selectAll();
@@ -237,9 +243,18 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
                     @Override
                     public void onClick(View view) {
                         float speedLimitFloat = Float.parseFloat(speedLimitEditText.getText().toString());
-                        pref.edit().putInt(SPEED_LIMIT, (int)(speedLimitFloat*100)).apply();
+                        pref.edit().putInt(SPEED_LIMIT, (int) (speedLimitFloat * 100)).apply();
                     }
                 });
+
+                speedLimitSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton compoundButton, boolean isOn) {
+                        pref.edit().putBoolean(SPEED_LIMIT_SWITCH, isOn).apply();
+                        updateSpeedSwitchGUI(isOn);
+                    }
+                });
+                speedLimitSwitch.setChecked(pref.getBoolean(SPEED_LIMIT_SWITCH, false));
 
                 up.setOnTouchListener(new View.OnTouchListener() {
                     @Override
@@ -247,7 +262,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
                         if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                             upIsTouched = true;
                             incrementSpeedTrigger();
-                        } else  if (motionEvent.getAction() == MotionEvent.ACTION_UP){
+                        } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
                             upIsTouched = false;
                         }
                         return true;
@@ -259,7 +274,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
                         if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                             downIsTouched = true;
                             incrementSpeedTrigger();
-                        } else  if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                        } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
                             downIsTouched = false;
                         }
                         return true;
@@ -373,7 +388,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+//        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
         pref.unregisterOnSharedPreferenceChangeListener(this);
         Log.d("ONDESTROY", "DESTROY");
     }
@@ -475,7 +490,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
                 }
             }
         } else if (s.equals(SPEED_LIMIT)) {
-            String speedLimit = "" + pref.getInt(SPEED_LIMIT, 42);
+            String speedLimit = "" + pref.getInt(SPEED_LIMIT, 0);
             if (speedLimit.length() > 4) {
                 pref.edit().putInt(SPEED_LIMIT, 9999).apply();
             }
@@ -488,8 +503,52 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
                 speedLimitEditText.setText(speedLimit);
                 speedLimitEditText.selectAll();
             }
-        } else if (s.equals(CURRENT_SPEED)){
+            sharedPreferences.edit().putBoolean(SPEED_LIMIT_SWITCH, true).apply(); //Enable if limit changed
+        } else if (s.equals(CURRENT_SPEED)) {
+            if (sharedPreferences.getBoolean(SPEED_LIMIT_SWITCH, false)) {
+                //TODO check if speed is below threshold, update speed alarm accordingly
+            }
+        } else if (s.equals(SPEED_LIMIT_SWITCH)) {
+            Log.d("INACTIVATE", "check0");
+            boolean isEnabled = sharedPreferences.getBoolean(SPEED_LIMIT_SWITCH, true);
+            boolean isChecked = speedLimitSwitch.isChecked();
+            if (isEnabled) {
+                //TODO (function) Start speed alarm in BeeperTasks
+            } else {
+                //TODO (function) Stop speed alarm in BeeperTasks
+            }
+            if (isChecked != isEnabled) {
+                Log.d("INACTIVATE", "check1");
+                speedLimitSwitch.setChecked(isEnabled);
+            }
+        } else if (s.equals(THEME)) {
+            int backgroundColor;
+            switch (sharedPreferences.getInt(THEME, THEME_LIGHT)) {
+                case THEME_DARK: {
+                    backgroundColor = getResources().getColor(R.color.backgroundDark);
+                    break;
+                }
+                default: {  //i.e. THEME_LIGHT
+                    backgroundColor = getResources().getColor(R.color.backgroundLight);
+                }
+            }
+            sharedPreferences.edit().putInt(THEME_COLOR, backgroundColor).apply();
 
+            //TODO set backgrounds
+            this.getWindow().getDecorView().setBackgroundColor(backgroundColor);
+            if (slideFragment.dialGrid != null) {
+                slideFragment.dialGrid.setBackgroundColor(backgroundColor);
+            }
+            if (slideFragment.presetRV != null) {
+                slideFragment.presetRV.setBackgroundColor(backgroundColor);
+            }
+            if (slideFragment.historyRV != null) {
+                slideFragment.historyRV.setBackgroundColor(backgroundColor);
+            }
+            if (slideFragment.mSlidingTabLayout != null) {
+//                slideFragment.mSlidingTabLayout.setDividerColors(0xffffbb33, 0xffffbb33);
+//                slideFragment.mSlidingTabLayout.set
+            }
         } else if (s.equals(BEEP)) {
             Log.d("BEEP", "beep");
             spmTextView.startAnimation(AnimationUtils.loadAnimation(WaveActivity.this, R.anim.on_click));
@@ -556,7 +615,13 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 
     public void onSpmClicked(View view) {
 //        view.performClick();
+        //Bounce
         spmTextView.startAnimation(AnimationUtils.loadAnimation(WaveActivity.this, R.anim.on_click));
+
+        //Swap background theme
+        int currentTheme = (pref.getInt(THEME, THEME_DARK) == THEME_DARK) ? THEME_LIGHT : THEME_DARK;
+        pref.edit().putInt(THEME, currentTheme).apply();
+        Log.d("TehTheme", pref.getInt(THEME, THEME_DARK) + "");
     }
 
     private void incrementSpeedTrigger() {
@@ -589,32 +654,42 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         }.execute();
     }
 
+    private void updateSpeedSwitchGUI(boolean isOn) {
+        if (isOn) {
+            speedLimitSwitch.setBackgroundResource(R.drawable.ic_rectangle);
+            speedLimitSwitch.setTextColor(getResources().getColor(android.R.color.white));
+        } else {
+            speedLimitSwitch.setBackgroundResource(R.drawable.ic_rectangle2);
+            speedLimitSwitch.setTextColor(getResources().getColor(R.color.grey));
+        }
+    }
+
     public String getSpeedString(String speedLimit) {
         String s1, s2, s3, s4;
         switch (speedLimit.length()) {
             case 4:
-                s1 = speedLimit.substring(0,1);
-                s2 = speedLimit.substring(1,2);
-                s3 = speedLimit.substring(2,3);
+                s1 = speedLimit.substring(0, 1);
+                s2 = speedLimit.substring(1, 2);
+                s3 = speedLimit.substring(2, 3);
                 s4 = speedLimit.substring(3);
                 break;
             case 3:
                 s1 = " ";
-                s2 = speedLimit.substring(0,1);
-                s3 = speedLimit.substring(1,2);
-                s4 = speedLimit.substring(2,3);
+                s2 = speedLimit.substring(0, 1);
+                s3 = speedLimit.substring(1, 2);
+                s4 = speedLimit.substring(2, 3);
                 break;
             case 2:
                 s1 = " ";
                 s2 = "0";
-                s3 = speedLimit.substring(0,1);
-                s4 = speedLimit.substring(1,2);
+                s3 = speedLimit.substring(0, 1);
+                s4 = speedLimit.substring(1, 2);
                 break;
             case 1:
                 s1 = " ";
                 s2 = "0";
                 s3 = "0";
-                s4 = speedLimit.substring(0,1);
+                s4 = speedLimit.substring(0, 1);
                 break;
             default:
                 s1 = s2 = s3 = s4 = "0";

@@ -1,15 +1,34 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:colorControlNormal">@color/blueAppColor</item>
+        <item name="android:colorForeground">@color/blueAppColor</item>
+        <item name="android:textColor">@color/blueAppColor</item>
+        <item name="android:editTextColor">@color/blueAppColor</item>
+    </style>
+
+    <style name="EntryFormRadioTheme" parent="AppTheme">
+        <item name="android:colorForeground">@android:color/white</item>
+        <item name="colorAccent">@android:color/white</item>
+        <item name="android:buttonTint">@android:color/white</item>
+        <!--<item name="android:solidColor">@android:color/white</item>-->
+    </style>
+
+    <style name="SpeedLimitTheme" parent="AppTheme">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:editTextColor">@color/blueAppColor</item>
+        <!--<item name="android:solidColor">@android:color/white</item>-->
     </style>
 
         <!-- Customize your theme here. -->
-    <style name="AppTheme2" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="AppThemeLight" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:textColor">@color/blueAppColor</item>
+        <item name="colorAccent">@color/colorAccent</item>
     </style>
 
     <style name="waveProgress">

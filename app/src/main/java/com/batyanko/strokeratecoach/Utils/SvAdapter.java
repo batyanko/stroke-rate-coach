@@ -22,8 +22,10 @@ package com.batyanko.strokeratecoach.Utils;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.support.annotation.ColorInt;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -72,6 +74,9 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
     private boolean workoutIsRunning;
     private int workoutId;
 
+    TypedValue typedValue;
+    @ColorInt int color;
+
     public interface ListItemClickListener {
         void onListItemClick(View vie, long clickedItemIndex, int position, String tableName, Cursor cursor, int itemFunction);
     }
@@ -85,6 +90,11 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
         this.tableName = tableName;
         mOnClickListener = listener;
         workoutIsRunning = false;
+
+        //Get style background color
+        typedValue = new TypedValue();
+        mContext.getTheme().resolveAttribute(R.attr.colorBackgroundFloating, typedValue, true);
+        color = typedValue.data;
     }
 
     /**
@@ -100,13 +110,14 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
 
     @Override
     public ExerciseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+
         Context context = parent.getContext();
         int layoutIdForListItem = R.layout.exercise_item;
         LayoutInflater inflater = LayoutInflater.from(context); //TODO use mContext
         boolean shouldAttachToParentImmediately = false;
 
         View view = inflater.inflate(layoutIdForListItem, parent, shouldAttachToParentImmediately);
-
+//        view.setBackgroundColor(color);
         return new ExerciseViewHolder(view);
     }
 
