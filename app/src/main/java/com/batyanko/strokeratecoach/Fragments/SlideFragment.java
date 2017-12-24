@@ -314,9 +314,9 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
 
                             if (position < 9) {
                                 setSpmFromDigital(position + 1, view);
-                            } else if (position == 9) {
-                                setSpmFromDigital(0, view);
                             } else if (position == 10) {
+                                setSpmFromDigital(0, view);
+                            } else if (position == 9) {
                                 Log.d("TEHACTION", "STOP?");
 //                                checkBeeper();
                                 stopBeeper();
