@@ -25,9 +25,10 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.PagerAdapter;
@@ -35,13 +36,16 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.ContextThemeWrapper;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.batyanko.strokeratecoach.R;
@@ -56,6 +60,9 @@ import com.batyanko.strokeratecoach.data.WorkoutDBHelper;
 import com.batyanko.strokeratecoach.sync.BeeperService;
 import com.batyanko.strokeratecoach.sync.BeeperServiceUtils;
 import com.batyanko.strokeratecoach.sync.BeeperTasks;
+
+import static com.batyanko.strokeratecoach.WaveActivity.THEME_COLOR;
+import static com.batyanko.strokeratecoach.WaveActivity.windowWidth;
 
 
 /**
@@ -109,6 +116,9 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
      * A {@link ViewPager} which will be used in conjunction with the {@link SlidingTabLayout} above.
      */
     private ViewPager mViewPager;
+    private View workoutInfoLayout;
+    private PopupWindow descPopupWindow;
+    private TextView descPopupTextView;
 
     public SlideFragment() {
         // Required empty public constructor
@@ -194,7 +204,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         }
         String message;
 
-        if (itemFunction == WaveActivity.FAV_BUTTON_FUNCTION) {
+        if (itemFunction == WaveActivity.DEL_BUTTON_FUNCTION) {
 //            Toast.makeText(getActivity(), "Removing entry...", Toast.LENGTH_SHORT).show();
             WaveUtilities.showShortToast("Removing entry...", getContext());
             removeWorkout(clickedItemId, tableName);
@@ -218,8 +228,30 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                     cursor.getString(cursor.getColumnIndex(WorkoutContract.WorkoutEntry1.COLUMN_DESC));
 
             Log.d("TEHPOSITION", "gotten on click: " + clickedItemId);
+            LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            float density = getActivity().getResources().getDisplayMetrics().density;
+            workoutInfoLayout = inflater.inflate(R.layout.workout_info_layout, null);
+            descPopupTextView = workoutInfoLayout.findViewById(R.id.popup_desc_text_view);
+            descPopupTextView.setText(message);
+            descPopupWindow = new PopupWindow(workoutInfoLayout, windowWidth, LinearLayout.LayoutParams.WRAP_CONTENT, true);
+            descPopupWindow.setBackgroundDrawable(
+                    new ColorDrawable(pref.getInt(THEME_COLOR, getResources().getColor(R.color.backgroundLight)))
+            );
 
-            Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                descPopupWindow.setElevation(100f);
+            }
+
+//            descPopupWindow.showAsDropDown(view);
+            descPopupWindow.showAtLocation(workoutInfoLayout, Gravity.CENTER, 0, (int) density * 100);
+
+            workoutInfoLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    descPopupWindow.dismiss();
+                }
+            });
+//            Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
 
         } else if (itemFunction == WaveActivity.ENGAGE_WORKOUT_FUNCTION) {
             stopBeeper();
@@ -306,7 +338,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                     view = getActivity().getLayoutInflater().inflate(R.layout.fragment_dial, container, false);
                     dialGrid = (GridView) view.findViewById(R.id.dial_grid_frag);
                     dialGrid.setAdapter(dialAdapter);
-                    dialGrid.setBackgroundColor(pref.getInt(WaveActivity.THEME_COLOR, 0xfffafafa));
+                    dialGrid.setBackgroundColor(pref.getInt(THEME_COLOR, 0xfffafafa));
                     //Define dial grid button functions
                     dialGrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
@@ -339,7 +371,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                     LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
                     presetRV.setLayoutManager(layoutManager);
                     presetRV.setAdapter(presetsAdapter);
-                    presetRV.setBackgroundColor(pref.getInt(WaveActivity.THEME_COLOR, 0xfffafafa));
+                    presetRV.setBackgroundColor(pref.getInt(THEME_COLOR, 0xfffafafa));
                     presetCursor = getAllPresets();
                     presetsAdapter.swapCursor(presetCursor, workoutIsRunning, lastWorkoutId);
                     break;
@@ -350,7 +382,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                     LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
                     historyRV.setLayoutManager(layoutManager);
                     historyRV.setAdapter(historyAdapter);
-                    historyRV.setBackgroundColor(pref.getInt(WaveActivity.THEME_COLOR, 0xfffafafa));
+                    historyRV.setBackgroundColor(pref.getInt(THEME_COLOR, 0xfffafafa));
                     historyCursor = getAllHistory();
                     historyAdapter.swapCursor(historyCursor, workoutIsRunning, lastWorkoutId);
                     break;

@@ -67,7 +67,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     public static final int WORKOUT_STOP = 0;
 
     //Workout item function IDs
-    public static final int FAV_BUTTON_FUNCTION = 1;
+    public static final int DEL_BUTTON_FUNCTION = 1;
     public static final int WORKOUT_ITEM_FUNCTION = 2;
     public static final int ENGAGE_WORKOUT_FUNCTION = 3;
 

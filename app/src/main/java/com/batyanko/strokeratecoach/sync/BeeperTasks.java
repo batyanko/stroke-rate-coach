@@ -246,6 +246,7 @@ public class BeeperTasks {
         locationAccuracy = 500;     //Init at an extremely inaccurate value, i.e. no accuracy
 
         phaseStartTime = System.currentTimeMillis();
+        Log.d("SystemTimeInMillis", phaseStartTime + "");
     }
 
     private void flushUI() {
@@ -638,7 +639,9 @@ public class BeeperTasks {
                     currentLocation = location;
                     currentSpeed = location.getSpeed();
 
-                    phaseProgress = (int) location.distanceTo(startingPhaseLocation);
+                    if (mSppType == SPP_TYPE_METERS) {
+                        phaseProgress = (int) location.distanceTo(startingPhaseLocation);
+                    }
                     Log.d("UPDATESPEED", "" + phaseProgress);
                 }
             }

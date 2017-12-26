@@ -44,9 +44,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import static com.batyanko.strokeratecoach.data.WorkoutContract.WorkoutEntry1.COLUMN_GEARS_CSV;
 import static com.batyanko.strokeratecoach.data.WorkoutContract.WorkoutEntry1.COLUMN_NAME;
-import static com.batyanko.strokeratecoach.data.WorkoutContract.WorkoutEntry1.COLUMN_SPP_CSV;
 import static com.batyanko.strokeratecoach.data.WorkoutContract.WorkoutEntry1.COLUMN_SPP_TYPE;
 import static com.batyanko.strokeratecoach.data.WorkoutContract.WorkoutEntry1.COLUMN_TIMESTAMP;
 
@@ -116,9 +114,9 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
         LayoutInflater inflater = LayoutInflater.from(context); //TODO use mContext
         boolean shouldAttachToParentImmediately = false;
 
-        View view = inflater.inflate(layoutIdForListItem, parent, shouldAttachToParentImmediately);
-//        view.setBackgroundColor(color);
-        return new ExerciseViewHolder(view);
+        View itemView = inflater.inflate(layoutIdForListItem, parent, shouldAttachToParentImmediately);
+//        itemView.setBackgroundColor(color);
+        return new ExerciseViewHolder(itemView);
     }
 
     @Override
@@ -135,11 +133,12 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
 
     public class ExerciseViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private TextView workoutTitle;
+        private TextView workoutTime;
         private TextView workoutDate;
         private TextView workoutDesc;
         private Button delButton;
         private ImageView engageButton;
-        private final int itemId;
+        private final int descId;
         private final int favButtonId;
         private final int engageButtonId;
 
@@ -148,12 +147,13 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
             super(itemView);
 
             workoutTitle = (TextView) itemView.findViewById(R.id.workout_title);
+            workoutTime = (TextView) itemView.findViewById(R.id.workout_time);
             workoutDate = (TextView) itemView.findViewById(R.id.workout_date);
-            workoutDesc = (TextView) itemView.findViewById(R.id.exercise_text);
+            workoutDesc = (TextView) itemView.findViewById(R.id.exercise_desc);
             delButton = (Button) itemView.findViewById(R.id.del_button);
             engageButton = (ImageView) itemView.findViewById(R.id.engage_button);
             //TODO Make sure IDs are unique?
-            itemId = workoutDesc.getId();
+            descId = workoutDesc.getId();
             favButtonId = delButton.getId();
             engageButtonId = engageButton.getId();
         }
@@ -163,17 +163,35 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
             long clickedTag = (long) itemView.getTag();
             int clickedPosition = getAdapterPosition();
             int viewId = view.getId();
-            if (historyCursor == null) {
-                Log.d("TEHCURSOR", "is null");
-            } else {
-                Log.d("TEHCURSOR", historyCursor.toString());
-            }
+            Log.d("OnClickItem", "check");
             if (viewId == favButtonId) {
-                mOnClickListener.onListItemClick(view, clickedTag, clickedPosition, tableName, gottenCursor, WaveActivity.FAV_BUTTON_FUNCTION);
+                mOnClickListener.onListItemClick(
+                        view,
+                        clickedTag,
+                        clickedPosition,
+                        tableName,
+                        gottenCursor,
+                        WaveActivity.DEL_BUTTON_FUNCTION
+                );
             } else if (viewId == engageButtonId) {
-                mOnClickListener.onListItemClick(view, clickedTag, clickedPosition, tableName, gottenCursor, WaveActivity.ENGAGE_WORKOUT_FUNCTION);
-            } else if (viewId == itemId) {
-                mOnClickListener.onListItemClick(view, clickedTag, clickedPosition, tableName, gottenCursor, WaveActivity.WORKOUT_ITEM_FUNCTION);
+                mOnClickListener.onListItemClick(
+                        view,
+                        clickedTag,
+                        clickedPosition,
+                        tableName,
+                        gottenCursor,
+                        WaveActivity.ENGAGE_WORKOUT_FUNCTION
+                );
+            } else /*if (viewId == descId)*/ {
+                Log.d("WorkoutItemFunc", "check");
+                mOnClickListener.onListItemClick(
+                        view,
+                        clickedTag,
+                        clickedPosition,
+                        tableName,
+                        gottenCursor,
+                        WaveActivity.WORKOUT_ITEM_FUNCTION
+                );
             }
         }
 
@@ -200,15 +218,19 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
             delButton.setOnClickListener(this);
             workoutDesc.setOnClickListener(this);
             engageButton.setOnClickListener(this);
+            itemView.setOnClickListener(this);
 
             String scrollItemName;
+            String sppType;
 
             String timestampFromSQLite = gottenCursor.getString(gottenCursor.getColumnIndex(COLUMN_TIMESTAMP));
 
             Log.d("DATE BENCH", "START");
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.US);
-            SimpleDateFormat sdfTime = new SimpleDateFormat("yyyy-MM-dd',' hh:mm:ss", Locale.US);
-            SimpleDateFormat sdfSimple = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+            //TODO add setting for 12/24h format
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss", Locale.US);
+            SimpleDateFormat sdfDateTime = new SimpleDateFormat("yyyy-MM-dd',' kk:mm:ss", Locale.US);
+            SimpleDateFormat sdfDate = new SimpleDateFormat("dd MMM yyyy", Locale.US);
+            SimpleDateFormat sdfTime = new SimpleDateFormat("kk:mm:ss", Locale.US);
             ParsePosition pp = new ParsePosition(0);
             Date dt = sdf.parse(timestampFromSQLite, pp);
             String localDate = "";
@@ -218,22 +240,21 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
 
                 long localOffset = TimeZone.getDefault().getOffset(currentEpoch);
                 //Current local time?
-                    localDate = sdfSimple.format(currentEpoch + localOffset);
+                    localDate = sdfDate.format(currentEpoch + localOffset);
                     localTime = sdfTime.format(currentEpoch + localOffset);
                 Log.d("DATE BENCH", "FINISH");
 
-                String sppType;
                 switch (gottenCursor.getInt(gottenCursor.getColumnIndex(COLUMN_SPP_TYPE))) {
                     case BeeperTasks.SPP_TYPE_STROKES: {
-                        sppType = "(" + mContext.getString(R.string.strokes)+ ") ";
+                        sppType = "" + mContext.getString(R.string.strokes)+ "";
                         break;
                     }
                     case BeeperTasks.SPP_TYPE_METERS: {
-                        sppType = "(" + mContext.getString(R.string.meters) + ") ";
+                        sppType = "" + mContext.getString(R.string.meters) + "";
                         break;
                     }
                     case BeeperTasks.SPP_TYPE_SECONDS: {
-                        sppType = "(" + mContext.getString(R.string.seconds) + " ";
+                        sppType = "" + mContext.getString(R.string.seconds) + "";
                         break;
                     }
                     default: {
@@ -242,7 +263,8 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
                 }
                 String at = mContext.getString(R.string.gear_title_text) + " ";
 
-                if (tableName.equals(WorkoutContract.WorkoutEntry1.TABLE_NAME_PRESETS)) {
+                //Show workout phase details
+                /*if (tableName.equals(WorkoutContract.WorkoutEntry1.TABLE_NAME_PRESETS)) {
                     scrollItemName =
                             sppType +
                             "\n" +
@@ -258,15 +280,17 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
                             " " +
                             at +
                             gottenCursor.getString(gottenCursor.getColumnIndex(COLUMN_GEARS_CSV));
-                }
+                }*/
 
             } else {
-                scrollItemName = gottenCursor.getString(gottenCursor.getColumnIndex(COLUMN_NAME));
+//                scrollItemName = gottenCursor.getString(gottenCursor.getColumnIndex(COLUMN_NAME));
+                sppType = "";
             }
 
 
-            workoutDesc.setText(scrollItemName);
+            workoutDesc.setText(sppType);
             workoutTitle.setText(gottenCursor.getString(gottenCursor.getColumnIndex(COLUMN_NAME)));
+            workoutTime.setText(localTime);
             workoutDate.setText(localDate);
 
             this.itemView.setTag(gottenCursor.getLong(gottenCursor.getColumnIndex(WorkoutContract.WorkoutEntry1._ID)));
