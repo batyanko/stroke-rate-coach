@@ -10,6 +10,7 @@
 
     <color name="backgroundDark">#303030</color>
     <color name="backgroundLight">#ffffff</color>
+    <color name="colorTransparent">#00ffffff</color>
 
     <color name="blueAppColor">@android:color/holo_blue_light</color>
 

@@ -35,4 +35,13 @@
         <!--<item name="progressDrawable">@</item>-->
     </style>
 
+        <style parent="@android:style/Widget.Spinner" name="PureSpinner">
+            <item name="android:background">@color/colorTransparent</item>
+        </style>
+
+    <style name="ThinSpinnerBorderStyle" parent="android:style/Widget.ListView.DropDown">
+        <item name="android:divider">#FFEEEEEE</item>
+        <item name="android:dividerHeight">1dp</item>
+    </style>
+
 </resources>

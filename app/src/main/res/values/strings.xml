@@ -52,6 +52,8 @@
     <string name="speed_dial_title">Speed Dial</string>
     <string name="workouts_title">Workouts</string>
     <string name="history_title">History</string>
-    <string name="minimum_speed_warning">Minimum Speed Warning</string>
+    <string name="minimum_speed_warning">Low Speed Warning</string>
+    <string name="speed_unit_mps">m/s</string>
+    <string name="speed_unit_500m">/500m</string>
 
 </resources>

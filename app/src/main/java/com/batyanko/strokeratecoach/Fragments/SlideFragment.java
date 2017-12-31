@@ -439,7 +439,8 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
 //        lastClickedEngageButton.setBackgroundResource(R.drawable.ic_menu_play_clip_negative);
     }
 
-    private void stopBeeper() {
+    public void stopBeeper() {
+        pref.edit().putInt(WaveActivity.OPERATION_SETTING, WaveActivity.WORKOUT_STOP).apply();
         if (lastClickedEngageButton != null) {
             lastClickedEngageButton.setBackgroundResource(R.drawable.ic_play_2_new);
         }

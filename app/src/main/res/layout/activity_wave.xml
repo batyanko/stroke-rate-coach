@@ -22,50 +22,32 @@
     android:id="@+id/activity_wave"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:clipToPadding="false"
     android:paddingBottom="0dp"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="0dp"
-    android:clipToPadding="false"
     tools:context="com.batyanko.strokeratecoach.WaveActivity">
-
-
-
 
 
     <TextView
         android:id="@+id/countdown_digit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:textSize="128sp"
-        android:fontFamily="serif"
-        android:includeFontPadding="false"
-        android:lineSpacingExtra="0dp"
-        android:elevation="3dp"
-        android:background="@color/blueAppColor"
-        android:textColor="#ffffff"
         android:layout_marginLeft="-20dp"
         android:layout_marginRight="-20dp"
         android:layout_marginTop="112dp"
-        app:layout_constraintTop_toTopOf="parent"
+        android:background="@color/blueAppColor"
+        android:elevation="3dp"
+        android:fontFamily="serif"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:lineSpacingExtra="0dp"
+        android:textColor="#ffffff"
+        android:textSize="128sp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        />
-
-    <ProgressBar
-        android:id="@+id/wave_progress_bar_2"
-        style="@android:style/Widget.ProgressBar.Horizontal"
-        android:layout_width="0dp"
-        android:progressDrawable="@drawable/wave_progress"
-        android:layout_height="50dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginStart="8dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/create_workout_button"
@@ -75,34 +57,29 @@
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginStart="0dp"
-        android:text="@string/create_workout_button_label"
-        android:textSize="22sp"
+        android:layout_marginTop="8dp"
         android:background="@drawable/ic_rectangle"
+        android:text="@string/create_workout_button_label"
         android:textColor="@android:color/white"
+        android:textSize="22sp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/wave_progress_bar_2" />
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/SpmTextView_2"
+    <ProgressBar
+        android:id="@+id/wave_progress_bar_2"
+        style="@android:style/Widget.ProgressBar.Horizontal"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
+        android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:text="@string/initial_spm"
-        android:textAlignment="center"
-        android:textSize="128sp"
-        android:clickable="true"
-        android:focusable="true"
-        android:background="?attr/selectableItemBackground"
-        android:onClick="onSpmClicked"
+        android:progressDrawable="@drawable/wave_progress"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/progressTextView"
-        app:layout_constraintBottom_toTopOf="@+id/guideline_hor50_2" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/progressTextView"
@@ -114,54 +91,163 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:textAlignment="center"
-        android:textSize="24sp"
         android:textColor="@android:color/white"
+        android:textSize="24sp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
+        android:id="@+id/legend_strip"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="#00000000"
+        app:layout_constraintTop_toBottomOf="@+id/wave_progress_bar_2">
+
+        <TextView
+            android:id="@+id/speed_speed_legend"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:gravity="center"
+            android:text="Speed"
+
+            />
+
+        <ImageView
+            android:id="@+id/speed_unit_legend"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="bottom"
+            android:layout_weight="2"
+            android:gravity="bottom"
+            android:src="@color/colorTransparent"
+
+            />
+
+        <TextView
+            android:id="@+id/speed_limit_legend"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:gravity="center"
+            android:text="Limit"
+
+            />
+
+        <TextView
+            android:id="@+id/filler_tv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:gravity="center"
+            android:text=""
+
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/speed_strip"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/speed_strip_height"
         android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@id/wave_progress_bar_2"
-        >
+        app:layout_constraintTop_toBottomOf="@+id/legend_strip">
+
         <TextView
             android:id="@+id/speed_view"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:textSize="20sp"
             android:layout_weight="3"
             android:gravity="center"
-            />
-        <Spinner
-            android:id="@+id/speed_unit"
+            android:textSize="@dimen/speed_strip_text_size" />
+
+        <FrameLayout
+            android:id="@+id/speed_unit_stack"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="3"
-            />
+            android:layout_weight="2">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="40dp"
+                android:layout_gravity="right|center_vertical"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_corner_arrow" />
+
+            <Spinner
+                android:id="@+id/speed_unit"
+                style="@style/PureSpinner"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:popupBackground="@color/blueAppColor"
+                android:spinnerMode="dropdown" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/speed_limit_stack"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="3">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="40dp"
+                android:layout_gravity="right|center_vertical"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_corner_arrow" />
+
+            <TextView
+                android:id="@+id/speed_limit_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:textAlignment="center"
+                android:textSize="@dimen/speed_strip_text_size"
+                />
+        </FrameLayout>
+
         <TextView
-            android:id="@+id/speed_limit_view"
+            android:id="@+id/stop_button"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:textSize="20sp"
+            android:layout_height="wrap_content"
             android:layout_weight="3"
+            android:background="@drawable/ic_rectangle"
             android:gravity="center"
-            android:text="baa"
-            />
+            android:text="@string/stopper_button_text"
+            android:textAllCaps="true"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/speed_strip_text_size" />
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/SpmTextView_2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
+        android:onClick="onSpmClicked"
+        android:text="@string/initial_spm"
+        android:textAlignment="center"
+        android:textSize="128sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/speed_strip" />
 
     <FrameLayout
         android:id="@+id/slide_frame_layout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="10"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/guideline_hor50_2"
-        app:layout_constraintBottom_toBottomOf="parent"
-        />
+        app:layout_constraintTop_toBottomOf="@+id/guideline_hor50_2" />
 
     <android.support.constraint.Guideline
         android:id="@+id/guideline_vert1_2"
@@ -230,27 +316,26 @@
         android:id="@+id/countdown_image_view"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:gravity="center"
-        android:textSize="192sp"
-        android:fontFamily="serif"
-        android:elevation="3dp"
-        android:textColor="#00076b"
-        android:src="@drawable/ic_background"
+        android:layout_marginBottom="-64dp"
         android:layout_marginLeft="-64dp"
         android:layout_marginRight="-64dp"
         android:layout_marginTop="-64dp"
-        android:layout_marginBottom="-64dp"
+        android:elevation="3dp"
+        android:fontFamily="serif"
+        android:gravity="center"
+        android:src="@drawable/ic_background"
+        android:textColor="#00076b"
+        android:textSize="192sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        />
+        app:layout_constraintTop_toTopOf="parent" />
 
 </android.support.constraint.ConstraintLayout>
 
-<!--
+    <!--
 
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
 
--->
+    -->

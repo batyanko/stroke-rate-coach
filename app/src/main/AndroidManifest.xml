@@ -26,10 +26,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity android:name="com.batyanko.strokeratecoach.MainActivity">
-
-        </activity>
-
         <activity
             android:name="com.batyanko.strokeratecoach.WaveActivity"
             android:launchMode="singleTop">

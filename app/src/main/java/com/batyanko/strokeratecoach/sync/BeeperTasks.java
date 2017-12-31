@@ -61,8 +61,6 @@ public class BeeperTasks {
     //SPP (strokes or stuff per phase) unit types
     public static final int SPP_TYPE_STROKES = 0;
     public static final int SPP_TYPE_METERS = 1;
-
-
     public static final int SPP_TYPE_SECONDS = 2;
 
     //VALUES FROM WaveActivity
@@ -88,7 +86,7 @@ public class BeeperTasks {
     private static TimerTask speedLimitTimerTask;
     private static Timer speedLimitTimer;
     //autoWave values
-    private static int workoutRunning;     //0=off, 1=autoWave(depreciated), 2=autoProgress, 9=lastPhase
+    private static int workoutRunning;     //0=off, 1=wave(depreciated), 2=interval, 3=simple 9=lastPhase
     private static int countdownRunning;    //0=off, 1=on
     private static int totalWorkoutCount;
     private static int phaseTrigger;
@@ -142,6 +140,7 @@ public class BeeperTasks {
     private static int oldWorkoutProgress;
 
     private static int beeps;
+    private static int warns;
 
     void executeTask(BeeperService beeperService, String action,
                      int[] sppSettings, int[] gearSettings, int sppType) {
@@ -161,6 +160,7 @@ public class BeeperTasks {
             if (gearSettings != null) {
                 if (sppSettings == null) {  //Manual SPM setting
                     //TODO show speed?
+                    workoutRunning = WaveActivity.WORKOUT_SIMPLE;
                     flushUI();
                     spm = gearSettings[0];
                     startTheTempo(beeperService);
@@ -187,8 +187,11 @@ public class BeeperTasks {
             }
             pref.edit().putInt(WaveActivity.OPERATION_SETTING, workoutRunning).apply();
         } else if (action.equals(ACTION_START_WARNING)) {
+            Log.d("WarningAction", "start");
+            cancelTimer(speedLimitTimer, speedLimitTimerTask);
             startSpeedLimit(beeperService);
         } else if (action.equals(ACTION_STOP_WARNING)) {
+            Log.d("WarningAction", "stop");
             cancelTimer(speedLimitTimer, speedLimitTimerTask);
         }
     }
@@ -208,7 +211,7 @@ public class BeeperTasks {
     private void resetVariables(BeeperService beeperService) {
         pref = PreferenceManager.getDefaultSharedPreferences(beeperService);
 
-        workoutRunning = 0;     //0=off, 1=autoWave, 2=autoProgress, 9=lastPhase
+        workoutRunning = WaveActivity.WORKOUT_STOP;
         countdownRunning = 0;
         phaseProgress = 0;
         workoutProgress = 0;
@@ -219,6 +222,7 @@ public class BeeperTasks {
         phasesTotal = 0;
         color = 0;
         beeps = 0;
+        warns = 0;
         locationPool = new CLocation[SPEED_SAMPLE_COUNT];
         locCycleCount = 0;
         locationPoolIsFull = false;
@@ -241,12 +245,14 @@ public class BeeperTasks {
             pref.edit().putString(WaveActivity.SPEED_UNIT, WaveActivity.SPEED_MS).apply();
         }
         pref.edit().putInt(WaveActivity.WORKOUT_PROGRESS, workoutProgress).apply();
+        flushUI();
 
         phaseProgress = 0;
-        locationAccuracy = 500;     //Init at an extremely inaccurate value, i.e. no accuracy
+        locationAccuracy = 500;     //Init to extremely inaccurate value, i.e. no accuracy
 
         phaseStartTime = System.currentTimeMillis();
         Log.d("SystemTimeInMillis", phaseStartTime + "");
+        flushUI();
     }
 
     private void flushUI() {
@@ -257,6 +263,7 @@ public class BeeperTasks {
     }
 
     private void startTheTempo(final BeeperService beeperService) {
+
         Log.d("TEHSERVICE", "at startTheTempo");
 
         pref.edit().putInt(WaveActivity.SPM_SETTING, spm).apply();
@@ -273,10 +280,19 @@ public class BeeperTasks {
             timeTimer.scheduleAtFixedRate(timeTimerTask, 1, 1000);
         }
 
+        //TODO create Task just once?
         workoutTimerTask = new TimerTask() {
             @Override
             public void run() {
-                if (workoutRunning > 0) {
+
+                //Abort if OPERATION set to WORKOUT_STOP. Avoid zombie service in the background?
+                if (pref.getInt(WaveActivity.OPERATION_SETTING, WaveActivity.WORKOUT_STOP)
+                        == WaveActivity.WORKOUT_STOP) {
+                    endWorkout(beeperService);
+                }
+
+                else if (workoutRunning == WaveActivity.WORKOUT_INTERVAL
+                        || workoutRunning == WaveActivity.WORKOUT_LAST) {
 
                     switch (mSppType) {
                         //Handle stroke-based workouts
@@ -284,7 +300,7 @@ public class BeeperTasks {
                             if (phaseProgress >= phaseTrigger) {
                                 phaseProgress = 0;
                                 switch (workoutRunning) {
-                                    case 2: {
+                                    case WaveActivity.WORKOUT_INTERVAL: {
                                         phaseProgress++;
 //                                        pref.edit().putInt(WaveActivity.PHASE_PROGRESS, 1).apply();
 //                                        pref.edit().putInt(WaveActivity.WORKOUT_PROGRESS, ++workoutProgress).apply();
@@ -306,7 +322,7 @@ public class BeeperTasks {
                         }
                         //Handle distance-based workouts
                         case SPP_TYPE_METERS: {
-                            if (phaseProgress > phaseTrigger) {
+                            if (phaseProgress >= phaseTrigger) {
                                 cancel();
                                 startingPhaseLocation = currentLocation;
                                 prevPhasesDistance += phaseTrigger;
@@ -314,7 +330,7 @@ public class BeeperTasks {
                                 pref.edit().putInt(WaveActivity.WORKOUT_PROGRESS, workoutProgress).apply();
                                 phaseProgress = 0;
                                 switch (workoutRunning) {
-                                    case 2:
+                                    case WaveActivity.WORKOUT_INTERVAL:
                                         autoProgress(beeperService);
                                         break;
                                     default:
@@ -344,7 +360,7 @@ public class BeeperTasks {
                                 phaseProgress = 0;
 
                                 switch (workoutRunning) {
-                                    case 2:
+                                    case WaveActivity.WORKOUT_INTERVAL:
                                         autoProgress(beeperService);
 
                                         break;
@@ -369,7 +385,6 @@ public class BeeperTasks {
                     }
                 }
                 workoutToneGen.startTone(ToneGenerator.TONE_CDMA_EMERGENCY_RINGBACK, 150);
-                updateAverageSpeed();
                 pref.edit().putInt(WaveActivity.BEEP, ++beeps).apply();
                 Log.d("TEHBEEP", "BEEP!");
 
@@ -394,10 +409,14 @@ public class BeeperTasks {
 
 
     private void startSpeedLimit(final BeeperService beeperService) {
+        Log.d("onSetSpeedWarning", "check");
         speedLimitTimerTask = new TimerTask() {
             @Override
             public void run() {
-                warningToneGen.startTone(ToneGenerator.TONE_CDMA_ABBR_REORDER, 150);
+                //TODO check SpeedLimit prefs to avoid zombie beepers?
+                pref.edit().putInt(WaveActivity.WARN, ++warns).apply();
+//                warningToneGen.startTone(ToneGenerator.TONE_CDMA_ABBR_REORDER, 100);
+                warningToneGen.startTone(ToneGenerator.TONE_CDMA_ANSWER, 50);
             }
         };
         speedLimitTimer = new Timer();
@@ -438,7 +457,7 @@ public class BeeperTasks {
     private void autoProgress(BeeperService beeperService) {
 
         //Set exercise to autoProgress;
-        workoutRunning = 2;
+        workoutRunning = WaveActivity.WORKOUT_INTERVAL;
 
         phasesTotal = gearSettings.length;
 
@@ -450,7 +469,7 @@ public class BeeperTasks {
         phase++;
 
         if (phase == phasesTotal) {
-            workoutRunning = 0;
+            workoutRunning = WaveActivity.WORKOUT_STOP;
         }
 
         if ((phase & 1) == 1) {
@@ -552,8 +571,9 @@ public class BeeperTasks {
         locationPool[locCycleCount] = currentLocation;
 
         //TESTING
+        Log.d("SPEEDCYCLEarray", "first");
         for (CLocation i : locationPool) {
-            Log.d("SPEEDCYCLE array", "" + i);
+            Log.d("SPEEDCYCLEarray", "" + i);
         }
         Log.d("SPEEDCYCLE", "" + locCycleCount);
         Log.d("SPEEDCYCLE POOLISFULL", " " + locationPoolIsFull);
@@ -658,6 +678,7 @@ public class BeeperTasks {
             if (location != null) {
                 CLocation myLocation = new CLocation(location, this.useMetricUnits());
                 this.updateLocation(myLocation);
+                updateAverageSpeed();
             }
 
         }

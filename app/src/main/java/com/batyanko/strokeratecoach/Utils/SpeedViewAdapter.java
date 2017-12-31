@@ -2,6 +2,7 @@ package com.batyanko.strokeratecoach.Utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.drawable.ColorDrawable;
 import android.preference.PreferenceManager;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
@@ -15,6 +16,8 @@ import android.widget.TextView;
 
 import com.batyanko.strokeratecoach.R;
 import com.batyanko.strokeratecoach.WaveActivity;
+
+import static com.batyanko.strokeratecoach.WaveActivity.THEME_COLOR;
 
 /**
  * Created by batyanko on 10/16/17.
@@ -60,13 +63,20 @@ public class SpeedViewAdapter extends ArrayAdapter<String> implements SpinnerAda
     @Override
     public View getDropDownView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         inflater = LayoutInflater.from(context);
+        int color = pref.getInt(THEME_COLOR, parent.getResources().getColor(R.color.backgroundLight));
         view = inflater.inflate(viewResource, parent, false);
 
         text = contentString[position];
 
+//        parent.setBackgroundResource(R.color.colorAccent);
         TextView textView = view.findViewById(R.id.spinner_tv);
         textView.setText(text);
-//        textView.setTextSize(20);
+
+        textView.setBackgroundDrawable(new ColorDrawable(color));
+        textView.setTextSize(parent.getResources().getDimension(R.dimen.speed_strip_text_size)
+        / parent.getResources().getDisplayMetrics().density);
         return textView;
     }
+
+
 }

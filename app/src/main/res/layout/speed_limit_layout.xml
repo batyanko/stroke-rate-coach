@@ -8,6 +8,7 @@
     android:paddingStart="12dp"
     android:paddingRight="12dp"
     android:paddingEnd="12dp"
+    android:paddingBottom="12dp"
     android:theme="@style/SpeedLimitTheme"
     >
 
@@ -18,7 +19,8 @@
         android:layout_height="wrap_content"
         android:background="@drawable/ic_rectangle"
         android:text="@string/minimum_speed_warning"
-        android:paddingHorizontal="20dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
         android:layout_marginLeft="-3dp"
         />
 
@@ -29,36 +31,88 @@
         android:padding="0dp">
 
         <LinearLayout
-            android:layout_weight="1"
+            android:layout_weight="3"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
             android:orientation="vertical"
             android:gravity="center"
             >
 
-            <EditText
-                android:id="@+id/speed_limit_edit_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="numberDecimal"
-                android:selectAllOnFocus="true"
-                android:textSize="32sp"
-                android:textAlignment="center"
-                />
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:orientation="horizontal"
+                android:layout_weight="1"
+                android:gravity="center"
+                >
+                <TextView
+                    android:id="@+id/speed_limit_tv_500m"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="0:00"
+                    android:textStyle="italic"
+                    android:textSize="24sp"
+                    android:textAlignment="center"
+                    android:textColor="@color/colorAccent"
+                    android:layout_weight="3"
+                    />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:gravity="bottom"
+                    android:text="@string/speed_unit_500m"
+                    android:textStyle="italic"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="24sp"
+                    android:textAlignment="center"
+                    />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:orientation="horizontal"
+                android:layout_weight="1"
+                android:gravity="center"
+                >
+                <EditText
+                    android:id="@+id/speed_limit_edit_text"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:inputType="numberDecimal"
+                    android:selectAllOnFocus="true"
+                    android:textSize="32sp"
+                    android:textAlignment="center"/>
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:gravity="bottom"
+                    android:text="@string/speed_unit_mps"
+                    android:textColor="@color/blueAppColor"
+                    android:textSize="24sp"
+                    android:textAlignment="center"
+                    />
+            </LinearLayout>
+
+            <!--TODO remove?-->
             <Button
+                android:visibility="gone"
                 android:id="@+id/speed_limit_setter_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="Set limit"
                 android:background="@drawable/ic_rectangle"
                 />
         </LinearLayout>
 
         <LinearLayout
-            android:layout_weight="1"
+            android:layout_weight="2"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
