@@ -17,7 +17,7 @@
 <resources>
     <string name="app_name">Stroke Rate Coach</string>
     <string name="stopper_button_text">Стоп</string>
-    <string name="speed_button_text">Скорост</string>
+    <string name="speed_label">Скорост</string>
     <string name="big_wave_desc">Голяма вълна от 20 до 60 загребока и обратно до 20.</string>
     <string name="big_wave_name">Голяма вълна</string>
     <string name="button_add_phase_label">+ отсечка</string>
@@ -32,5 +32,16 @@
     <string name="workout_desc_tooltip">Описание (по желание)</string>
     <string name="speed_dial_title">Бърз набор</string>
     <string name="workouts_title">Тренировки</string>
-    <string name="history_title">Архив</string>
+    <string name="history_title">История</string>
+    <string name="minimum_speed_warning">Аларма мин. скорост</string>
+    <string name="speed_unit_mps">м/с</string>
+    <string name="speed_unit_500m">/500м</string>
+    <string name="entry_form_label">Създаване на тренировка</string>
+    <string name="missing_workout_type_warning">Моля изберете мерна единица (загребоци, метри, секунди)</string>
+    <string name="empty_workout_warning">Празна тренировка - не беше добавена.</string>
+    <string name="empty_data_notification">Пропускане на празните отсечки...</string>
+    <string name="phase_title_text">Отсечка</string>
+    <string name="tpp_title_text">Време</string>
+    <string name="dpp_title_text">Разстояние</string>
+    <string name="min_speed_label">Мин Скорост</string>
 </resources>

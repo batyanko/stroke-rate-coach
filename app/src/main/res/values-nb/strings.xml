@@ -16,8 +16,8 @@
     -->
 <resources>
     <string name="app_name">Stroke Rate Coach</string>
-    <string name="stopper_button_text">Stopp</string>
-    <string name="speed_button_text">Hastighet</string>
+    <string name="stopper_button_text">Stop</string>
+    <string name="speed_label">Hastighet</string>
     <string name="big_wave_name">Stor Bølge</string>
     <string name="button_add_phase_label">+ fase</string>
     <string name="small_wave_name">Liten Bølge</string>
@@ -32,4 +32,15 @@
     <string name="speed_dial_title">Hurtigvalg</string>
     <string name="workouts_title">Trening</string>
     <string name="history_title">Logg</string>
+    <string name="minimum_speed_warning">Hastighetsalarm</string>
+    <string name="speed_unit_mps">m/s</string>
+    <string name="speed_unit_500m">/500m</string>
+    <string name="entry_form_label">skape trening</string>
+    <string name="missing_workout_type_warning">Vennligst velg en måleenhet (roingslag, meter, sekunder)</string>
+    <string name="empty_workout_warning">Tømme trening ble ikke skapt.</string>
+    <string name="empty_data_notification">Utelater tømme faser...</string>
+    <string name="phase_title_text">Fase</string>
+    <string name="tpp_title_text">Tid</string>
+    <string name="dpp_title_text">Avstand</string>
+    <string name="min_speed_label">Min Hastighet</string>
 </resources>

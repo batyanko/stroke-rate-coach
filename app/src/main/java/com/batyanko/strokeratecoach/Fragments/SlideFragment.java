@@ -351,11 +351,11 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                             } else if (position == 9) {
                                 Log.d("TEHACTION", "STOP?");
 //                                checkBeeper();
-                                stopBeeper();
+//                                stopBeeper();
                             } else if (position == 11) {
 //                                getActivity().setTheme(R.style.AppThemeLight);
-                                final Context contextThemeWrapper = new ContextThemeWrapper(getActivity(), R.style.Theme_AppCompat_Light);
-                                contextThemeWrapper.setTheme(R.style.AppThemeLight);
+//                                final Context contextThemeWrapper = new ContextThemeWrapper(getActivity(), R.style.Theme_AppCompat_Light);
+//                                contextThemeWrapper.setTheme(R.style.AppThemeLight);
 
 //                                checkBeeper(intent);
 //                                Intent intent = new Intent(SlideFragment.this.getActivity(), SpeedActivity.class);

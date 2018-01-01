@@ -111,7 +111,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="3"
             android:gravity="center"
-            android:text="Speed"
+            android:text="@string/speed_label"
 
             />
 
@@ -132,7 +132,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="3"
             android:gravity="center"
-            android:text="Limit"
+            android:text="@string/min_speed_label"
+            android:maxEms="30"
 
             />
 

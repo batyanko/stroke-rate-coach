@@ -247,8 +247,8 @@ public class BeeperTasks {
 
         //Init speed unit setting if necessary
         String speedUnit = pref.getString(WaveActivity.SPEED_UNIT, "");
-        if (!speedUnit.equals(WaveActivity.SPEED_500M) && !speedUnit.equals(WaveActivity.SPEED_MS)) {
-            pref.edit().putString(WaveActivity.SPEED_UNIT, WaveActivity.SPEED_MS).apply();
+        if (!speedUnit.equals(WaveActivity.SPEED_500M_SETTING) && !speedUnit.equals(WaveActivity.SPEED_MS_SETTING)) {
+            pref.edit().putString(WaveActivity.SPEED_UNIT, WaveActivity.SPEED_MS_SETTING).apply();
         }
         pref.edit().putInt(WaveActivity.WORKOUT_PROGRESS, workoutProgress).apply();
         flushUI();

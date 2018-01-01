@@ -17,8 +17,8 @@
 
 <resources>
     <string name="app_name">Stroke Rate Coach</string>
-    <string name="stopper_button_text">Stopp</string>
-    <string name="speed_button_text">Geschwindigkeit</string>
+    <string name="stopper_button_text">Stop</string>
+    <string name="speed_label">Geschw.</string>
     <string name="big_wave_desc"></string>
     <string name="big_wave_name">Große Welle</string>
     <string name="button_add_phase_label">+ strecke</string>
@@ -34,4 +34,15 @@
     <string name="speed_dial_title">Schnellauswahl</string>
     <string name="workouts_title">Übungen</string>
     <string name="history_title">Geschichte</string>
+    <string name="minimum_speed_warning">Geschwindigkeitsalarm</string>
+    <string name="speed_unit_mps">m/s</string>
+    <string name="speed_unit_500m">/500m</string>
+    <string name="entry_form_label">Übung erstellen</string>
+    <string name="missing_workout_type_warning">Wählen Sie bitte eine Maßeinheit (Schlagzahl, Meter, Sekunden)</string>
+    <string name="empty_workout_warning">Leere Übung nicht erstellt.</string>
+    <string name="empty_data_notification">Leere Strecken werden ausgelassen...</string>
+    <string name="phase_title_text">Strecke</string>
+    <string name="tpp_title_text">Dauer</string>
+    <string name="dpp_title_text">Entfernung</string>
+    <string name="min_speed_label">Min Geschw.</string>
 </resources>

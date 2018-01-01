@@ -34,7 +34,7 @@ public class DialGridAdapter extends BaseAdapter {
                 "1", "2", "3",
                 "4", "5", "6",
                 "7", "8", "9",
-                mContext.getString(R.string.stopper_button_text), "0", " "
+                " ", "0", " "
         };
 
         //Get style background color

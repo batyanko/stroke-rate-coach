@@ -227,10 +227,11 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
 
             Log.d("DATE BENCH", "START");
             //TODO add setting for 12/24h format
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss", Locale.US);
-            SimpleDateFormat sdfDateTime = new SimpleDateFormat("yyyy-MM-dd',' kk:mm:ss", Locale.US);
-            SimpleDateFormat sdfDate = new SimpleDateFormat("dd MMM yyyy", Locale.US);
-            SimpleDateFormat sdfTime = new SimpleDateFormat("kk:mm:ss", Locale.US);
+            Locale locale = Locale.getDefault();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss", locale);
+            SimpleDateFormat sdfDateTime = new SimpleDateFormat("yyyy-MM-dd',' kk:mm:ss", locale);
+            SimpleDateFormat sdfDate = new SimpleDateFormat("dd MMM yyyy", locale);
+            SimpleDateFormat sdfTime = new SimpleDateFormat("kk:mm:ss", locale);
             ParsePosition pp = new ParsePosition(0);
             Date dt = sdf.parse(timestampFromSQLite, pp);
             String localDate = "";

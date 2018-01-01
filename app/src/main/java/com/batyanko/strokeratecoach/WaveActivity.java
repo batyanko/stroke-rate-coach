@@ -20,7 +20,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.graphics.drawable.*;
 import android.media.AudioManager;
 import android.os.AsyncTask;
@@ -88,8 +87,8 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     public static final String SPEED_LIMIT = "speed-limit";
     public static final String SPEED_LIMIT_SWITCH = "speed-limit-switch";
     public static final String SPEED_UNIT = "speed-unit";
-    public static final String SPEED_MS = "m/s";
-    public static final String SPEED_500M = "/500m";
+    public static final String SPEED_MS_SETTING = "m/s";
+    public static final String SPEED_500M_SETTING = "/500m";
     public static final String COUNTDOWN_RUNNING = "countdown-running";
     public static final String COUNTDOWN_DURATION = "countdown-duration";   //In ms
     public static final String COUNTDOWN_DURATION_LEFT = "countdown-duration-left";   //In ms
@@ -216,8 +215,8 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
             }
         });
 
-        String[] speeds = {SPEED_MS, SPEED_500M};
-        String initSpeedUnit = pref.getString(SPEED_UNIT, SPEED_MS);
+        String[] speeds = {SPEED_MS_SETTING, SPEED_500M_SETTING};
+        String initSpeedUnit = pref.getString(SPEED_UNIT, SPEED_MS_SETTING);
         speedUnitSpinner = (Spinner) findViewById(R.id.speed_unit);
         final SpeedViewAdapter myAdapter = new SpeedViewAdapter(this, R.layout.spinner_tv, speeds);
 
@@ -225,7 +224,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
                 String string = myAdapter.getItem(position);
-                if (string != null && (string.equals(SPEED_MS) || string.equals(SPEED_500M))) {
+                if (string != null && (string.equals(SPEED_MS_SETTING) || string.equals(SPEED_500M_SETTING))) {
                     pref.edit().putString(SPEED_UNIT, string).apply();
                 }
                 if (pref.getInt(OPERATION_SETTING, WORKOUT_STOP) == WORKOUT_STOP) {
@@ -248,7 +247,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         speedUnitSpinner.setOnItemSelectedListener(spinnerListener);
 
         speedUnitSpinner.setSelection(
-                (initSpeedUnit.equals(SPEED_MS) ? 0 : 1)
+                (initSpeedUnit.equals(SPEED_MS_SETTING) ? 0 : 1)
         );
 
         speedView = (TextView) findViewById(R.id.speed_view);
@@ -681,7 +680,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
             //Put the comma :-]
             speedLimitStringMps = getSpeedString(speedLimitStringMps);
             //Set speedLimitView in m/s or /500m accordingly
-            if (pref.getString(SPEED_UNIT, SPEED_MS).equals(SPEED_MS)) {
+            if (pref.getString(SPEED_UNIT, SPEED_MS_SETTING).equals(SPEED_MS_SETTING)) {
                 speedLimitView.setText(speedLimitStringMps);
             } else {
                 speedLimitView.setText(speedLimitString500m);
@@ -798,7 +797,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     private void onSpeedChange() {
         float currentSpeed = pref.getFloat(CURRENT_SPEED, 0);
         String rowingSpeedString;
-        if (pref.getString(SPEED_UNIT, SPEED_MS).equals(SPEED_500M)) {
+        if (pref.getString(SPEED_UNIT, SPEED_MS_SETTING).equals(SPEED_500M_SETTING)) {
             rowingSpeedString = getSpeedPer500(currentSpeed);
         } else {
             rowingSpeedString = "" + currentSpeed;
@@ -916,7 +915,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     private void updateSpeedUnit() {
         int speedLimit = pref.getInt(SPEED_LIMIT, 0);
         String speedLimitString;
-        if (pref.getString(SPEED_UNIT, SPEED_MS).equals(SPEED_MS)) {
+        if (pref.getString(SPEED_UNIT, SPEED_MS_SETTING).equals(SPEED_MS_SETTING)) {
             speedLimitString = "" + speedLimit;
             if (speedLimitString.length() > 4) {
                 pref.edit().putInt(SPEED_LIMIT, 9999).apply();
