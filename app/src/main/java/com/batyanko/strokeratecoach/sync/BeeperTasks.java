@@ -141,6 +141,7 @@ public class BeeperTasks {
 
     private static int beeps;
     private static int warns;
+    private static boolean warningIsRunning = false;
 
     void executeTask(BeeperService beeperService, String action,
                      int[] sppSettings, int[] gearSettings, int sppType) {
@@ -188,11 +189,15 @@ public class BeeperTasks {
             pref.edit().putInt(WaveActivity.OPERATION_SETTING, workoutRunning).apply();
         } else if (action.equals(ACTION_START_WARNING)) {
             Log.d("WarningAction", "start");
-            cancelTimer(speedLimitTimer, speedLimitTimerTask);
-            startSpeedLimit(beeperService);
+//            cancelTimer(speedLimitTimer, speedLimitTimerTask);
+            if (speedLimitTimer == null || speedLimitTimerTask == null || warningIsRunning == false) {
+                startSpeedLimit(beeperService);
+                warningIsRunning = true;
+            }
         } else if (action.equals(ACTION_STOP_WARNING)) {
             Log.d("WarningAction", "stop");
             cancelTimer(speedLimitTimer, speedLimitTimerTask);
+            warningIsRunning = false;
         }
     }
 
@@ -227,6 +232,7 @@ public class BeeperTasks {
         locCycleCount = 0;
         locationPoolIsFull = false;
         prevPhasesDistance = 0;
+        averageSpeed = 0;
 
         cancelTimer(workoutTimer, workoutTimerTask);
         cancelTimer(timeTimer, timeTimerTask);
@@ -258,6 +264,7 @@ public class BeeperTasks {
     private void flushUI() {
         pref.edit().putInt(WaveActivity.OPERATION_SETTING, workoutRunning).apply();
         pref.edit().putInt(WaveActivity.COUNTDOWN_DURATION_LEFT, countdownRunning).apply();
+        pref.edit().putFloat(WaveActivity.CURRENT_SPEED, averageSpeed).apply();
         Boolean bool = pref.getBoolean(WaveActivity.SWITCH_SETTING, true);
         pref.edit().putBoolean(WaveActivity.SWITCH_SETTING, !bool).apply();
     }
@@ -420,7 +427,7 @@ public class BeeperTasks {
             }
         };
         speedLimitTimer = new Timer();
-        speedLimitTimer.scheduleAtFixedRate(speedLimitTimerTask, 1, 500);
+        speedLimitTimer.scheduleAtFixedRate(speedLimitTimerTask, 1, 1000);
     }
 
     //TODO cancel countdown on interrupt
@@ -609,6 +616,7 @@ public class BeeperTasks {
             z/=10;
             Log.d("SPEEDCYCLE TEHZfinal(", "" + z);*/
             pref.edit().putFloat(WaveActivity.CURRENT_SPEED, averageSpeed).apply();
+//            pref.edit().putFloat(WaveActivity.CURRENT_SPEED_TIMESTAMP, currentLocation.getTime()).apply();
         }
     }
 

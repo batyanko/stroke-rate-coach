@@ -22,6 +22,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.*;
+import android.media.AudioManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -83,6 +84,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     public static final String WORKOUT_PROGRESS = "total-strokes-elapsed";
     public static final String CURRENT_COLOR = "current-phase";
     public static final String CURRENT_SPEED = "current-speed";
+    public static final String CURRENT_SPEED_TIMESTAMP = "current-speed-timestamp";
     public static final String SPEED_LIMIT = "speed-limit";
     public static final String SPEED_LIMIT_SWITCH = "speed-limit-switch";
     public static final String SPEED_UNIT = "speed-unit";
@@ -172,6 +174,8 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 
         Log.d("BENCHMARKING", "1");
 
+        setVolumeControlStream(AudioManager.STREAM_MUSIC);
+
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         slideFragment = new SlideFragment();
         transaction.replace(R.id.slide_frame_layout, slideFragment);
@@ -224,7 +228,14 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
                 if (string != null && (string.equals(SPEED_MS) || string.equals(SPEED_500M))) {
                     pref.edit().putString(SPEED_UNIT, string).apply();
                 }
-                onSpeedChange();
+                if (pref.getInt(OPERATION_SETTING, WORKOUT_STOP) == WORKOUT_STOP) {
+                    //Don't show outdated speed, especially onCreate...
+                    Log.d("SpeedViewText", "true" + pref.getInt(OPERATION_SETTING, WORKOUT_STOP));
+                    speedView.setText("0.00");
+                } else {
+                    Log.d("SpeedViewText", "false" + pref.getInt(OPERATION_SETTING, WORKOUT_STOP));
+                    onSpeedChange();
+                }
             }
 
             @Override
@@ -489,7 +500,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         }
 //        countdownView.startAnimation(animation);
 
-        if (pref.getInt(OPERATION_SETTING, 0) == WORKOUT_INTERVAL) {
+        if (pref.getInt(OPERATION_SETTING, WORKOUT_STOP) == WORKOUT_INTERVAL) {
             //Bind to service if a workout is running
             Intent intent = new Intent(this, BeeperService.class);
             intent.setAction(BeeperTasks.ACTION_JUST_BIND);
