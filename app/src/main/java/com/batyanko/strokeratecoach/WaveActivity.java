@@ -608,6 +608,12 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
                     onProgressChange();
                     break;
                 }
+                case WORKOUT_LAST: {
+                    workoutRunning = WORKOUT_LAST;
+                    flushGUI();
+                    onProgressChange();
+                    break;
+                }
                 case WORKOUT_SIMPLE: {
                     workoutRunning = WORKOUT_SIMPLE;
                     flushGUI();
@@ -754,6 +760,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
             Log.d("BEEP", "beep");
             spmTextView.startAnimation(beeperAnimation);
         } else if (s.equals(WARN)) {
+            speedView.startAnimation(warningAnimation);
             speedLimitView.startAnimation(warningAnimation);
         }
     }

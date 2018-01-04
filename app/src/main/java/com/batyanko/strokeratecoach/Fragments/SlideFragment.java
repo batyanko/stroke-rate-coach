@@ -405,6 +405,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
 
     public void setSpmFromDigital(int digitalInput, View view) {
         if (firstDigit != 0) {
+            stopBeeper();
             firstDigitView.animate().scaleX(1);
             firstDigitView.animate().scaleY(1);
             firstDigitView.setBackgroundColor(Color.TRANSPARENT);

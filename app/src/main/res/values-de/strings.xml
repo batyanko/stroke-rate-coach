@@ -33,7 +33,7 @@
     <string name="workout_desc_tooltip">Beschreibung (optional)</string>
     <string name="speed_dial_title">Schnellauswahl</string>
     <string name="workouts_title">Übungen</string>
-    <string name="history_title">Geschichte</string>
+    <string name="history_title">Verlauf</string>
     <string name="minimum_speed_warning">Geschwindigkeitsalarm</string>
     <string name="speed_unit_mps">m/s</string>
     <string name="speed_unit_500m">/500m</string>
