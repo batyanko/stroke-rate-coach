@@ -224,6 +224,7 @@ public class EntryFormActivity extends AppCompatActivity implements SharedPrefer
                 Log.d("CURRENT PHASE SAVED", spp[j - 1] + " " + gears[j - 1]);
             }
 
+            String emptyPhasesPresent = "";
             //Check for empty lines or an empty workout
             if (j == 0) {
                 Toast.makeText(
@@ -232,10 +233,8 @@ public class EntryFormActivity extends AppCompatActivity implements SharedPrefer
                         Toast.LENGTH_LONG).show();
                 return;
             } else if (emptyLinesExist) {
-                Toast.makeText(
-                        EntryFormActivity.this,
-                        R.string.empty_data_notification,
-                        Toast.LENGTH_SHORT).show();
+
+                        emptyPhasesPresent = getResources().getString(R.string.empty_data_notification) + " ";
             }
 
             String[] sppResized = Arrays.copyOfRange(spp, 0, j);
@@ -254,7 +253,7 @@ public class EntryFormActivity extends AppCompatActivity implements SharedPrefer
                     sppType);
             Log.d("ADDEDPRESETID", "" + i);
             Toast.makeText(EntryFormActivity.this,
-                    "Preset added.",
+                    emptyPhasesPresent + getString(R.string.preset_added_notification),
                     Toast.LENGTH_LONG).show();
 
             finish();

@@ -17,6 +17,9 @@
         <item name="colorAccent">@android:color/white</item>
         <item name="android:buttonTint">@android:color/white</item>
         <!--<item name="android:solidColor">@android:color/white</item>-->
+        <item name="colorControlNormal">@android:color/white</item>
+        <item name="colorControlActivated">@android:color/white</item>
+        <item name="colorControlHighlight">@android:color/white</item>
     </style>
 
     <style name="SpeedLimitTheme" parent="AppTheme">

@@ -121,8 +121,8 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     private View speedUnitStack;
     private View speedLimitStack;
 
-    Animation beeperAnimation;
-    Animation warningAnimation;
+    private static Animation beeperAnimation;
+    public static Animation warningAnimation;
 
     private View legendStrip;
     private ImageView speedUnitLegend;
@@ -310,7 +310,16 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     popupWindow.setElevation(100f);
+                } else {
+                    int backgroundColor = (pref.getInt(THEME, THEME_LIGHT) == THEME_DARK) ?
+                            getResources().getColor(R.color.backgroundLight)
+                            :
+                            getResources().getColor(R.color.backgroundDark);
+                    popupWindow.setBackgroundDrawable(
+                            new ColorDrawable(backgroundColor)
+                    );
                 }
+
 
                 popupWindow.showAsDropDown(speedLimitView);
                 popupWindow.showAtLocation(speedLimitPopupLayout, Gravity.CENTER, 0, (int) density * 100);
@@ -733,16 +742,12 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 
         } else if (s.equals(THEME)) {
             Log.d("onPrefChange", "themeChange");
-            int backgroundColor;
-            switch (sharedPreferences.getInt(THEME, THEME_LIGHT)) {
-                case THEME_DARK: {
-                    backgroundColor = getResources().getColor(R.color.backgroundDark);
-                    break;
-                }
-                default: {  //i.e. THEME_LIGHT
-                    backgroundColor = getResources().getColor(R.color.backgroundLight);
-                }
-            }
+
+            int backgroundColor = (pref.getInt(THEME, THEME_LIGHT) == THEME_DARK) ?
+                    getResources().getColor(R.color.backgroundDark)
+                    :
+                    getResources().getColor(R.color.backgroundLight);
+
             sharedPreferences.edit().putInt(THEME_COLOR, backgroundColor).apply();
 
             //TODO set backgrounds
@@ -965,8 +970,8 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 
     private void firstRunInit() {
         if (pref.getBoolean(FIRST_RUN, true)) {
-            //TODO init on first run
-//            pref.edit().putInt(WaveActivity.OPERATION_SETTING, WORKOUT_STOP).apply();
+
+            pref.edit().putInt(WaveActivity.OPERATION_SETTING, WORKOUT_STOP).apply();
 
             pref.edit().putBoolean(FIRST_RUN, false).apply();
         }

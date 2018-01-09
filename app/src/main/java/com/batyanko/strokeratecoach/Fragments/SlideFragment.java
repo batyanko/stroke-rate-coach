@@ -41,6 +41,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.LinearLayout;
@@ -415,16 +416,21 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
             firstDigit = 0;
 
         } else {
-            firstDigit = digitalInput;
-            firstDigitView = view;
-
+            view.setBackgroundColor(getActivity().getResources().getColor(R.color.colorAccent));
             //Bug fix - scaled view does not accept touches on API 17 / Nexus 4
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
                 view.animate().scaleX(1.15f).setDuration(50).start();
                 view.animate().scaleY(1.15f).setDuration(50).start();
             }
 
-            view.setBackgroundColor(getActivity().getResources().getColor(R.color.colorAccent));
+            //SPM lower than 10 not allowed
+            if (digitalInput == 0) {
+                view.startAnimation(WaveActivity.warningAnimation);
+                view.setBackgroundColor(getActivity().getResources().getColor(R.color.colorTransparent));
+            } else {
+                firstDigit = digitalInput;
+                firstDigitView = view;
+            }
 
 //            Log.d("GridHeight!!!: ", "" + dialGrid.getHeight());
 //            Log.d("WindowHeight!!!: ", "" + windowHeight);

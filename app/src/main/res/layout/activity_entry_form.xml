@@ -90,7 +90,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="text|textCapWords"
-
+            android:textColor="@color/blueAppColor"
             />
 
         <TextView
@@ -102,7 +102,9 @@
             android:id="@+id/workout_desc_et"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="text|textCapSentences" />
+            android:inputType="text|textCapSentences"
+            android:textColor="@color/blueAppColor"
+            />
 
         <LinearLayout
             android:id="@+id/layout_dynamic"
