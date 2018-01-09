@@ -418,8 +418,12 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
             firstDigit = digitalInput;
             firstDigitView = view;
 
-            view.animate().scaleX(1.15f).setDuration(50).start();
-            view.animate().scaleY(1.15f).setDuration(50).start();
+            //Bug fix - scaled view does not accept touches on API 17 / Nexus 4
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+                view.animate().scaleX(1.15f).setDuration(50).start();
+                view.animate().scaleY(1.15f).setDuration(50).start();
+            }
+
             view.setBackgroundColor(getActivity().getResources().getColor(R.color.colorAccent));
 
 //            Log.d("GridHeight!!!: ", "" + dialGrid.getHeight());

@@ -77,6 +77,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     public static final int MY_LOCATION_PERMISSION = 22;
 
     //Shared preferences
+    public static final String FIRST_RUN = "first-run";
     public static final String PHASE_LENGTH = "phase-length";
     public static final String WORKOUT_LENGTH = "workout-length";
     public static final String PHASE_PROGRESS = "phase-strokes-elapsed";
@@ -99,6 +100,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     public static final String THEME_COLOR = "theme-color";
     public static final String DAT_HASH = "dat-hash";
     public static final String WARN = "teh-warn";
+
 
     /* Global spm setting to hold current spm */
     public static int spm;
@@ -190,6 +192,9 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         //Initialize spm at last setting, or default at 0
         pref = PreferenceManager.getDefaultSharedPreferences(this);
         pref.registerOnSharedPreferenceChangeListener(this);
+
+        firstRunInit();
+
         spm = pref.getInt(SPM_SETTING, 0);
 
         Log.d("BENCHMARKING", "3");
@@ -769,7 +774,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
      * Update GUI according to workout
      */
     private void onProgressChange() {
-        if (workoutRunning != WORKOUT_INTERVAL) return;
+        if (workoutRunning != WORKOUT_INTERVAL && workoutRunning != WORKOUT_LAST) return;
 
         int[] phaseProgress = new int[2];    //0 = current phaseProgress 1 = total length
         phaseProgress[0] = pref.getInt(PHASE_PROGRESS, 0);
@@ -955,6 +960,15 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         BeeperService service = BeeperServiceUtils.getBeeperService();
         if (service != null) {
             service.doEpicShit(intent);
+        }
+    }
+
+    private void firstRunInit() {
+        if (pref.getBoolean(FIRST_RUN, true)) {
+            //TODO init on first run
+//            pref.edit().putInt(WaveActivity.OPERATION_SETTING, WORKOUT_STOP).apply();
+
+            pref.edit().putBoolean(FIRST_RUN, false).apply();
         }
     }
 }
