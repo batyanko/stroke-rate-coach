@@ -40,10 +40,11 @@
     <string name="entry_form_label">Übung erstellen</string>
     <string name="missing_workout_type_warning">Wählen Sie bitte eine Maßeinheit (Schlagzahl, Meter, Sekunden)</string>
     <string name="empty_workout_warning">Leere Übung nicht erstellt.</string>
-    <string name="empty_data_notification">Leere Strecken werden ausgelassen...</string>
+    <string name="empty_data_notification">Leere Strecken werden ausgelassen…</string>
     <string name="phase_title_text">Strecke</string>
     <string name="tpp_title_text">Dauer</string>
     <string name="dpp_title_text">Entfernung</string>
     <string name="min_speed_label">Min Geschw.</string>
     <string name="preset_added_notification">Übung erstellt.</string>
+    <string name="gps_lock_text">Eine genauer GPS-Fix wird empfangen…</string>
 </resources>

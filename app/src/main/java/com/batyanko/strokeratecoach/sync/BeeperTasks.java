@@ -112,7 +112,7 @@ public class BeeperTasks {
     private CLocation startingPhaseLocation;
 
     //TODO > 20 for emulator testing, < 5 for practical use
-    private static final float ACCEPTABLE_ACCURACY = 25;
+    public static final float ACCEPTABLE_ACCURACY = 5;
     private static float locationAccuracy;
     private static float currentSpeed;
 
@@ -152,6 +152,7 @@ public class BeeperTasks {
             initLocation(beeperService);
 
             if (mSppType == SPP_TYPE_METERS) {
+                pref.edit().putBoolean(WaveActivity.GPS_LOCKING, true).apply();
 //                initLocation(beeperService);
             }
             if (mSppType == SPP_TYPE_SECONDS) {
@@ -166,6 +167,8 @@ public class BeeperTasks {
                     spm = gearSettings[0];
                     startTheTempo(beeperService);
                 } else {                    //Preset workout
+                    workoutRunning = WaveActivity.WORKOUT_INTERVAL;
+                    pref.edit().putInt(WaveActivity.OPERATION_SETTING, workoutRunning).apply();
                     BeeperTasks.sppSettings = sppSettings;
                     BeeperTasks.gearSettings = gearSettings;
                     workoutLength = 0;
@@ -228,11 +231,15 @@ public class BeeperTasks {
         color = 0;
         beeps = 0;
         warns = 0;
-        locationPool = new CLocation[SPEED_SAMPLE_COUNT];
         locCycleCount = 0;
         locationPoolIsFull = false;
         prevPhasesDistance = 0;
         averageSpeed = 0;
+
+        //Remove sensitive data?
+        currentLocation = null;
+        startingPhaseLocation = null;
+        locationPool = new CLocation[SPEED_SAMPLE_COUNT];
 
         cancelTimer(workoutTimer, workoutTimerTask);
         cancelTimer(timeTimer, timeTimerTask);
@@ -251,10 +258,12 @@ public class BeeperTasks {
             pref.edit().putString(WaveActivity.SPEED_UNIT, WaveActivity.SPEED_MS_SETTING).apply();
         }
         pref.edit().putInt(WaveActivity.WORKOUT_PROGRESS, workoutProgress).apply();
+        pref.edit().putBoolean(WaveActivity.GPS_LOCKING, false).apply();
         flushUI();
 
         phaseProgress = 0;
         locationAccuracy = 500;     //Init to extremely inaccurate value, i.e. no accuracy
+        pref.edit().putFloat(WaveActivity.LOCATION_ACCURACY, locationAccuracy).apply();
 
         phaseStartTime = System.currentTimeMillis();
         Log.d("SystemTimeInMillis", phaseStartTime + "");
@@ -439,6 +448,9 @@ public class BeeperTasks {
 
             @Override
             public void run() {
+                //Wait if locking distance location
+                if (pref.getBoolean(WaveActivity.GPS_LOCKING, false)) return;
+
                 if (countdownCyclesElapsed % 10 == 0) {
                     pref.edit().putInt(
                             WaveActivity.COUNTDOWN_DURATION_LEFT,
@@ -448,7 +460,7 @@ public class BeeperTasks {
                 }
                 if (++countdownCyclesElapsed >= countdownCyclesTotal) {
                     pref.edit().putInt(WaveActivity.COUNTDOWN_DURATION_LEFT, 0).apply();
-                    workoutStartTime = System.currentTimeMillis();
+                    //workoutStartTime = System.currentTimeMillis();
                     autoProgress(beeperService);
                     cancelTimer(countdownTimer, this);
                 } else
@@ -634,8 +646,8 @@ public class BeeperTasks {
             location.setUseMetricunits(true);
             locationAccuracy = location.getAccuracy();
             Log.d("UPDATESPEED", "Accuracy: " + locationAccuracy);
+            pref.edit().putFloat(WaveActivity.LOCATION_ACCURACY, locationAccuracy).apply();
             if (locationAccuracy <= ACCEPTABLE_ACCURACY) {
-
                 //TESTING
                 long getNanos = 0;
                 long gettime = location.getTime();
@@ -660,12 +672,14 @@ public class BeeperTasks {
                 Log.d("SPEEDCYCLE TIMEACC", "getNanos: " + getNanos);
                 Log.d("SPEEDCYCLE TIMEACC", "nanosDIF: " + (currNanoTime - getNanos));
 
+                pref.edit().putBoolean(WaveActivity.GPS_LOCKING, false).apply();
+
                 if (startingPhaseLocation == null) {
                     startingPhaseLocation = location;
                 } else {
                     locationAccuracy = location.getAccuracy();
                     currentLocation = location;
-                    currentSpeed = location.getSpeed();
+                    //currentSpeed = location.getSpeed();
 
                     if (mSppType == SPP_TYPE_METERS) {
                         phaseProgress = (int) location.distanceTo(startingPhaseLocation);

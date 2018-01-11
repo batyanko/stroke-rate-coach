@@ -34,7 +34,7 @@
     <string name="phase_title_text">Phase</string>
     <string name="tpp_title_text">Time</string>
     <string name="dpp_title_text">Distance</string>
-    <string name="empty_data_notification">Skipping empty phases...</string>
+    <string name="empty_data_notification">Skipping empty phases…</string>
     <string name="meters">metres</string>
     <string name="seconds">seconds</string>
     <string name="strokes">strokes</string>
@@ -56,5 +56,6 @@
     <string name="speed_unit_mps">m/s</string>
     <string name="speed_unit_500m">/500m</string>
     <string name="preset_added_notification">Preset added.</string>
+    <string name="gps_lock_text">Locking on starting GPS location…</string>
 
 </resources>

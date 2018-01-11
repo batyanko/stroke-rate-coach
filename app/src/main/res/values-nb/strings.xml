@@ -38,10 +38,11 @@
     <string name="entry_form_label">skape trening</string>
     <string name="missing_workout_type_warning">Vennligst velg en måleenhet (roingslag, meter, sekunder)</string>
     <string name="empty_workout_warning">Tømme trening ble ikke skapt.</string>
-    <string name="empty_data_notification">Utelater tømme faser...</string>
+    <string name="empty_data_notification">Utelater tømme faser…</string>
     <string name="phase_title_text">Fase</string>
     <string name="tpp_title_text">Tid</string>
     <string name="dpp_title_text">Avstand</string>
     <string name="min_speed_label">Min Hastighet</string>
     <string name="preset_added_notification">Trening ble skapt.</string>
+    <string name="gps_lock_text">Mottar en nøyaktig GPS-fix…</string>
 </resources>

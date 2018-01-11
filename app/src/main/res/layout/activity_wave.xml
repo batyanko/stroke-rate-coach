@@ -69,7 +69,7 @@
     <ProgressBar
         android:id="@+id/wave_progress_bar_2"
         style="@android:style/Widget.ProgressBar.Horizontal"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
@@ -89,8 +89,8 @@
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
         android:textAlignment="center"
+        android:gravity="center"
         android:textColor="@android:color/white"
         android:textSize="24sp"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -235,6 +235,7 @@
         android:onClick="onSpmClicked"
         android:text="@string/initial_spm"
         android:textAlignment="center"
+        android:gravity="center_horizontal"
         android:textSize="128sp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -324,13 +325,47 @@
         android:elevation="3dp"
         android:fontFamily="serif"
         android:gravity="center"
-        android:src="@drawable/ic_background"
+        android:src="@drawable/ic_splash"
         android:textColor="#00076b"
         android:textSize="192sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <FrameLayout
+        android:id="@+id/gps_splash_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/ic_gps_splash"
+        android:layout_marginBottom="-64dp"
+        android:layout_marginLeft="-64dp"
+        android:layout_marginRight="-64dp"
+        android:layout_marginTop="-64dp"
+        android:elevation="3dp"
+        >
+        <!--<ImageView
+            android:id="@+id/gps_grid_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_gps_splash"/>
+        --><ImageView
+            android:id="@+id/gps_locator_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_gps_splash_locator"
+            />
+        <TextView
+            android:id="@+id/gps_splash_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/gps_lock_text"
+            android:textSize="16sp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            />
+
+    </FrameLayout>
 
 </android.support.constraint.ConstraintLayout>
 

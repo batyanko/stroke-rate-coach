@@ -43,6 +43,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
 import android.view.animation.ScaleAnimation;
+import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.*;
@@ -52,6 +53,9 @@ import com.batyanko.strokeratecoach.Utils.SpeedViewAdapter;
 import com.batyanko.strokeratecoach.sync.BeeperService;
 import com.batyanko.strokeratecoach.sync.BeeperServiceUtils;
 import com.batyanko.strokeratecoach.sync.BeeperTasks;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class WaveActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -100,6 +104,8 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     public static final String THEME_COLOR = "theme-color";
     public static final String DAT_HASH = "dat-hash";
     public static final String WARN = "teh-warn";
+    public static final String GPS_LOCKING = "gps-lock";
+    public static final String LOCATION_ACCURACY = "loc-accuracy";
 
 
     /* Global spm setting to hold current spm */
@@ -160,6 +166,13 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     private static AsyncTask asyncTask = null;
     boolean upIsTouched = false;
     boolean downIsTouched = false;
+    private View gpsSplashLayout;
+    private TextView gpsSplashText;
+    private ImageView gpsLocatorImage;
+
+    private static Timer timer;
+    private static TimerTask gpsTask;
+    private static Runnable gpsSplashRunnable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -473,6 +486,29 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         countdownDigit = findViewById(R.id.countdown_digit);
         countdownDigit.setVisibility(View.INVISIBLE);
 
+        gpsSplashLayout = findViewById(R.id.gps_splash_layout);
+        gpsLocatorImage = findViewById(R.id.gps_locator_image);
+        gpsSplashText = findViewById(R.id.gps_splash_text);
+        gpsSplashLayout.setVisibility(View.INVISIBLE);
+        gpsLocatorImage.setVisibility(View.INVISIBLE);
+        gpsSplashText.setVisibility(View.INVISIBLE);
+
+        gpsSplashRunnable = new Runnable() {
+            @Override
+            public void run() {
+                Log.d("THATRUNNABLE", "check");
+                gpsLocatorImage.startAnimation(getGpsAnimationSet());
+            }
+        };
+
+        gpsSplashLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                slideFragment.stopBeeper();
+                flushGUI();
+            }
+        });
+
         //Bind to service if already running (in case of screen rotation / onDestroy)
         Log.d("BENCHMARKING", "6");
 
@@ -553,10 +589,10 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
      * Reset the GUI at workout's end.
      */
     public void flushGUI() {
-
         Log.d("flushh", "" + "flushGUI");
         switch (pref.getInt(OPERATION_SETTING, WORKOUT_STOP)) {
             case WORKOUT_STOP: {
+                pref.edit().putBoolean(GPS_LOCKING, false).apply();
                 waveProgress.setVisibility(View.INVISIBLE);
                 progressTextView.setVisibility(View.INVISIBLE);
                 createButton.setVisibility(View.VISIBLE);
@@ -568,6 +604,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
                 break;
             }
             case WORKOUT_SIMPLE: {
+                pref.edit().putBoolean(GPS_LOCKING, false).apply();
                 waveProgress.setVisibility(View.INVISIBLE);
                 progressTextView.setVisibility(View.INVISIBLE);
                 createButton.setVisibility(View.INVISIBLE);
@@ -591,6 +628,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
                 legendStrip.setVisibility(View.VISIBLE);
             }
         }
+        updateGpsSplash();
         countdownDigit.setVisibility(View.INVISIBLE);
 //        spmTextView.setText("0");
 //        spmTextView.setBackgroundColor(Color.TRANSPARENT);
@@ -684,6 +722,12 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
                     countdownView.startAnimation(animationSet);
                     countdownDigit.startAnimation(animationSet);
                 }
+            }
+        } else if (s.equals(GPS_LOCKING)) {
+            updateGpsSplash();
+        } else if (s.equals(LOCATION_ACCURACY)) {
+            if (pref.getBoolean(GPS_LOCKING, false)) {
+                updateGpsSplashText();
             }
         } else if (s.equals(SPEED_LIMIT)) {
             Log.d("onPrefChange", "speedLimit");
@@ -966,6 +1010,71 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         if (service != null) {
             service.doEpicShit(intent);
         }
+    }
+
+    private void updateGpsSplash() {
+        if (pref.getBoolean(GPS_LOCKING, false)) {
+            gpsSplashLayout.setVisibility(View.VISIBLE);
+            gpsLocatorImage.setVisibility(View.VISIBLE);
+            gpsSplashText.setVisibility(View.VISIBLE);
+
+            updateGpsSplashText();
+
+            gpsTask = new TimerTask() {
+                @Override
+                public void run() {
+                    runOnUiThread(gpsSplashRunnable);
+                }
+            };
+            timer = new Timer();
+            timer.scheduleAtFixedRate(gpsTask, 1, 6050);
+            gpsSplashLayout.bringToFront();
+        } else {
+            Log.d("CancelSplash", "check");
+            if (gpsTask != null) gpsTask.cancel();
+            if (timer != null) timer.cancel();
+            gpsLocatorImage.clearAnimation();
+            gpsSplashLayout.setVisibility(View.INVISIBLE);
+            gpsLocatorImage.setVisibility(View.INVISIBLE);
+            gpsSplashText.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    private AnimationSet getGpsAnimationSet() {
+        Animation animation1 = new TranslateAnimation(000f, -100f, 000f, 200f);
+        Animation animation2 = new TranslateAnimation(0f, 100f, 0f, 200f);
+        Animation animation3 = new TranslateAnimation(0f, -100f, 0f, 000f);
+        Animation animation4 = new TranslateAnimation(0f, -100f, 0f, -300f);
+        Animation animation5 = new TranslateAnimation(0f, 200f, -0f, -300f);
+//                Animation animation6 = new TranslateAnimation(200f, -400f, -300f, 000f);
+        Animation animation6 = new TranslateAnimation(0, 0, 0f, 200);
+        animation1.setDuration(1000);
+        animation2.setDuration(1000);
+        animation2.setStartOffset(1000);
+        animation3.setDuration(1000);
+        animation3.setStartOffset(2000);
+        animation4.setDuration(1000);
+        animation4.setStartOffset(3000);
+        animation5.setDuration(1000);
+        animation5.setStartOffset(4000);
+        animation6.setDuration(1000);
+        animation6.setStartOffset(5000);
+        final AnimationSet gpsSet = new AnimationSet(false);
+        gpsSet.addAnimation(animation1);
+        gpsSet.addAnimation(animation2);
+        gpsSet.addAnimation(animation3);
+        gpsSet.addAnimation(animation4);
+        gpsSet.addAnimation(animation5);
+        gpsSet.addAnimation(animation6);
+
+        return gpsSet;
+    }
+
+    private void updateGpsSplashText() {
+        String string = getString(R.string.gps_lock_text) + "\n"
+                + pref.getFloat(LOCATION_ACCURACY, 0f)
+                + " > " + BeeperTasks.ACCEPTABLE_ACCURACY;
+        gpsSplashText.setText(string);
     }
 
     private void firstRunInit() {

@@ -39,10 +39,11 @@
     <string name="entry_form_label">Създаване на тренировка</string>
     <string name="missing_workout_type_warning">Моля изберете мерна единица (загребоци, метри, секунди)</string>
     <string name="empty_workout_warning">Празна тренировка - не беше добавена.</string>
-    <string name="empty_data_notification">Пропускане на празните отсечки...</string>
+    <string name="empty_data_notification">Пропускане на празните отсечки…</string>
     <string name="phase_title_text">Отсечка</string>
     <string name="tpp_title_text">Време</string>
     <string name="dpp_title_text">Разстояние</string>
     <string name="min_speed_label">Мин Скорост</string>
     <string name="preset_added_notification">Тренировката е добавена.</string>
+    <string name="gps_lock_text">Получаване на точен GPS сигнал…</string>
 </resources>
