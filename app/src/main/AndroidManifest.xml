@@ -54,7 +54,9 @@
             android:name=".sync.BeeperService"
             android:exported="false" />
 
-        <activity android:name=".SettingsActivity"></activity>
+        <activity android:name=".SettingsActivity" />
+        <activity android:name=".HelpActivity" />
+        <activity android:name=".AboutActivity"></activity>
     </application>
 
 </manifest>

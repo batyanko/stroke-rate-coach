@@ -632,11 +632,11 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
                 break;
             }
             case WORKOUT_SIMPLE: {
-                constraintSet.connect(R.id.spm_text_view, ConstraintSet.TOP, R.id.speed_strip, ConstraintSet.BOTTOM);
                 constraintSet.connect(R.id.legend_strip, ConstraintSet.TOP, R.id.activity_wave, ConstraintSet.TOP);
+//                constraintSet.connect(R.id.speed_strip, ConstraintSet.TOP, R.id.legend_strip, ConstraintSet.BOTTOM);
+                constraintSet.connect(R.id.spm_text_view, ConstraintSet.TOP, R.id.speed_strip, ConstraintSet.BOTTOM);
                 constraintSet.connect(R.id.spm_text_view, ConstraintSet.BOTTOM, R.id.guideline_hor50_2, ConstraintSet.TOP);
                 constraintSet.applyTo((ConstraintLayout) viewGroup);
-jjkkkjkjkkjqqq
                 pref.edit().putBoolean(GPS_LOCKING, false).apply();
                 waveProgress.setVisibility(View.INVISIBLE);
                 progressTextView.setVisibility(View.INVISIBLE);
@@ -646,7 +646,6 @@ jjkkkjkjkkjqqq
                 speedLimitStack.setVisibility(View.VISIBLE);
                 stopperButton.setVisibility(View.VISIBLE);
                 legendStrip.setVisibility(View.VISIBLE);
-                legendStrip.setVisibility(View.INVISIBLE);
                 countdownView.setVisibility(View.INVISIBLE);
                 menuTextView.setVisibility(View.INVISIBLE);
                 break;
@@ -1159,7 +1158,13 @@ jjkkkjkjkkjqqq
                 return true;
             }
             case R.id.menu_item_help: {
-                //TODO create Help activity or popup
+                Intent intent = new Intent(WaveActivity.this, HelpActivity.class);
+                startActivity(intent);
+                return true;
+            }
+            case R.id.menu_item_about: {
+                Intent intent = new Intent(WaveActivity.this, AboutActivity.class);
+                startActivity(intent);
                 return true;
             }
             default:

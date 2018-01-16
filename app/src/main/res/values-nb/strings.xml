@@ -49,4 +49,6 @@
     <string name="starting_loc_accuracy_setting_title">Starting gps accuracy (m)</string>
     <string name="dark_theme_setting_title">Dark theme</string>
     <string name="speedometer_sample_count_setting_desc">Measure speed for last n fixes.  Higher = better accuracy Lower = better responsiveness</string>
+    <string name="how_to_title">How To...</string>
+    <string name="about_title">About</string>
 </resources>

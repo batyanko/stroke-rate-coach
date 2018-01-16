@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.batyanko.strokeratecoach.HelpActivity"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        tools:context="com.batyanko.strokeratecoach.HelpActivity"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="12dp"
+        android:orientation="vertical"
+        >
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/help_text_size_big"
+            android:textStyle="bold"
+            android:text="@string/help_about1"
+            android:paddingBottom="5dp"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/help_text_size_small"
+            android:text="@string/help_about2"
+            android:paddingBottom="5dp"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/help_text_size_small"
+            android:text="@string/help_about3"
+            android:autoLink="email"
+            android:paddingBottom="5dp"
+
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/help_text_size_small"
+            android:text="@string/help_about4"
+            android:autoLink="web"
+            android:paddingBottom="25dp"
+
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/help_text_size_big"
+            android:text="@string/help_privacy1"
+            android:textStyle="bold"
+            android:paddingBottom="5dp"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/help_text_size_small"
+            android:text="@string/help_privacy2"
+            android:paddingBottom="5dp"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/help_text_size_small"
+            android:text="@string/help_privacy3"
+            android:paddingBottom="25dp"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/help_text_size_big"
+            android:text="@string/help_license1"
+            android:textStyle="bold"
+            android:paddingBottom="5dp"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/help_text_size_small"
+            android:text="@string/help_license2"
+            android:autoLink="web"
+            android:paddingBottom="5dp"
+
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/help_text_size_small"
+            android:text="@string/help_license3"
+            android:autoLink="web"
+            android:paddingBottom="25dp"
+
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/help_text_size_small"
+            />
+
+    </LinearLayout>
+
+</ScrollView>

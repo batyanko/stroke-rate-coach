@@ -12,8 +12,14 @@
         />-->
     <item
         android:id="@+id/menu_item_settings"
-        android:title="@string/settings_title" />
+        android:title="@string/settings_title"
+        />
     <item
         android:id="@+id/menu_item_help"
-        android:title="@string/help_title"/>
+        android:title="@string/help_title"
+        />
+    <item
+        android:id="@+id/menu_item_about"
+        android:title="@string/about_title"
+        />
 </menu>
