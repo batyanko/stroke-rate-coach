@@ -26,6 +26,8 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.constraint.ConstraintLayout;
+import android.support.constraint.ConstraintSet;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -35,6 +37,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,6 +50,7 @@ import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.*;
+import android.widget.PopupMenu;
 
 import com.batyanko.strokeratecoach.Fragments.SlideFragment;
 import com.batyanko.strokeratecoach.Utils.SpeedViewAdapter;
@@ -57,7 +61,7 @@ import com.batyanko.strokeratecoach.sync.BeeperTasks;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class WaveActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class WaveActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener, PopupMenu.OnMenuItemClickListener {
 
     public static final String TAG = "StrokeRateCoach";
 
@@ -98,15 +102,19 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     public static final String COUNTDOWN_DURATION = "countdown-duration";   //In ms
     public static final String COUNTDOWN_DURATION_LEFT = "countdown-duration-left";   //In ms
     public static final String BEEP = "beep";
-    public static final String THEME = "theme";
-    public static final int THEME_DARK = 0;
-    public static final int THEME_LIGHT = 1;
     public static final String THEME_COLOR = "theme-color";
     public static final String DAT_HASH = "dat-hash";
     public static final String WARN = "teh-warn";
     public static final String GPS_LOCKING = "gps-lock";
     public static final String LOCATION_ACCURACY = "loc-accuracy";
-
+    public static final boolean THEME_LIGHT = false;
+    public static final boolean THEME_DARK = true;
+    //R.string.theme_setting_key
+    public static final String THEME = "theme";
+    //R.string.starting_loc_accuracy_setting_key
+    public static final String LOCATION_ACCURACY_ACCEPTABLE = "starting-loc-accuracy";
+    //R.string.speed_sample_count_setting_key
+    public static final String SPEED_SAMPLE_COUNT = "speed-sample-count";
 
     /* Global spm setting to hold current spm */
     public static int spm;
@@ -115,6 +123,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     private ProgressBar waveProgress;
     private Button createButton;
     private ImageView countdownView;
+    private static boolean countdownBeingAnimated;
     private TextView spmTextView;
     private TextView progressTextView;
 
@@ -174,6 +183,11 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     private static TimerTask gpsTask;
     private static Runnable gpsSplashRunnable;
 
+    private TextView menuTextView;
+
+    private static ConstraintSet constraintSet;
+    private static ViewGroup viewGroup;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d("BENCHMARKING", "0");
@@ -182,7 +196,8 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         Log.d("BENCHMARKING", "0.5");
 
         setContentView(R.layout.activity_wave);
-        final ViewGroup viewGroup = (ViewGroup) findViewById(R.id.activity_wave);
+        viewGroup = (ViewGroup) findViewById(R.id.activity_wave);
+        final LayoutInflater inflater = (LayoutInflater) WaveActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         Log.d("INTHEBEGINNING", "" + BeeperTasks.spm);
 
@@ -202,6 +217,10 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         windowWidth = metrics.widthPixels;
         windowHeight = metrics.heightPixels;
 
+        constraintSet = new ConstraintSet();
+        constraintSet.clone((ConstraintLayout) viewGroup);
+
+
         //Initialize spm at last setting, or default at 0
         pref = PreferenceManager.getDefaultSharedPreferences(this);
         pref.registerOnSharedPreferenceChangeListener(this);
@@ -218,7 +237,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         waveProgress = (ProgressBar) findViewById(R.id.wave_progress_bar_2);
         waveProgress.setVisibility(View.INVISIBLE);
 
-        spmTextView = (TextView) findViewById(R.id.SpmTextView_2);
+        spmTextView = (TextView) findViewById(R.id.spm_text_view);
         spmTextView.setText(String.valueOf(spm));
         progressTextView = (TextView) findViewById(R.id.progressTextView);
 
@@ -251,7 +270,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
                     speedView.setText("0.00");
                 } else {
                     Log.d("SpeedViewText", "false" + pref.getInt(OPERATION_SETTING, WORKOUT_STOP));
-                    onSpeedChange();
+                    onSpeedChange(pref);
                 }
             }
 
@@ -313,7 +332,6 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         speedLimitView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                LayoutInflater inflater = (LayoutInflater) WaveActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 float density = WaveActivity.this.getResources().getDisplayMetrics().density;
                 speedLimitPopupLayout = inflater.inflate(R.layout.speed_limit_layout, null);
 
@@ -324,7 +342,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     popupWindow.setElevation(100f);
                 } else {
-                    int backgroundColor = (pref.getInt(THEME, THEME_LIGHT) == THEME_DARK) ?
+                    int backgroundColor = (pref.getBoolean(THEME, THEME_LIGHT)) ?
                             getResources().getColor(R.color.backgroundLight)
                             :
                             getResources().getColor(R.color.backgroundDark);
@@ -450,7 +468,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         beeperAnimation = AnimationUtils.loadAnimation(WaveActivity.this, R.anim.on_click);
         warningAnimation = AnimationUtils.loadAnimation(WaveActivity.this, R.anim.on_warn);
 
-        createButton = (Button) findViewById(R.id.create_workout_button);
+        /*createButton = (Button) findViewById(R.id.create_workout_button);
         createButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -459,7 +477,20 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
             }
         });
         createButton.setVisibility(View.VISIBLE);
+        */
         Log.d("BENCHMARKING", "4");
+
+        menuTextView = findViewById(R.id.menu_text_view);
+        menuTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                PopupMenu popup = new PopupMenu(WaveActivity.this, view);
+                popup.inflate(R.menu.menu_options);
+                popup.setOnMenuItemClickListener(WaveActivity.this);
+                popup.show();
+            }
+        });
 
         int resource = getResources().getIdentifier("status_bar_height", "dimen", "android");
         if (resource > 0) {
@@ -504,8 +535,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         gpsSplashLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                slideFragment.stopBeeper();
-                flushGUI();
+                BeeperTasks.completeLocking();
             }
         });
 
@@ -517,6 +547,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 
         Log.d("OperationAtStartup", "" + pref.getInt(OPERATION_SETTING, 99));
 
+        animateSplash(3000);
     }
 
     @Override
@@ -530,24 +561,11 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     protected void onResume() {
         super.onResume();
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-//        Animation animation = new AlphaAnimation(1,0);
-//        animation.setDuration(2000);
+        onThemeChange(pref);
 
-            countdownView.animate().alpha(0f).setDuration(3000).withEndAction(
-                    new Runnable() {
-                        @Override
-                        public void run() {
-                            Log.d("ALPHAA", "" + countdownView.getAlpha());
-                            countdownView.setAlpha(1f);
-                            countdownView.setVisibility(View.INVISIBLE);
-                        }
-                    }
-            );
-        } else {
-            countdownView.setVisibility(View.INVISIBLE);
+        if (!countdownBeingAnimated) {
+            animateSplash(1200);
         }
-//        countdownView.startAnimation(animation);
 
         if (pref.getInt(OPERATION_SETTING, WORKOUT_STOP) == WORKOUT_INTERVAL) {
             //Bind to service if a workout is running
@@ -593,39 +611,64 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         switch (pref.getInt(OPERATION_SETTING, WORKOUT_STOP)) {
             case WORKOUT_STOP: {
                 pref.edit().putBoolean(GPS_LOCKING, false).apply();
+
+                constraintSet.connect(R.id.spm_text_view, ConstraintSet.TOP, R.id.activity_wave, ConstraintSet.TOP);
+                constraintSet.connect(R.id.spm_text_view, ConstraintSet.BOTTOM, R.id.guideline_hor50_2, ConstraintSet.TOP);
+                constraintSet.applyTo((ConstraintLayout) viewGroup);
+
                 waveProgress.setVisibility(View.INVISIBLE);
                 progressTextView.setVisibility(View.INVISIBLE);
-                createButton.setVisibility(View.VISIBLE);
+//                createButton.setVisibility(View.VISIBLE);
                 speedUnitStack.setVisibility(View.INVISIBLE);
                 speedView.setVisibility(View.INVISIBLE);
                 speedLimitStack.setVisibility(View.INVISIBLE);
                 stopperButton.setVisibility(View.INVISIBLE);
                 legendStrip.setVisibility(View.INVISIBLE);
+                countdownView.setVisibility(View.INVISIBLE);
+                menuTextView.setVisibility(View.VISIBLE);
+
+                //Setup spmTsxtView
+//                spmTextView.layout
                 break;
             }
             case WORKOUT_SIMPLE: {
+                constraintSet.connect(R.id.spm_text_view, ConstraintSet.TOP, R.id.speed_strip, ConstraintSet.BOTTOM);
+                constraintSet.connect(R.id.legend_strip, ConstraintSet.TOP, R.id.activity_wave, ConstraintSet.TOP);
+                constraintSet.connect(R.id.spm_text_view, ConstraintSet.BOTTOM, R.id.guideline_hor50_2, ConstraintSet.TOP);
+                constraintSet.applyTo((ConstraintLayout) viewGroup);
+jjkkkjkjkkjqqq
                 pref.edit().putBoolean(GPS_LOCKING, false).apply();
                 waveProgress.setVisibility(View.INVISIBLE);
                 progressTextView.setVisibility(View.INVISIBLE);
-                createButton.setVisibility(View.INVISIBLE);
+//                createButton.setVisibility(View.INVISIBLE);
                 speedUnitStack.setVisibility(View.VISIBLE);
                 speedView.setVisibility(View.VISIBLE);
                 speedLimitStack.setVisibility(View.VISIBLE);
                 stopperButton.setVisibility(View.VISIBLE);
                 legendStrip.setVisibility(View.VISIBLE);
+                legendStrip.setVisibility(View.INVISIBLE);
+                countdownView.setVisibility(View.INVISIBLE);
+                menuTextView.setVisibility(View.INVISIBLE);
                 break;
             }
             //Interval workout
             default: {
                 Log.d("flushh", "" + "workout progress");
+                constraintSet.connect(R.id.spm_text_view, ConstraintSet.TOP, R.id.speed_strip, ConstraintSet.BOTTOM);
+                constraintSet.connect(R.id.legend_strip, ConstraintSet.TOP, R.id.wave_progress_bar_2, ConstraintSet.BOTTOM);
+                constraintSet.connect(R.id.spm_text_view, ConstraintSet.BOTTOM, R.id.guideline_hor50_2, ConstraintSet.TOP);
+                constraintSet.applyTo((ConstraintLayout) viewGroup);
+
                 waveProgress.setVisibility(View.VISIBLE);
                 progressTextView.setVisibility(View.VISIBLE);
-                createButton.setVisibility(View.INVISIBLE);
+//                createButton.setVisibility(View.INVISIBLE);
                 speedUnitStack.setVisibility(View.VISIBLE);
                 speedView.setVisibility(View.VISIBLE);
                 speedLimitStack.setVisibility(View.VISIBLE);
                 stopperButton.setVisibility(View.VISIBLE);
                 legendStrip.setVisibility(View.VISIBLE);
+                countdownView.setVisibility(View.INVISIBLE);
+                menuTextView.setVisibility(View.INVISIBLE);
             }
         }
         updateGpsSplash();
@@ -690,7 +733,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 //            spmTextView.setBackgroundColor(sharedPreferences.getInt(CURRENT_COLOR, Color.TRANSPARENT));
         } else if (s.equals(COUNTDOWN_DURATION_LEFT)) {
             Log.d("onPrefChange", "countdownDuration");
-            createButton.setVisibility(View.INVISIBLE);
+//            createButton.setVisibility(View.INVISIBLE);
             int duration = sharedPreferences.getInt(COUNTDOWN_DURATION, 3000) / 1000;
             int durationLeft = sharedPreferences.getInt(COUNTDOWN_DURATION_LEFT, 0) / 1000;
             String countdownString = durationLeft + "";
@@ -763,15 +806,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
             }
         } else if (s.equals(CURRENT_SPEED)) {
             Log.d("onPrefChange", "currentSpeed");
-            boolean limitOn = sharedPreferences.getBoolean(SPEED_LIMIT_SWITCH, false);
-            float speed = sharedPreferences.getFloat(CURRENT_SPEED, 0f);
-            int speedLimit = sharedPreferences.getInt(SPEED_LIMIT, 0);
-
-            Log.d("onSetSpeedWarning", "limitOn / speed / speedLimit: " + limitOn + " / " + speed + " / " + speedLimit);
-            if (limitOn && speedLimit != 0 && speed != 0) {
-                setSpeedWarning(limitOn, speed, speedLimit);
-            }
-            onSpeedChange();
+            onSpeedChange(sharedPreferences);
         } else if (s.equals(SPEED_LIMIT_SWITCH)) {
             Log.d("onPrefChange", "speedLimitSwitch");
             boolean limitOn = sharedPreferences.getBoolean(SPEED_LIMIT_SWITCH, false);
@@ -787,28 +822,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         } else if (s.equals(THEME)) {
             Log.d("onPrefChange", "themeChange");
 
-            int backgroundColor = (pref.getInt(THEME, THEME_LIGHT) == THEME_DARK) ?
-                    getResources().getColor(R.color.backgroundDark)
-                    :
-                    getResources().getColor(R.color.backgroundLight);
-
-            sharedPreferences.edit().putInt(THEME_COLOR, backgroundColor).apply();
-
-            //TODO set backgrounds
-            this.getWindow().getDecorView().setBackgroundColor(backgroundColor);
-            if (slideFragment.dialGrid != null) {
-                slideFragment.dialGrid.setBackgroundColor(backgroundColor);
-            }
-            if (slideFragment.presetRV != null) {
-                slideFragment.presetRV.setBackgroundColor(backgroundColor);
-            }
-            if (slideFragment.historyRV != null) {
-                slideFragment.historyRV.setBackgroundColor(backgroundColor);
-            }
-            if (slideFragment.mSlidingTabLayout != null) {
-//                slideFragment.mSlidingTabLayout.setDividerColors(0xffffbb33, 0xffffbb33);
-//                slideFragment.mSlidingTabLayout.set
-            }
+            onThemeChange(sharedPreferences);
         } else if (s.equals(BEEP)) {
             Log.d("onPrefChange", "onBeep");
             Log.d("BEEP", "beep");
@@ -855,7 +869,16 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 //        spmTextView.setBackgroundColor(pref.getInt(CURRENT_COLOR, Color.TRANSPARENT));
     }
 
-    private void onSpeedChange() {
+    private void onSpeedChange(SharedPreferences sharedPreferences) {
+        boolean limitOn = sharedPreferences.getBoolean(SPEED_LIMIT_SWITCH, false);
+        float speed = sharedPreferences.getFloat(CURRENT_SPEED, 0f);
+        int speedLimit = sharedPreferences.getInt(SPEED_LIMIT, 0);
+
+        Log.d("onSetSpeedWarning", "limitOn / speed / speedLimit: " + limitOn + " / " + speed + " / " + speedLimit);
+        if (limitOn && speedLimit != 0 && speed != 0) {
+            setSpeedWarning(limitOn, speed, speedLimit);
+        }
+
         float currentSpeed = pref.getFloat(CURRENT_SPEED, 0);
         String rowingSpeedString;
         if (pref.getString(SPEED_UNIT, SPEED_MS_SETTING).equals(SPEED_500M_SETTING)) {
@@ -889,9 +912,9 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         spmTextView.startAnimation(AnimationUtils.loadAnimation(WaveActivity.this, R.anim.on_click));
 
         //Swap background theme
-        int currentTheme = (pref.getInt(THEME, THEME_DARK) == THEME_DARK) ? THEME_LIGHT : THEME_DARK;
-        pref.edit().putInt(THEME, currentTheme).apply();
-        Log.d("TehTheme", pref.getInt(THEME, THEME_DARK) + "");
+        boolean darkEnabled = (pref.getBoolean(THEME, THEME_LIGHT)) ? THEME_LIGHT : THEME_DARK;
+        pref.edit().putBoolean(THEME, darkEnabled).apply();
+        Log.d("TehTheme", pref.getBoolean(THEME, THEME_DARK) + "");
     }
 
     private void incrementSpeedTrigger() {
@@ -986,7 +1009,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
             speedLimitString = getSpeedPer500(((float) speedLimit) / 100);
         }
         speedLimitView.setText(speedLimitString);
-        onSpeedChange();
+        onSpeedChange(pref);
     }
 
     private void updateSpeedLimitView(boolean limitOn) {
@@ -1009,6 +1032,27 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         BeeperService service = BeeperServiceUtils.getBeeperService();
         if (service != null) {
             service.doEpicShit(intent);
+        }
+    }
+
+    private void animateSplash(long duration) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            countdownView.setVisibility(View.VISIBLE);
+
+            countdownBeingAnimated = true;
+            countdownView.animate().alpha(0f).setDuration(duration).withEndAction(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.d("ALPHAA", "" + countdownView.getAlpha());
+                            countdownView.setAlpha(1f);
+                            countdownView.setVisibility(View.INVISIBLE);
+                            countdownBeingAnimated = false;
+                        }
+                    }
+            );
+        } else {
+            countdownView.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -1073,15 +1117,72 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     private void updateGpsSplashText() {
         String string = getString(R.string.gps_lock_text) + "\n"
                 + pref.getFloat(LOCATION_ACCURACY, 0f)
-                + " > " + BeeperTasks.ACCEPTABLE_ACCURACY;
+                + " > " + BeeperTasks.acceptableAccuracy;
         gpsSplashText.setText(string);
+    }
+
+    private void onThemeChange(SharedPreferences sharedPreferences) {
+        int backgroundColor = (pref.getBoolean(THEME, THEME_LIGHT)) ?
+                getResources().getColor(R.color.backgroundDark)
+                :
+                getResources().getColor(R.color.backgroundLight);
+
+        sharedPreferences.edit().putInt(THEME_COLOR, backgroundColor).apply();
+
+        this.getWindow().getDecorView().setBackgroundColor(backgroundColor);
+        if (slideFragment.dialGrid != null) {
+            slideFragment.dialGrid.setBackgroundColor(backgroundColor);
+        }
+        if (slideFragment.presetRV != null) {
+            slideFragment.presetRV.setBackgroundColor(backgroundColor);
+        }
+        if (slideFragment.historyRV != null) {
+            slideFragment.historyRV.setBackgroundColor(backgroundColor);
+        }
+        if (slideFragment.mSlidingTabLayout != null) {
+//                slideFragment.mSlidingTabLayout.setDividerColors(0xffffbb33, 0xffffbb33);
+//                slideFragment.mSlidingTabLayout.set
+        }
+    }
+
+    @Override
+    public boolean onMenuItemClick(MenuItem menuItem) {
+        switch (menuItem.getItemId()) {
+            case R.id.item_add_workout: {
+                Intent intent = new Intent(WaveActivity.this, EntryFormActivity.class);
+                startActivity(intent);
+                return true;
+            }
+            case R.id.menu_item_settings: {
+                Intent intent = new Intent(WaveActivity.this, SettingsActivity.class);
+                startActivity(intent);
+                return true;
+            }
+            case R.id.menu_item_help: {
+                //TODO create Help activity or popup
+                return true;
+            }
+            default:
+                return false;
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (pref.getBoolean(GPS_LOCKING, true)) {
+//            pref.edit().putBoolean(GPS_LOCKING, false).apply();
+            slideFragment.stopBeeper();
+            flushGUI();
+        } else {
+            super.onBackPressed();
+        }
     }
 
     private void firstRunInit() {
         if (pref.getBoolean(FIRST_RUN, true)) {
 
             pref.edit().putInt(WaveActivity.OPERATION_SETTING, WORKOUT_STOP).apply();
-
+            PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
             pref.edit().putBoolean(FIRST_RUN, false).apply();
         }
     }

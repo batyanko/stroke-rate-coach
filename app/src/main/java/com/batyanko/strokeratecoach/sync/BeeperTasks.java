@@ -35,10 +35,6 @@ import com.batyanko.strokeratecoach.Speed.IBaseGpsListener;
 import com.batyanko.strokeratecoach.Utils.SpmUtilities;
 import com.batyanko.strokeratecoach.WaveActivity;
 
-import java.text.ParsePosition;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -107,22 +103,24 @@ public class BeeperTasks {
 
     //END OF COPIED VALUES
 
-    private CLocation currentLocation;
+    private static CLocation currentLocation;
 
-    private CLocation startingPhaseLocation;
+    private static CLocation startingPhaseLocation;
 
     //TODO > 20 for emulator testing, < 5 for practical use
-    public static final float ACCEPTABLE_ACCURACY = 5;
+    public static final float ACCEPTABLE_ACCURACY_DEFAULT = 5;
+    public static float acceptableAccuracy = ACCEPTABLE_ACCURACY_DEFAULT;
     private static float locationAccuracy;
     private static float currentSpeed;
 
-    private CLocation[] locationPool;
+    private static CLocation[] locationPool;
 
     private static float averageSpeed;  //In m/s
 
     private static int locCycleCount;
     //TODO add preference for sample count
-    private static final int SPEED_SAMPLE_COUNT = 10;
+    private static final int SPEED_SAMPLE_COUNT_DEFAULT = 10;
+    private static int speedSampleCount = SPEED_SAMPLE_COUNT_DEFAULT;
 
     private static boolean locationPoolIsFull;
 
@@ -235,11 +233,18 @@ public class BeeperTasks {
         locationPoolIsFull = false;
         prevPhasesDistance = 0;
         averageSpeed = 0;
-
         //Remove sensitive data?
         currentLocation = null;
         startingPhaseLocation = null;
-        locationPool = new CLocation[SPEED_SAMPLE_COUNT];
+        acceptableAccuracy = Float.valueOf(pref.getString(WaveActivity.LOCATION_ACCURACY_ACCEPTABLE, acceptableAccuracy +""));
+        if (acceptableAccuracy <= .0001f) {
+            acceptableAccuracy = .0001f;
+        }
+        speedSampleCount = Integer.valueOf(pref.getString(WaveActivity.SPEED_SAMPLE_COUNT, speedSampleCount +""));
+        if (speedSampleCount < 3) {
+            speedSampleCount = 3;
+        }
+        locationPool = new CLocation[speedSampleCount];
 
         cancelTimer(workoutTimer, workoutTimerTask);
         cancelTimer(timeTimer, timeTimerTask);
@@ -305,9 +310,7 @@ public class BeeperTasks {
                 if (pref.getInt(WaveActivity.OPERATION_SETTING, WaveActivity.WORKOUT_STOP)
                         == WaveActivity.WORKOUT_STOP) {
                     endWorkout(beeperService);
-                }
-
-                else if (workoutRunning == WaveActivity.WORKOUT_INTERVAL
+                } else if (workoutRunning == WaveActivity.WORKOUT_INTERVAL
                         || workoutRunning == WaveActivity.WORKOUT_LAST) {
 
                     switch (mSppType) {
@@ -415,7 +418,7 @@ public class BeeperTasks {
         timeTimerTask = new TimerTask() {
             @Override
             public void run() {
-                if(phase != 0 && timeTimerPhaseProgress == 0) workoutProgress--;
+                if (phase != 0 && timeTimerPhaseProgress == 0) workoutProgress--;
 //                workoutProgress = (int) (System.currentTimeMillis() - workoutStartTime)/1000;
                 pref.edit().putInt(WaveActivity.WORKOUT_PROGRESS, ++workoutProgress).apply();
                 pref.edit().putInt(WaveActivity.PHASE_PROGRESS, timeTimerPhaseProgress++).apply();
@@ -572,7 +575,7 @@ public class BeeperTasks {
         PackageManager manager = beeperService.getPackageManager();
         int permission = manager.checkPermission("android.permission.ACCESS_FINE_LOCATION", "com.batyanko.strokeratecoach");
         boolean hasPermission = (permission == PackageManager.PERMISSION_GRANTED);
-//
+
         if (!hasPermission) {
             Log.d("I CAN HAZ PERMISSION?", "NO!");
             return;
@@ -596,7 +599,8 @@ public class BeeperTasks {
         }
         Log.d("SPEEDCYCLE", "" + locCycleCount);
         Log.d("SPEEDCYCLE POOLISFULL", " " + locationPoolIsFull);
-        if (locCycleCount == 9) {
+
+        if (locCycleCount == speedSampleCount - 1) {
             locCycleCount = 0;
             locationPoolIsFull = true;
             Log.d("SPEEDCYCLE REACH9", "check");
@@ -644,47 +648,58 @@ public class BeeperTasks {
 
         private void updateLocation(CLocation location) {
             location.setUseMetricunits(true);
-            locationAccuracy = location.getAccuracy();
-            Log.d("UPDATESPEED", "Accuracy: " + locationAccuracy);
-            pref.edit().putFloat(WaveActivity.LOCATION_ACCURACY, locationAccuracy).apply();
-            if (locationAccuracy <= ACCEPTABLE_ACCURACY) {
-                //TESTING
-                long getNanos = 0;
-                long gettime = location.getTime();
-                long currNanoTime = 0;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1) {
-                    getNanos = location.getElapsedRealtimeNanos();
-                    currNanoTime = SystemClock.elapsedRealtimeNanos();
-                }
-                long currTime = System.currentTimeMillis();
+            currentLocation = location;
 
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.US);
-                SimpleDateFormat sdfSimple = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-                ParsePosition pp = new ParsePosition(0);
-                Date dtCurr = new Date(currTime);
-                Date dtLoc = new Date(gettime);
+            if (mSppType == SPP_TYPE_METERS) {
 
-                Log.d("SPEEDCYCLE TIMEACC", "--------------------");
-                Log.d("SPEEDCYCLE TIMEACC", "currtime: " + currTime + " " + sdf.format(dtCurr));
-                Log.d("SPEEDCYCLE TIMEACC", "currnanotime: " + currNanoTime);
-                Log.d("SPEEDCYCLE TIMEACC", "gettime: " + gettime + " " + sdf.format(dtLoc));
-                Log.d("SPEEDCYCLE TIMEACC", "gettimeDIF: " + (currTime - gettime));
-                Log.d("SPEEDCYCLE TIMEACC", "getNanos: " + getNanos);
-                Log.d("SPEEDCYCLE TIMEACC", "nanosDIF: " + (currNanoTime - getNanos));
+                locationAccuracy = location.getAccuracy();
+                Log.d("UPDATESPEED", "Accuracy: " + locationAccuracy);
+                pref.edit().putFloat(WaveActivity.LOCATION_ACCURACY, locationAccuracy).apply();
 
-                pref.edit().putBoolean(WaveActivity.GPS_LOCKING, false).apply();
+                if (startingPhaseLocation == null &&
+                        locationAccuracy <= acceptableAccuracy) {
 
-                if (startingPhaseLocation == null) {
-                    startingPhaseLocation = location;
-                } else {
-                    locationAccuracy = location.getAccuracy();
-                    currentLocation = location;
-                    //currentSpeed = location.getSpeed();
+                    long timeDiffMillis;
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                        timeDiffMillis =
+                                (SystemClock.elapsedRealtimeNanos() - location.getElapsedRealtimeNanos()) / 1000000;
+                        Log.d("TEHFLOAT", "timediff1: " + timeDiffMillis);
 
-                    if (mSppType == SPP_TYPE_METERS) {
-                        phaseProgress = (int) location.distanceTo(startingPhaseLocation);
+                    } else {
+                        timeDiffMillis =
+                                System.currentTimeMillis() - location.getTime();
+                        Log.d("TEHFLOAT", "timediff2" + (int) timeDiffMillis);
                     }
+                    Log.d("TimeDiffMillis", "" + timeDiffMillis);
+
+                    //TESTING
+                   /* long getNanos = 0;
+                    long gettime = location.getTime();
+                    long currNanoTime = 0;
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                        getNanos = location.getElapsedRealtimeNanos();
+                        currNanoTime = SystemClock.elapsedRealtimeNanos();
+                    }
+                    long currTime = System.currentTimeMillis();
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.US);
+                    SimpleDateFormat sdfSimple = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+                    ParsePosition pp = new ParsePosition(0);
+                    Date dtCurr = new Date(currTime);
+                    Date dtLoc = new Date(gettime);
+                    Log.d("SPEEDCYCLE TIMEACC", "--------------------");
+                    Log.d("SPEEDCYCLE TIMEACC", "currtime: " + currTime + " " + sdf.format(dtCurr));
+                    Log.d("SPEEDCYCLE TIMEACC", "currnanotime: " + currNanoTime);
+                    Log.d("SPEEDCYCLE TIMEACC", "gettime: " + gettime + " " + sdf.format(dtLoc));
+                    Log.d("SPEEDCYCLE TIMEACC", "gettimeDIF: " + (currTime - gettime));
+                    Log.d("SPEEDCYCLE TIMEACC", "getNanos: " + getNanos);
+                    Log.d("SPEEDCYCLE TIMEACC", "nanosDIF: " + (currNanoTime - getNanos));*/
+
+                    Log.d("startingPhaseLocation", "" + startingPhaseLocation);
+                    completeLocking();
+
+                } else if (startingPhaseLocation != null ) {
                     Log.d("UPDATESPEED", "" + phaseProgress);
+                    phaseProgress = (int) location.distanceTo(startingPhaseLocation);
                 }
             }
         }
@@ -702,7 +717,6 @@ public class BeeperTasks {
                 this.updateLocation(myLocation);
                 updateAverageSpeed();
             }
-
         }
 
         @Override
@@ -728,5 +742,10 @@ public class BeeperTasks {
         public void onGpsStatusChanged(int event) {
 
         }
+    }
+
+    public static void completeLocking(){
+        pref.edit().putBoolean(WaveActivity.GPS_LOCKING, false).apply();
+        startingPhaseLocation = currentLocation;
     }
 }

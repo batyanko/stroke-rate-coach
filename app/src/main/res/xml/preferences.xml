@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    >
+
+    <SwitchPreference
+        android:key="@string/theme_setting_key"
+        android:title="@string/dark_theme_setting_title"
+        android:defaultValue="false"
+        />
+    <EditTextPreference
+        android:key="@string/starting_loc_accuracy_setting_key"
+        android:title="@string/starting_loc_accuracy_setting_title"
+        android:summary="@string/starting_loc_accuracy_setting_desc"
+        android:inputType="numberDecimal"
+        android:defaultValue="5"
+        android:textColor="@color/colorAccent"
+        />
+    <EditTextPreference
+        android:key="@string/speed_sample_count_setting_key"
+        android:title="@string/speedometer_sample_length_setting_title"
+        android:summary="@string/speedometer_sample_count_setting_desc"
+        android:inputType="number"
+        android:defaultValue="10"
+        />
+
+<!--
+
+    <CheckBoxPreference
+        android:key="pref_sync"
+        android:title="@string/pref_sync"
+        android:summary="@string/pref_sync_summ"
+        android:defaultValue="true" />
+    <ListPreference
+        android:dependency="pref_sync"
+        android:key="pref_syncConnectionType"
+        android:title="@string/pref_syncConnectionType"
+        android:dialogTitle="@string/pref_syncConnectionType"
+        android:entries="@array/pref_syncConnectionTypes_entries"
+        android:entryValues="@array/pref_syncConnectionTypes_values"
+        android:defaultValue="@string/pref_syncConnectionTypes_default" />-->
+</PreferenceScreen>

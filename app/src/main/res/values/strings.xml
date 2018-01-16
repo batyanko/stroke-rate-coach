@@ -57,5 +57,15 @@
     <string name="speed_unit_500m">/500m</string>
     <string name="preset_added_notification">Preset added.</string>
     <string name="gps_lock_text">Locking on starting GPS location…</string>
+    <string name="settings_title">Settings</string>
+    <string name="help_title">Help</string>
+    <string name="starting_loc_accuracy_setting_key" translatable="false">starting-loc-accuracy</string>
+    <string name="starting_loc_accuracy_setting_title">Starting GPS accuracy (metres)</string>
+    <string name="starting_loc_accuracy_setting_desc">Acceptable GPS accuracy for starting distance workout. \nLower = better accuracy\nHigher = faster start</string>
+    <string name="speed_sample_count_setting_key" translatable="false">speed-sample-count</string>
+    <string name="speedometer_sample_length_setting_title">Speedometer sample length (GPS fixes)</string>
+    <string name="speedometer_sample_count_setting_desc">Measure speed for starting n fixes back.\nMore fixes = accurate speed\nFewer fixes = quick and responsive speed</string>
+    <string name="theme_setting_key" translatable="false">theme</string>
+    <string name="dark_theme_setting_title">Night mode</string>
 
 </resources>

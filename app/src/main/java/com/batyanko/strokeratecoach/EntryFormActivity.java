@@ -45,7 +45,7 @@ import java.util.List;
 import static android.text.TextUtils.join;
 import static com.batyanko.strokeratecoach.WaveActivity.THEME_COLOR;
 
-public class EntryFormActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class EntryFormActivity extends AppCompatActivity{
 
     private EditText nameEt;
     private EditText descEt;
@@ -74,7 +74,6 @@ public class EntryFormActivity extends AppCompatActivity implements SharedPrefer
         setContentView(R.layout.activity_entry_form);
 
         pref = PreferenceManager.getDefaultSharedPreferences(this);
-        pref.registerOnSharedPreferenceChangeListener(this);
 
         this.getWindow().getDecorView().setBackgroundColor(
                 pref.getInt(THEME_COLOR, getResources().getColor(R.color.backgroundLight)));
@@ -93,13 +92,6 @@ public class EntryFormActivity extends AppCompatActivity implements SharedPrefer
         nameEt = findViewById(R.id.workout_name_et);
         descEt = findViewById(R.id.workout_desc_et);
         addLine();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        pref.unregisterOnSharedPreferenceChangeListener(this);
-        Log.d("DESTROY", "ON DESTROY");
     }
 
     private void addLine() {
@@ -285,13 +277,14 @@ public class EntryFormActivity extends AppCompatActivity implements SharedPrefer
         } else return 9;
     }
 
-    @Override
+    /*@Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
         if(s.equals(WaveActivity.THEME_COLOR)) {
-            int backgroundColor = pref.getInt(WaveActivity.THEME_COLOR, WaveActivity.THEME_LIGHT);
+            int backgroundColor = pref.getInt(WaveActivity.THEME_COLOR,
+                    getResources().getColor(R.color.backgroundLight));
             this.getWindow().getDecorView().setBackgroundColor(backgroundColor);
         }
-    }
+    }*/
 
     public class CustomWatcher implements TextWatcher {
 

@@ -9,6 +9,7 @@
         <item name="android:colorControlNormal">@color/blueAppColor</item>
         <item name="android:colorForeground">@color/blueAppColor</item>
         <item name="android:textColor">@color/blueAppColor</item>
+        <item name="android:textColorSecondary">@color/blueAppColorLight</item>
         <item name="android:editTextColor">@color/blueAppColor</item>
     </style>
 

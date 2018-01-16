@@ -46,4 +46,8 @@
     <string name="min_speed_label">Мин Скорост</string>
     <string name="preset_added_notification">Тренировката е добавена.</string>
     <string name="gps_lock_text">Получаване на точен GPS сигнал…</string>
+    <string name="settings_title">Preferences</string>
+    <string name="starting_loc_accuracy_setting_title">Starting gps accuracy (m)</string>
+    <string name="dark_theme_setting_title">Dark theme</string>
+    <string name="speedometer_sample_count_setting_desc">Measure speed for last n fixes.  Higher = better accuracy Lower = better responsiveness</string>
 </resources>
