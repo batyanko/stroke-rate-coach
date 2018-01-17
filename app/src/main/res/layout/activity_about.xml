@@ -38,8 +38,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="@dimen/help_text_size_small"
-            android:text="@string/help_about3"
-            android:autoLink="email"
+            android:text="@string/help_about4"
+            android:autoLink="web"
             android:paddingBottom="5dp"
 
             />
@@ -48,10 +48,18 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="@dimen/help_text_size_small"
-            android:text="@string/help_about4"
+            android:text="@string/help_about3"
+            android:autoLink="email"
+            android:paddingBottom="5dp"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/help_text_size_small"
+            android:text="@string/help_about5"
             android:autoLink="web"
             android:paddingBottom="25dp"
-
             />
 
         <TextView
@@ -76,6 +84,14 @@
             android:layout_height="wrap_content"
             android:textSize="@dimen/help_text_size_small"
             android:text="@string/help_privacy3"
+            android:paddingBottom="5dp"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/help_text_size_small"
+            android:text="@string/help_privacy4"
             android:paddingBottom="25dp"
             />
 

@@ -61,7 +61,7 @@
     <string name="help_title">Help</string>
     <string name="starting_loc_accuracy_setting_key" translatable="false">starting-loc-accuracy</string>
     <string name="starting_loc_accuracy_setting_title">Starting GPS accuracy (metres)</string>
-    <string name="starting_loc_accuracy_setting_desc">Acceptable GPS accuracy for starting distance workout. \nLower = better accuracy\nHigher = faster start</string>
+    <string name="starting_loc_accuracy_setting_desc">Acceptable GPS standard deviation for starting workout (only for distance workouts). \nLower = better accuracy\nHigher = faster start</string>
     <string name="speed_sample_count_setting_key" translatable="false">speed-sample-count</string>
     <string name="speedometer_sample_length_setting_title">Speedometer sample length (GPS fixes)</string>
     <string name="speedometer_sample_count_setting_desc">Measure speed for starting n fixes back.\nMore fixes = accurate speed\nFewer fixes = quick and responsive speed</string>
@@ -75,7 +75,7 @@
     </string>
     <string name="help_intro3">StrokeRateCoach will happily beep from the background, so feel free to combine it with other sports apps!
     </string>
-    <string name="help_how_to_title">How To...</string>
+    <string name="help_how_to_title">How To…</string>
     <string name="help_how_to_simple_beep1">- Simple beeper</string>
     <string name="help_how_to_simple_beep2">Go to \'SPEED DIAL\' and enter desired SPM. The beeping starts automatically upon dialing the second digit. Supported SPM rates from 10 to 99.
     </string>
@@ -86,25 +86,27 @@
     <string name="help_how_to_speed3">\'Speed\' shows your current speed, based on the distance covered for the last few GPS fixes (10 by default).</string>
     <string name="help_how_to_speed4">\'Min Speed\' shows the current speed warning threshold. If on, it will sound a warning as long as your current speed is below that level. Tap to enable and set minimum speed threshold.</string>
     <string name="help_how_to_create1">- Creating a new workout</string>
-    <string name="help_how_to_create2">Tap the menu button while the beeper is stopped (\'⋮\'), then tap \'Create workout\'.
-        Then enter data for all workout legs/phases:
-        The first (left hand) field of each phase for phase duration.
-        The second (right hand) for SPM rate of that phase.</string>
+    <string name="help_how_to_create2">Tap the menu button (\'⋮\') while the beeper is stopped, then tap \'Create workout\'.
+        Choose \'strokes\', \'metres\' or \'seconds\' for workout unit, enter a workout name and then enter data for all workout legs/phases:
+        \nThe first (left hand) field of each phase for phase duration.
+        \nThe second (right hand) for SPM rate of that phase.</string>
     <string name="help_how_to_create3">Example: to create a 2000m workout comprising 4 legs of 500m each at 22/24/26/28 SPM, create 4 phases and put \'500\' in the left hand field for each phase.
         Then, in the right hand field, put 22 for the first phase, then 24 for the second, 26 for the third and 28 for the fourth phase.</string>
     <string name="help_about1">About</string>
     <string name="help_about2">This app created by batyanko, enthusiast rower and android developer.
-        Any questions and feedback welcome:</string>
+        Any questions and feedback welcome, especially bug reports. I read all e-mail ;)</string>
     <string name="help_about3">E-mail\nbatyankodev@gmail.com</string>
     <string name="help_about4">Web\nwww.batyanko.com</string>
+    <string name="help_about5">Github\ngithub.com/batyanko/stroke-rate-coach</string>
     <string name="help_license1">License</string>
-    <string name="help_license2">StrokeRateCoach is being developed under the Apache 2.0 license ( http://www.apache.org/licenses/LICENSE-2.0 ).</string>
+    <string name="help_license2">StrokeRateCoach is being developed under the Apache 2.0 license http://www.apache.org/licenses/LICENSE-2.0</string>
     <string name="help_license3">Parts of code from other developers have been used and annotated where necessary.
-        These parts are licensed under either Apache 2.0 or CC BY-SA 3.0 ( http://creativecommons.org/licenses/by-sa/3.0/ )</string>
+        These parts are licensed under either Apache 2.0 or CC BY-SA 3.0 http://creativecommons.org/licenses/by-sa/3.0</string>
     <string name="help_privacy1">Privacy Policy</string>
-    <string name="help_privacy2">The StrokeRateCoach app stores a database with your saved and used workouts.
+    <string name="help_privacy2">The StrokeRateCoach app stores a database with your saved and used workouts (entered workout data including unit, name, description, phase length and rate, as well as creation and use timestamp).
         This data is not shared with anyone and can be erased at will using the \'delete\' (bin) button found next to each workout entry.</string>
     <string name="help_privacy3">To enable distance and speed measurement, the StrokeRateCoach app makes temporary use of your precise location.
         This location information is neither stored on persistent storage nor disclosed to third parties.</string>
+    <string name="help_privacy4"> The StrokeRateCoach app uses no internet connection.</string>
     <string name="about_title">About</string>
 </resources>

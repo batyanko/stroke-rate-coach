@@ -46,10 +46,55 @@
     <string name="min_speed_label">Мин Скорост</string>
     <string name="preset_added_notification">Тренировката е добавена.</string>
     <string name="gps_lock_text">Получаване на точен GPS сигнал…</string>
-    <string name="settings_title">Preferences</string>
-    <string name="starting_loc_accuracy_setting_title">Starting gps accuracy (m)</string>
-    <string name="dark_theme_setting_title">Dark theme</string>
-    <string name="speedometer_sample_count_setting_desc">Measure speed for last n fixes.  Higher = better accuracy Lower = better responsiveness</string>
-    <string name="how_to_title">How To...</string>
-    <string name="about_title">About</string>
+    <string name="settings_title">Настройки</string>
+    <string name="help_title">Помощ</string>
+    <string name="starting_loc_accuracy_setting_title">GPS точност при старт (м)</string>
+    <string name="starting_loc_accuracy_setting_desc">Допустимо GPS стандартно отклонение при започване на тренировка (само за тренировки, измервани в метри). \nНиска стойност = висока точност\nВисока стойност = по-бърз старт</string>
+    <string name="dark_theme_setting_title">Тъмен фон</string>
+    <string name="speedometer_sample_length_setting_title">Дължина на отсечката за измерване на скорост (GPS замервания)</string>
+    <string name="speedometer_sample_count_setting_desc">Измерване на скоростта от последните n замервания.\nПовече = точна скорост\По-малко = бързо обновяване</string>
+
+    <!--Help entries-->
+    <string name="help_intro1"><i><b>StrokeRateCoach</b></i> е приложение за академично гребане, което издава сигнал с избрано темпо (загребоци в минута) - с други думи, <i><b>метроном</b></i>.
+    </string>
+    <string name="help_intro2">Поддържа се както директно задаване на темпо от 10 до 99 загребоци в минута, така и създаване на комплексни тренировки базирани на разстояние, време или брой загребоци.
+    </string>
+    <string name="help_intro3">StrokeRateCoach спокойно може да издава звуков сигнал, без в момента да е на фокус на екрана.
+        Това означава, че може да го комбинирате с други спортни приложения по ваше желание!
+    </string>
+    <string name="help_how_to_title">How To…</string>
+    <string name="help_how_to_simple_beep1">- Директно задаване на темпо</string>
+    <string name="help_how_to_simple_beep2">Отидете на \'БЪРЗ НАБОР\' наберете желаното темпо. Звуковият сигнал започва директно със задаването на втората цифра.
+    </string>
+    <string name="help_how_to_preset1">- Тренировка</string>
+    <string name="help_how_to_preset2">Отидате на \'ТРЕНИРОВКИ\' или \'ИСТОРИЯ\' и натиснете \'PLAY\' бутона към желаната тренировка.</string>
+    <string name="help_how_to_speed1">- Наблюдение и контрол на скоростта</string>
+    <string name="help_how_to_speed2">Докато звуковият сигнал е активен, в горната част на екрана се виждат следните две полета:</string>
+    <string name="help_how_to_speed3">\'Скорост\' показва актуалната скорост, базирана на покритата дистанция от последните 10 GPS замервания (10 по фабрични настройки).</string>
+    <string name="help_how_to_speed4">\'Мин Скорост\' представлява аларма за минимална скорост. Ако е включена, тя ще издава звуков сигнал при падане под тази скорост.
+        Натиснете върху алармата, за да зададете и включите алармата.</string>
+    <string name="help_how_to_create1">- Създаване на нова тренировка</string>
+    <string name="help_how_to_create2">Натиснете меню бутона (\'⋮\'), докато звуковият сигнал е спрян, след което изберете \'Създай тренировка\'.
+        Изберете \'загребоци\', \'метри\' или \'секунди\' за мерна единица на тренировката, задайте име и след това задайте данни за всяка отсечка/фаза:
+        \nВ първото поле (отляво) задайте дължина на отсечката.
+        \nВъв второто поле (отдясно) задайте желано темпо за отсечката.</string>
+    <string name="help_how_to_create3">Например: за да създадете тренировка за нарастващо 2000м - 4 по 500м на 22/24/26/28 темпо, създайте общо 4 отсечки и наберете \'500\' в първото поле на всяка отсечка.
+        Във второто поле съответно наберете 22 за първата, 24 за втората, 26 за третата и 28 за четвъртата отсечка.</string>
+    <string name="help_about1">За StrokeRateCoach</string>
+    <string name="help_about2">Приложението направено от batyanko.
+        За оплаквания от бъгове (чета всички Е-мейли ;)</string>
+    <string name="help_about3">E-mail\nbatyankodev@gmail.com</string>
+    <string name="help_about4">Web\nwww.batyanko.com</string>
+    <string name="help_about5">Github\ngithub.com/batyanko/stroke-rate-coach</string>
+    <string name="help_license1">Лиценз</string>
+    <string name="help_license2">StrokeRateCoach се разработва с отворен лиценз Apache 2.0 http://www.apache.org/licenses/LICENSE-2.0</string>
+    <string name="help_license3">Части от кода са взаимствани от други източници, съответно анотирани в самия код.
+        Тези части са лицензирани с Apache 2.0 или CC BY-SA 3.0 http://creativecommons.org/licenses/by-sa/3.0</string>
+    <string name="help_privacy1">Правила за поверителност</string>
+    <string name="help_privacy2">Приложението StrokeRateCoach съхранява данни за тренировките, които създавате и ползвате (съхраняват се зададените име, описание, мерна единица, продължителност, темпо и час на създаване/ползване).
+        Тези данни не биват споделяни с трети лица и могат да се изтрият по всяко време чрез бутона за изтриване (\'кошче\').</string>
+    <string name="help_privacy3">С цел измерване на разстоянието и скоростта, приложението StrokeRateCoach използва временно точната географска позиция на устройството.
+        Тази географска позиция, не се записва върху устойчивата памет на устройството, и не бива споделяна с трети лица. Приложението StrokeRateCoach не използва интернет връзка.</string>
+    <string name="help_privacy4">Приложението StrokeRateCoach не използва интернет връзка.</string>
+    <string name="about_title">За StrokeRateCoach</string>
 </resources>

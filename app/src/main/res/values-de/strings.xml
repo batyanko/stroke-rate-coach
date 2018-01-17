@@ -18,7 +18,7 @@
 <resources>
     <string name="app_name">Stroke Rate Coach</string>
     <string name="stopper_button_text">Stop</string>
-    <string name="speed_label">Geschw.</string>
+    <string name="speed_label">Tacho</string>
     <string name="big_wave_desc"></string>
     <string name="big_wave_name">Große Welle</string>
     <string name="button_add_phase_label">+ strecke</string>
@@ -47,10 +47,60 @@
     <string name="min_speed_label">Min Geschw.</string>
     <string name="preset_added_notification">Übung erstellt.</string>
     <string name="gps_lock_text">Eine genauer GPS-Fix wird empfangen…</string>
-    <string name="settings_title">Preferences</string>
-    <string name="starting_loc_accuracy_setting_title">Starting gps accuracy (m)</string>
-    <string name="dark_theme_setting_title">Dark theme</string>
-    <string name="speedometer_sample_count_setting_desc">Measure speed for last n fixes.  Higher = better accuracy Lower = better responsiveness</string>
-    <string name="how_to_title">How To...</string>
-    <string name="about_title">About</string>
+    <string name="settings_title">Einstellungen</string>
+    <string name="help_title">Hilfe</string>
+    <string name="starting_loc_accuracy_setting_title">GPS-Anfanggenauigkeit (metres)</string>
+    <string name="starting_loc_accuracy_setting_desc">Zulässige Standardabweichung am Anfang einer Übung (nur distanzbasierte Übungen). \nNiedriger = genauer messen\nHoher = schneller Anfangen</string>
+    <string name="speedometer_sample_length_setting_title">Tacho Messdistanz (GPS-Fixe)</string>
+    <string name="speedometer_sample_count_setting_desc">Geschwindigkeit für die Distanz seit n GPS-Fixen.
+        \nMehrere Fixe = genauere Geschwindigkeit
+        \nWeniger Fixe = schnellere Reaktionszeit</string>
+    <string name="dark_theme_setting_title">Nachtmodus</string>
+
+    <!--Help entries-->
+    <string name="help_intro1"><i><b>StrokeRateCoach</b></i> ist eine Ruderapp  die mit einer gewollten (Schlag-)Frequenz piept - mit anderen Worten, ein <i><b>Metronom</b></i>.
+    </string>
+    <string name="help_intro2">Es werden sowohl einfache Frequenzeinstellung unterstützt, als auch komplexe distanz-, zeit- und schlagzahl- basierte Übungen von mehreren Strecken/Phasen.
+    </string>
+    <string name="help_intro3">StrokeRateCoach wird gerne auch vom Hintergrund piepen, womit Sie die App zusammen mit anderen Sport-Apps verwenden können!
+    </string>
+    <string name="help_how_to_title">Anleitung</string>
+    <string name="help_how_to_simple_beep1">- Einfache Frequenzeinstellung</string>
+    <string name="help_how_to_simple_beep2">Gehen Sie zu \'SCHNELLAUSWAHL\' und geben Sie die gewünschte Schlagfrequenz ein.
+        Das Piepen startet sofort beim eintippen der zweiten Zahl.
+        Es werden Schlagfrequenzen von 10 bis 99 Schlag pro Minute unterstützt.
+    </string>
+    <string name="help_how_to_preset1">- Übung starten</string>
+    <string name="help_how_to_preset2">Gehen Sie zu \'ÜBUNGEN\' oder \'VERLAUF\' und tippen Sie auf den \'PLAY\'-Knopf der gewünschten Übung.</string>
+    <string name="help_how_to_speed1">- Geschwindigkeitsmessung und -Kontrolle</string>
+    <string name="help_how_to_speed2">Während der Pieper aktiv ist, kann man zwei Messwerte im oberen Bereich des Bildschirms sehen:</string>
+    <string name="help_how_to_speed3">\'Tacho\' zeight Ihre aktuelle geschwindigkeit an. basiert auf der Distanz, die Sie seit einer bestimmten von GPS-Messungen zurückgelegt haben (Werkeinstellung auf 10).</string>
+    <string name="help_how_to_speed4">\'Min Geschw.\' zeigt die aktuelle Schwelle für die Geschwindigkeitsalarm an.
+        Wenn aktiviert, wird ein Signal abgespielt, solange Ihre Geschwindigkeit unter der Grenze ist.
+        Tippen Sie drauf, um die Geschwindigkeitsalarm einzustellen.</string>
+    <string name="help_how_to_create1">- Eine Übung erstellen</string>
+    <string name="help_how_to_create2">Tippen Sie auf Menü (\'⋮\'), während der Pieper inaktiv ist, dann tippen Sie auf \'Übung erstellen\'.
+        Wählen Sie \'Schlagzahl\', \'Meter\' oder \'Sekunden\' für Maßeinheit, geben Sie einen Übungnamen eine ud dann tragen Sie die gewünschte Zahl von Strecken/Phasen ein:
+        \nDas erste Eingabefeld (links) für die Länge der Strecke/Phase.
+        \nDas zweite (rechts) für Schlagfrequenz dieser Strecke/Phase.</string>
+    <string name="help_how_to_create3">Beispiel: um eine 2000m-Übung mit Schlagfrequenz von 22-24-26-28 je 500m zu erstellen, verwenden Sie 4 Strecken/Phasen mit \'500\' im linken feld.
+        Dann, im rechten Feld, tragen Sie 22 für die erste Phase, 24 für die zweite, 26 für die dritte und 28 für die vierte.</string>
+    <string name="help_about1">Über StrokeRateCoach</string>
+    <string name="help_about2">Diese App wurde von batyanko erstellt.
+        Schicken Sie mir gerne Ihre Fragen, Feedback und besonders Bug-Meldungen. Ich lese alle E-Mails ;)</string>
+    <string name="help_about3">E-Mail\nbatyankodev@gmail.com</string>
+    <string name="help_about4">Web\nwww.batyanko.com</string>
+    <string name="help_about5">Github\ngithub.com/batyanko/stroke-rate-coach</string>
+    <string name="help_license1">Lizenz</string>
+    <string name="help_license2">StrokeRateCoach wird mit der Apache 2.0 Lizenz http://www.apache.org/licenses/LICENSE-2.0 entwickelt</string>
+    <string name="help_license3">Teile der Kodebase von anderen Entwicklern wurden verwendet und entsprechend annotiert.
+        Diese Teile sind entweder mit Apache 2.0 oder CC BY-SA 3.0 http://creativecommons.org/licenses/by-sa/3.0 lizenziert.</string>
+    <string name="help_privacy1">Datenschutz-Bestimmungen</string>
+    <string name="help_privacy2">Die StrokeRateCoach-App speichert eine Datenbank mit Ihren Übungen (inklusiv Übungsname, -Maßeinheit, -Beschreibung, -Phasenlänge, -Phasentempo und Zeitpunkt der Erstellung und Verwendung).
+        Diese Daten werden niemandem mitgeteilt und können zu jederzeit gelöscht werden anhand des \'Löschen\'-Knopfes (Eimer) neben jeder Übungseinheit.</string>
+    <string name="help_privacy3">Um Distanz- und Geschwindigkeitsmessung zu ermöglichen, wird Ihre Position vorübergehend verwendet.
+        Diese Position wird weder auf Dauerspeicher gelagert, noch an dritten Mitgeteilt.</string>
+    <string name="help_privacy4">Die StrokeRateCoach-App verwendet keine Internetverbindung.</string>
+    <string name="about_title">Über StrokeRateCoach</string>
+
 </resources>

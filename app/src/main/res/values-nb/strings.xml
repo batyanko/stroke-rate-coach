@@ -23,8 +23,8 @@
     <string name="small_wave_name">Liten Bølge</string>
     <string name="meters">meter</string>
     <string name="seconds">sekunder</string>
-    <string name="create_workout_button_label">skape trening</string>
-    <string name="strokes">roingslag</string>
+    <string name="create_workout_button_label">Skape trening</string>
+    <string name="strokes">slagtall</string>
     <string name="workout_name_title">Navn på treningen</string>
     <string name="workout_unit_choose_title">Velg måleenheter</string>
     <string name="gear_title_text">med</string>
@@ -36,7 +36,7 @@
     <string name="speed_unit_mps">m/s</string>
     <string name="speed_unit_500m">/500m</string>
     <string name="entry_form_label">skape trening</string>
-    <string name="missing_workout_type_warning">Vennligst velg en måleenhet (roingslag, meter, sekunder)</string>
+    <string name="missing_workout_type_warning">Vennligst velg en måleenhet (slagtall, meter, sekunder)</string>
     <string name="empty_workout_warning">Tømme trening ble ikke skapt.</string>
     <string name="empty_data_notification">Utelater tømme faser…</string>
     <string name="phase_title_text">Fase</string>
@@ -45,10 +45,59 @@
     <string name="min_speed_label">Min Hastighet</string>
     <string name="preset_added_notification">Trening ble skapt.</string>
     <string name="gps_lock_text">Mottar en nøyaktig GPS-fix…</string>
-    <string name="settings_title">Preferences</string>
-    <string name="starting_loc_accuracy_setting_title">Starting gps accuracy (m)</string>
-    <string name="dark_theme_setting_title">Dark theme</string>
-    <string name="speedometer_sample_count_setting_desc">Measure speed for last n fixes.  Higher = better accuracy Lower = better responsiveness</string>
-    <string name="how_to_title">How To...</string>
-    <string name="about_title">About</string>
+
+    <string name="settings_title">Instillinger</string>
+    <string name="help_title">Hjelp</string>
+    <string name="starting_loc_accuracy_setting_title">Treningsstart GPS-nøyaktighet (meter)</string>
+    <string name="starting_loc_accuracy_setting_desc">Godtakbar GPS standardavvik for å starte treningen (bare for avstandsbasert trening).
+        \nNedre = bedre nøyaktighet
+        \nHøyere = raskere start</string>
+    <string name="speedometer_sample_length_setting_title">Hastighetsmåler avstands prøve (GPS-fixer)</string>
+    <string name="speedometer_sample_count_setting_desc">Mål hastighet for å starte n fixer tilbake.
+        \nFlere fikser = nøyaktig hastighet
+        \nFærre fikser = rask og responsiv hastighet</string>
+    <string name="dark_theme_setting_title">Nattmodus</string>
+
+    <!--Help entries-->
+    <string name="help_intro1"><i><b>StrokeRateCoach</b></i>er en roingapp som piper til ønsket frekvens per minutt - med andre ord en <i><b>metronom</b></i>, eller <i><b>taktmåler</b></i>.</string>
+    <string name="help_intro2">Enkel SPM (Slag Per Minutt) freqvensinnstilling støttes, samt komplekse treningsøkter basert på avstand, tid eller slagtall.
+    </string>
+    <string name="help_intro3">StrokeRateCoach vil gjerne pipe fra bakgrunnen, så at du kan kombinere den med andre sportsapper!
+    </string>
+    <string name="help_how_to_title">Anvisning…</string>
+    <string name="help_how_to_simple_beep1">- Enkel pipeton</string>
+    <string name="help_how_to_simple_beep2">Velg \'HURTIGVALG\' og skriv inn ønsket SPM. Pipetonen starter automatisk ved oppringing av det andre sifferet. Støttede SPM fra 10 til 99.
+    </string>
+    <string name="help_how_to_preset1">- Forhåndsinnstilt trening</string>
+    <string name="help_how_to_preset2">Velg \'TRENING\' eller \'LOGG\' og trykk den \'PLAY\' knapp av den ønsket trening.</string>
+    <string name="help_how_to_speed1">- Hastighetskontroll</string>
+    <string name="help_how_to_speed2">Mens pipetonen er aktiv, er to avlesninger synlige i den øvre delen av skjermen:</string>
+    <string name="help_how_to_speed3">\'Hastighet\' viser din nåværende hastighet, basert på avstanden dekket for de siste få GPS-fikseringene (10 som standard).</string>
+    <string name="help_how_to_speed4">\'Min Hastighet\' viser gjeldende hastighetsvarslingsterskel.
+        Mens aktiv, vil det høres en advarsel så lenge din nåværende hastighet er under dette nivået.
+        Trykk for å aktivere og angi minimum hastighet grense.</string>
+    <string name="help_how_to_create1">- Skape ny trening</string>
+    <string name="help_how_to_create2">Trykk på menyknappen (\'⋮\') mens piperen er stoppet, og trykk deretter på \'Skape trening\'.Velg \'slagtall\', \'meter\' eller \'sekunder\' for treningsenheten, skriv inn treningsnavn og skriv inn data for alle treningsfaser:
+        \nDet første (venstre hånd) feltet for hver fase.
+        \nThe andre (høyre hånd) feltet for SPM freqvens for hver fase.</string>
+    <string name="help_how_to_create3">Eksempel: for å lage en 2000m trening bestående av 4 faser `a 500m ved 22/24/26/28 SPM, lag 4 faser og sett \'500\' i venstre felt for hver fase.
+        Deretter plasser 22 i det andre feltet 22 for den første fasen, deretter 24 for den andre, 26 for den tredje og 28 for fjerde fase.</string>
+    <string name="help_about1">Om StrokeRateCoach</string>
+    <string name="help_about2">Denne appen ble skapt av batyanko.
+        Vær så snill og kontaktere meg med din spørsmål og Bug-reports! Jeg leser all e-post ;)</string>
+    <string name="help_about3">E-mail\nbatyankodev@gmail.com</string>
+    <string name="help_about4">Web\nwww.batyanko.com</string>
+    <string name="help_about5">Github\ngithub.com/batyanko/stroke-rate-coach</string>
+    <string name="help_license1">Lisens</string>
+    <string name="help_license2">StrokeRateCoach blir utviklet under Apache 2.0-lisensen http://www.apache.org/licenses/LICENSE-2.0</string>
+    <string name="help_license3">Deler av kode fra andre utviklere har blitt brukt og merket i kildekoden.
+        Disse delene er lisensiert under enten Apache 2.0 eller CC BY-SA 3.0 http://creativecommons.org/licenses/by-sa/3.0</string>
+    <string name="help_privacy1">Personvernregler</string>
+    <string name="help_privacy2">StrokeRateCoach app lagrer en database med dine lagrede og brukte treninger (data som blir lagret er den skrivede inn treningsdata som måleenhet, navn, beskrivelse, fase lengde og freqvens, samt tidsstempel fra opprettelse og bruk).
+        Disse dataene deles ikke med noen som helst og kan slettes på vilkårlig måte ved hjelp av \'delete\' (bin) -knappen som finnes ved siden av hver treningsoppføring.</string>
+    <string name="help_privacy3">For å aktivere avstands- og hastighetsmåling, bruker StrokeRateCoach-appen midlertidig din presise plassering.
+        Denne plasseringsinformasjonen er heller ikke lagret på vedvarende lagring eller utlyst til tredjepart.</string>
+    <string name="help_privacy4"> StrokeRateCoach-appen bruker ingen Internett-tilkobling.</string>
+    <string name="about_title">Om StrokeRateCoach</string>
+
 </resources>
