@@ -9,18 +9,17 @@ Get the .apk here:
 ![giphy](https://media.giphy.com/media/3ohs7PyrDpwQCDqOXe/giphy.gif)
 
 Current features:
+- Workouts based on stroke count, distance (GPS Location) and time
 - Preset workouts, for example 4 legs of 50 strokes at SPM 22, 24, 26, 28
-- Option to add new workouts
-- Background beeping service allowing combined use with other sports apps
-- Workouts based on distance (GPS Location) and time
 - Workout history/logbook
-- Countdown before starting workout
+- Background beeping service allowing combined use with other sports apps
+- Speed monitor & control (low speed warning)
 
 Planned features:
-- Visual refinements
+- Share workouts with friends?
 
 Known bugs:
-- Location listener sometimes persists in the background thread
+- Location listener sometimes persists in the background thread SOLVED?
 - you tell me
 
 ## Motivation
