@@ -13,6 +13,8 @@ import android.widget.TextView;
 import com.batyanko.strokeratecoach.R;
 import com.batyanko.strokeratecoach.WaveActivity;
 
+import static android.gesture.GestureOverlayView.ORIENTATION_VERTICAL;
+
 /**
  * Created by yanko on 4/4/17.
  */
@@ -79,11 +81,21 @@ public class DialGridAdapter extends BaseAdapter {
 //            lp.width = 20; //WaveActivity.windowWidth / 3 - 5;
 //            lp.height = 30; //(WaveActivity.windowHeight - WaveActivity.statusbarHeight) / 10 - 1;
 //
+            int cellWidthFraction;
+            int cellHeightFraction;
+            if (WaveActivity.orientation == ORIENTATION_VERTICAL) {
+                cellWidthFraction = 3;
+                cellHeightFraction = 10;
+            } else {
+                cellWidthFraction = 6;
+                cellHeightFraction = 5;
+            }
             view.setLayoutParams(
-                    new android.widget.AbsListView.LayoutParams(WaveActivity.windowWidth / 3 - 5,
-                            (WaveActivity.windowHeight - WaveActivity.statusbarHeight) / 10 - 1
-                    )
-            );
+                        new android.widget.AbsListView.LayoutParams(WaveActivity.windowWidth / cellWidthFraction - 5,
+                                (WaveActivity.windowHeight - WaveActivity.statusbarHeight) / cellHeightFraction - 1
+                        )
+                );
+
 
 //            view.requestLayout();
 //            Log.d("Cell Height!!!: ", "" + MainActivity.windowHeight / 10);

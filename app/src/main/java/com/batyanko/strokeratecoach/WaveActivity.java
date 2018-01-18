@@ -61,6 +61,9 @@ import com.batyanko.strokeratecoach.sync.BeeperTasks;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
+import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
+
 public class WaveActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener, PopupMenu.OnMenuItemClickListener {
 
     public static final String TAG = "StrokeRateCoach";
@@ -120,6 +123,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     public static int spm;
 
     //UI elements
+    private View progressFrameLayout;
     private ProgressBar waveProgress;
     private Button createButton;
     private ImageView countdownView;
@@ -187,6 +191,9 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 
     private static ConstraintSet constraintSet;
     private static ViewGroup viewGroup;
+    private static ViewGroup speedStrip;
+
+    public static int orientation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -197,8 +204,10 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 
         setContentView(R.layout.activity_wave);
         viewGroup = (ViewGroup) findViewById(R.id.activity_wave);
+        speedStrip = (ViewGroup) findViewById(R.id.speed_strip);
         final LayoutInflater inflater = (LayoutInflater) WaveActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
+        orientation = getResources().getConfiguration().orientation;
         Log.d("INTHEBEGINNING", "" + BeeperTasks.spm);
 
         Log.d("BENCHMARKING", "1");
@@ -217,9 +226,10 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         windowWidth = metrics.widthPixels;
         windowHeight = metrics.heightPixels;
 
-        constraintSet = new ConstraintSet();
-        constraintSet.clone((ConstraintLayout) viewGroup);
-
+        if (orientation == ORIENTATION_PORTRAIT) {
+            constraintSet = new ConstraintSet();
+            constraintSet.clone((ConstraintLayout) viewGroup);
+        }
 
         //Initialize spm at last setting, or default at 0
         pref = PreferenceManager.getDefaultSharedPreferences(this);
@@ -234,7 +244,8 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         this.getWindow().getDecorView().setBackgroundColor(
                 pref.getInt(THEME_COLOR, getResources().getColor(R.color.backgroundLight)));
 
-        waveProgress = (ProgressBar) findViewById(R.id.wave_progress_bar_2);
+        progressFrameLayout = (FrameLayout) findViewById(R.id.progress_frame_layout);
+        waveProgress = (ProgressBar) findViewById(R.id.wave_progress_bar);
         waveProgress.setVisibility(View.INVISIBLE);
 
         spmTextView = (TextView) findViewById(R.id.spm_text_view);
@@ -611,20 +622,23 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         switch (pref.getInt(OPERATION_SETTING, WORKOUT_STOP)) {
             case WORKOUT_STOP: {
                 pref.edit().putBoolean(GPS_LOCKING, false).apply();
+                if (orientation == ORIENTATION_PORTRAIT) {
+                    constraintSet.connect(R.id.spm_text_view, ConstraintSet.TOP, R.id.activity_wave, ConstraintSet.TOP);
+                    constraintSet.connect(R.id.spm_text_view, ConstraintSet.BOTTOM, R.id.guideline_hor50, ConstraintSet.BOTTOM);
+                    constraintSet.applyTo((ConstraintLayout) viewGroup);
+                }
 
-                constraintSet.connect(R.id.spm_text_view, ConstraintSet.TOP, R.id.activity_wave, ConstraintSet.TOP);
-                constraintSet.connect(R.id.spm_text_view, ConstraintSet.BOTTOM, R.id.guideline_hor50_2, ConstraintSet.TOP);
-                constraintSet.applyTo((ConstraintLayout) viewGroup);
-
-                waveProgress.setVisibility(View.INVISIBLE);
-                progressTextView.setVisibility(View.INVISIBLE);
+                progressFrameLayout.setVisibility(View.GONE);
+//                waveProgress.setVisibility(View.GONE);
+//                progressTextView.setVisibility(View.GONE);
 //                createButton.setVisibility(View.VISIBLE);
-                speedUnitStack.setVisibility(View.INVISIBLE);
-                speedView.setVisibility(View.INVISIBLE);
-                speedLimitStack.setVisibility(View.INVISIBLE);
-                stopperButton.setVisibility(View.INVISIBLE);
-                legendStrip.setVisibility(View.INVISIBLE);
-                countdownView.setVisibility(View.INVISIBLE);
+                speedStrip.setVisibility(View.GONE);
+//                speedUnitStack.setVisibility(View.GONE);
+//                speedView.setVisibility(View.GONE);
+//                speedLimitStack.setVisibility(View.GONE);
+//                stopperButton.setVisibility(View.INVISIBLE);
+                legendStrip.setVisibility(View.GONE);
+                countdownView.setVisibility(View.GONE);
                 menuTextView.setVisibility(View.VISIBLE);
 
                 //Setup spmTsxtView
@@ -632,19 +646,23 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
                 break;
             }
             case WORKOUT_SIMPLE: {
-                constraintSet.connect(R.id.legend_strip, ConstraintSet.TOP, R.id.activity_wave, ConstraintSet.TOP);
-//                constraintSet.connect(R.id.speed_strip, ConstraintSet.TOP, R.id.legend_strip, ConstraintSet.BOTTOM);
-                constraintSet.connect(R.id.spm_text_view, ConstraintSet.TOP, R.id.speed_strip, ConstraintSet.BOTTOM);
-                constraintSet.connect(R.id.spm_text_view, ConstraintSet.BOTTOM, R.id.guideline_hor50_2, ConstraintSet.TOP);
-                constraintSet.applyTo((ConstraintLayout) viewGroup);
+                if (orientation == ORIENTATION_PORTRAIT) {
+                    constraintSet.connect(R.id.legend_strip, ConstraintSet.TOP, R.id.activity_wave, ConstraintSet.TOP);
+                    constraintSet.connect(R.id.speed_strip, ConstraintSet.TOP, R.id.legend_strip, ConstraintSet.BOTTOM);
+                    constraintSet.connect(R.id.spm_text_view, ConstraintSet.TOP, R.id.speed_strip, ConstraintSet.BOTTOM);
+//                constraintSet.connect(R.id.spm_text_view, ConstraintSet.BOTTOM, R.id.guideline_hor50, ConstraintSet.BOTTOM);
+                    constraintSet.applyTo((ConstraintLayout) viewGroup);
+                }
                 pref.edit().putBoolean(GPS_LOCKING, false).apply();
-                waveProgress.setVisibility(View.INVISIBLE);
-                progressTextView.setVisibility(View.INVISIBLE);
+                progressFrameLayout.setVisibility(View.GONE);
+//                waveProgress.setVisibility(View.GONE);
+//                progressTextView.setVisibility(View.GONE);
 //                createButton.setVisibility(View.INVISIBLE);
-                speedUnitStack.setVisibility(View.VISIBLE);
-                speedView.setVisibility(View.VISIBLE);
-                speedLimitStack.setVisibility(View.VISIBLE);
-                stopperButton.setVisibility(View.VISIBLE);
+                speedStrip.setVisibility(View.VISIBLE);
+//                speedUnitStack.setVisibility(View.VISIBLE);
+//                speedView.setVisibility(View.VISIBLE);
+//                speedLimitStack.setVisibility(View.VISIBLE);
+//                stopperButton.setVisibility(View.VISIBLE);
                 legendStrip.setVisibility(View.VISIBLE);
                 countdownView.setVisibility(View.INVISIBLE);
                 menuTextView.setVisibility(View.INVISIBLE);
@@ -653,18 +671,21 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
             //Interval workout
             default: {
                 Log.d("flushh", "" + "workout progress");
-                constraintSet.connect(R.id.spm_text_view, ConstraintSet.TOP, R.id.speed_strip, ConstraintSet.BOTTOM);
-                constraintSet.connect(R.id.legend_strip, ConstraintSet.TOP, R.id.wave_progress_bar_2, ConstraintSet.BOTTOM);
-                constraintSet.connect(R.id.spm_text_view, ConstraintSet.BOTTOM, R.id.guideline_hor50_2, ConstraintSet.TOP);
-                constraintSet.applyTo((ConstraintLayout) viewGroup);
-
+                if (orientation == ORIENTATION_PORTRAIT) {
+                    constraintSet.connect(R.id.spm_text_view, ConstraintSet.TOP, R.id.speed_strip, ConstraintSet.BOTTOM);
+                    constraintSet.connect(R.id.legend_strip, ConstraintSet.TOP, R.id.progress_frame_layout, ConstraintSet.BOTTOM);
+                    constraintSet.connect(R.id.spm_text_view, ConstraintSet.BOTTOM, R.id.guideline_hor50, ConstraintSet.BOTTOM);
+                    constraintSet.applyTo((ConstraintLayout) viewGroup);
+                }
+                progressFrameLayout.setVisibility(View.VISIBLE);
                 waveProgress.setVisibility(View.VISIBLE);
                 progressTextView.setVisibility(View.VISIBLE);
 //                createButton.setVisibility(View.INVISIBLE);
-                speedUnitStack.setVisibility(View.VISIBLE);
-                speedView.setVisibility(View.VISIBLE);
-                speedLimitStack.setVisibility(View.VISIBLE);
-                stopperButton.setVisibility(View.VISIBLE);
+                speedStrip.setVisibility(View.VISIBLE);
+//                speedUnitStack.setVisibility(View.VISIBLE);
+//                speedView.setVisibility(View.VISIBLE);
+//                speedLimitStack.setVisibility(View.VISIBLE);
+//                stopperButton.setVisibility(View.VISIBLE);
                 legendStrip.setVisibility(View.VISIBLE);
                 countdownView.setVisibility(View.INVISIBLE);
                 menuTextView.setVisibility(View.INVISIBLE);

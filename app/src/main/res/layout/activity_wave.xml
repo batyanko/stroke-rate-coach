@@ -68,9 +68,8 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ProgressBar
-        android:id="@+id/wave_progress_bar_2"
-        style="@android:style/Widget.ProgressBar.Horizontal"
+    <FrameLayout
+        android:id="@+id/progress_frame_layout"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_marginBottom="8dp"
@@ -78,26 +77,31 @@
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginStart="8dp"
-        android:progressDrawable="@drawable/wave_progress"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
 
-    <TextView
-        android:id="@+id/progressTextView"
-        android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginStart="8dp"
-        android:textAlignment="center"
-        android:gravity="center"
-        android:textColor="@android:color/white"
-        android:textSize="24sp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        >
+        <ProgressBar
+            android:id="@+id/wave_progress_bar"
+            style="@android:style/Widget.ProgressBar.Horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+
+            android:progressDrawable="@drawable/wave_progress"
+            />
+
+        <TextView
+            android:id="@+id/progressTextView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textAlignment="center"
+            android:gravity="center"
+            android:textColor="@android:color/white"
+            android:textSize="24sp"
+            />
+
+    </FrameLayout>
 
     <LinearLayout
         android:id="@+id/legend_strip"
@@ -105,7 +109,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:background="#00000000"
-        app:layout_constraintTop_toBottomOf="@+id/wave_progress_bar_2">
+        app:layout_constraintTop_toBottomOf="@+id/wave_progress_bar">
 
         <TextView
             android:id="@+id/speed_speed_legend"
@@ -260,7 +264,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/guideline_hor50_2" />
+        app:layout_constraintTop_toBottomOf="@+id/guideline_hor50" />
 
     <android.support.constraint.Guideline
         android:id="@+id/guideline_vert1_2"
@@ -281,7 +285,7 @@
         tools:layout_editor_absoluteY="25dp" />
 
     <android.support.constraint.Guideline
-        android:id="@+id/guideline_hor50_2"
+        android:id="@+id/guideline_hor50"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -290,7 +294,7 @@
         tools:layout_editor_absoluteY="41dp" />
 
     <android.support.constraint.Guideline
-        android:id="@+id/guideline_hor60_2"
+        android:id="@+id/guideline_hor60"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -299,7 +303,7 @@
         tools:layout_editor_absoluteY="41dp" />
 
     <android.support.constraint.Guideline
-        android:id="@+id/guideline_hor70_2"
+        android:id="@+id/guideline_hor70"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -308,7 +312,7 @@
         tools:layout_editor_absoluteY="41dp" />
 
     <android.support.constraint.Guideline
-        android:id="@+id/guideline_hor80_2"
+        android:id="@+id/guideline_hor80"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -317,7 +321,7 @@
         tools:layout_editor_absoluteY="57dp" />
 
     <android.support.constraint.Guideline
-        android:id="@+id/guideline_hor90_2"
+        android:id="@+id/guideline_hor90"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
