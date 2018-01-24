@@ -24,7 +24,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -138,12 +137,10 @@ public class EntryFormActivity extends AppCompatActivity{
         ld.addView(gearTitleView);
 
         //Add gear field for new phase
-        Log.d("BENCHMARK LIST", "START");
         gearEditTexts.add(new EditText(this));
         gearEditTexts.get(gearEditTexts.size() - 1).setLayoutParams(pHorizontal);
         gearEditTexts.get(gearEditTexts.size() - 1).setRawInputType(2);
         ld.addView(gearEditTexts.get(gearEditTexts.size() - 1));
-        Log.d("BENCHMARK LIST", "FINISH");
 
 //        ll.removeView(addPhaseButton);
 //        ll.removeView(createWorkoutButton);
@@ -209,11 +206,9 @@ public class EntryFormActivity extends AppCompatActivity{
                 }
 
                 j++;
-                Log.d("TEHJAY", j + "");
 
                 spp[j - 1] = sppString;
                 gears[j - 1] = gearString;
-                Log.d("CURRENT PHASE SAVED", spp[j - 1] + " " + gears[j - 1]);
             }
 
             String emptyPhasesPresent = "";
@@ -232,10 +227,6 @@ public class EntryFormActivity extends AppCompatActivity{
             String[] sppResized = Arrays.copyOfRange(spp, 0, j);
             String[] gearsResized = Arrays.copyOfRange(gears, 0, j);
 
-            Log.d("CSV", join(",", sppResized) + "  " + join(",", sppResized));
-
-
-            Log.d("TEHRADIO", "Selected: " + sppType);
             long i = addPreset(
                     mDb,
                     name,
@@ -243,7 +234,6 @@ public class EntryFormActivity extends AppCompatActivity{
                     join(",", sppResized),
                     join(",", gearsResized),
                     sppType);
-            Log.d("ADDEDPRESETID", "" + i);
             Toast.makeText(EntryFormActivity.this,
                     emptyPhasesPresent + getString(R.string.preset_added_notification),
                     Toast.LENGTH_LONG).show();

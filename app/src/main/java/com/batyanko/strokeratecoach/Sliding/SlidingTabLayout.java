@@ -22,7 +22,6 @@ import android.os.Build;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -219,7 +218,6 @@ public class SlidingTabLayout extends HorizontalScrollView {
             }
 
             tabTitleView.setText(adapter.getPageTitle(i));
-            Log.d("PageTitle", "" + adapter.getPageTitle(i));
             tabView.setOnClickListener(tabClickListener);
 
             mTabStrip.addView(tabView);

@@ -16,13 +16,9 @@
     -->
 
 <resources>
-    <string name="app_name">Stroke Rate Coach</string>
     <string name="stopper_button_text">Stop</string>
     <string name="speed_label">Tacho</string>
-    <string name="big_wave_desc"></string>
-    <string name="big_wave_name">Große Welle</string>
     <string name="button_add_phase_label">+ strecke</string>
-    <string name="small_wave_name">Kleine Welle</string>
     <string name="meters">Meter</string>
     <string name="seconds">Sekunden</string>
     <string name="create_workout_button_label">Übung erstellen</string>
@@ -50,15 +46,17 @@
     <string name="settings_title">Einstellungen</string>
     <string name="help_title">Hilfe</string>
     <string name="starting_loc_accuracy_setting_title">GPS-Anfanggenauigkeit (metres)</string>
-    <string name="starting_loc_accuracy_setting_desc">Zulässige Standardabweichung am Anfang einer Übung (nur distanzbasierte Übungen). \nNiedriger = genauer messen\nHoher = schneller Anfangen</string>
+    <string name="starting_loc_accuracy_setting_desc">Zulässige Standardabweichung am Anfang einer Übung (nur distanzbasierte Übungen).
+        \nNiedriger = genauer messen
+        \nHoher = schneller anfangen</string>
     <string name="speedometer_sample_length_setting_title">Tacho Messdistanz (GPS-Fixe)</string>
-    <string name="speedometer_sample_count_setting_desc">Geschwindigkeit für die Distanz seit n GPS-Fixen.
+    <string name="speedometer_sample_count_setting_desc">Geschwindigkeit für eine Strecke zu den letzten n GPS-Fixen.
         \nMehrere Fixe = genauere Geschwindigkeit
         \nWeniger Fixe = schnellere Reaktionszeit</string>
     <string name="dark_theme_setting_title">Nachtmodus</string>
 
     <!--Help entries-->
-    <string name="help_intro1"><i><b>StrokeRateCoach</b></i> ist eine Ruderapp  die mit einer gewollten (Schlag-)Frequenz piept - mit anderen Worten, ein <i><b>Metronom</b></i>.
+    <string name="help_intro1"><i><b>StrokeRateCoach</b></i> ist eine Ruder-App,  die mit einer gewollten (Schlag-)Frequenz piept - mit anderen Worten, ein <i><b>Metronom</b></i>.
     </string>
     <string name="help_intro2">Es werden sowohl einfache Frequenzeinstellung unterstützt, als auch komplexe distanz-, zeit- und schlagzahl- basierte Übungen von mehreren Strecken/Phasen.
     </string>
@@ -83,16 +81,21 @@
         Wählen Sie \'Schlagzahl\', \'Meter\' oder \'Sekunden\' für Maßeinheit, geben Sie einen Übungnamen eine ud dann tragen Sie die gewünschte Zahl von Strecken/Phasen ein:
         \nDas erste Eingabefeld (links) für die Länge der Strecke/Phase.
         \nDas zweite (rechts) für Schlagfrequenz dieser Strecke/Phase.</string>
-    <string name="help_how_to_create3">Beispiel: um eine 2000m-Übung mit Schlagfrequenz von 22-24-26-28 je 500m zu erstellen, verwenden Sie 4 Strecken/Phasen mit \'500\' im linken feld.
+    <string name="help_how_to_create3">Beispiel: um eine 2000m-Übung mit Schlagfrequenz von 22-24-26-28 je 500m zu erstellen, verwenden Sie 4 Strecken/Phasen mit \'500\' im linken Feld.
         Dann, im rechten Feld, tragen Sie 22 für die erste Phase, 24 für die zweite, 26 für die dritte und 28 für die vierte.</string>
     <string name="help_about1">Über StrokeRateCoach</string>
     <string name="help_about2">Diese App wurde von batyanko erstellt.
-        Schicken Sie mir gerne Ihre Fragen, Feedback und besonders Bug-Meldungen. Ich lese alle E-Mails ;)</string>
+        Schicken Sie mir gerne Ihre Fragen, Feedback und insbesondere Bug-Meldungen. Ich lese alle E-Mails ;)</string>
     <string name="help_about3">E-Mail\nbatyankodev@gmail.com</string>
     <string name="help_about4">Web\nwww.batyanko.com</string>
     <string name="help_about5">Github\ngithub.com/batyanko/stroke-rate-coach</string>
     <string name="help_license1">Lizenz</string>
-    <string name="help_license2">StrokeRateCoach wird mit der Apache 2.0 Lizenz http://www.apache.org/licenses/LICENSE-2.0 entwickelt</string>
+    <string name="help_license2">StrokeRateCoach wird mit der Apache 2.0 Lizenz http://www.apache.org/licenses/LICENSE-2.0 entwickelt.
+    Sofern nicht gesetzlich vorgeschrieben oder schriftlich vereinbart, Software
+unter der Lizenz vertrieben wird auf einer "Istzustand" Basis verteilt,
+OHNE GEWÄHRLEISTUNGEN ODER BEDINGUNGEN JEGLICHER ART, weder ausdrücklich noch stillschweigend.
+Weitere Informationen finden Sie in der Lizenz für die spezifische Sprache für Berechtigungen und
+Einschränkungen unter der Lizenz.</string>
     <string name="help_license3">Teile der Kodebase von anderen Entwicklern wurden verwendet und entsprechend annotiert.
         Diese Teile sind entweder mit Apache 2.0 oder CC BY-SA 3.0 http://creativecommons.org/licenses/by-sa/3.0 lizenziert.</string>
     <string name="help_privacy1">Datenschutz-Bestimmungen</string>
@@ -102,5 +105,7 @@
         Diese Position wird weder auf Dauerspeicher gelagert, noch an dritten Mitgeteilt.</string>
     <string name="help_privacy4">Die StrokeRateCoach-App verwendet keine Internetverbindung.</string>
     <string name="about_title">Über StrokeRateCoach</string>
+    <string name="menu_text">MENÜ…</string>
+    <string name="main_notification_channel_name">Primär</string>
 
 </resources>

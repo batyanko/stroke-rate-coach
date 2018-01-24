@@ -15,13 +15,9 @@
      limitations under the License.
     -->
 <resources>
-    <string name="app_name">Stroke Rate Coach</string>
     <string name="stopper_button_text">Стоп</string>
     <string name="speed_label">Скорост</string>
-    <string name="big_wave_desc">Голяма вълна от 20 до 60 загребока и обратно до 20.</string>
-    <string name="big_wave_name">Голяма вълна</string>
     <string name="button_add_phase_label">+ отсечка</string>
-    <string name="small_wave_name">Малка вълна</string>
     <string name="meters">метри</string>
     <string name="seconds">секунди</string>
     <string name="create_workout_button_label">Създай тренировка</string>
@@ -87,7 +83,12 @@
     <string name="help_about4">Web\nwww.batyanko.com</string>
     <string name="help_about5">Github\ngithub.com/batyanko/stroke-rate-coach</string>
     <string name="help_license1">Лиценз</string>
-    <string name="help_license2">StrokeRateCoach се разработва с отворен лиценз Apache 2.0 http://www.apache.org/licenses/LICENSE-2.0</string>
+    <string name="help_license2">StrokeRateCoach се разработва с отворен лиценз Apache 2.0 http://www.apache.org/licenses/LICENSE-2.0.
+    Освен ако не се изисква от приложимото законодателство или ако не е писмено съгласувано, софтуерът,
+разпространяван съгласно лиценза, се разпространява такъв, какъвто е,
+БЕЗ ГАРАНЦИИ ИЛИ УСЛОВИЯ ОТ КАКЪВТО И ДА Е ВИД, изрични или подразбиращи се.
+Вижте Лиценза за конкретния език, уреждащ разрешенията и
+ограничения по лиценза.</string>
     <string name="help_license3">Части от кода са взаимствани от други източници, съответно анотирани в самия код.
         Тези части са лицензирани с Apache 2.0 или CC BY-SA 3.0 http://creativecommons.org/licenses/by-sa/3.0</string>
     <string name="help_privacy1">Правила за поверителност</string>
@@ -97,4 +98,6 @@
         Тази географска позиция, не се записва върху устойчивата памет на устройството, и не бива споделяна с трети лица. Приложението StrokeRateCoach не използва интернет връзка.</string>
     <string name="help_privacy4">Приложението StrokeRateCoach не използва интернет връзка.</string>
     <string name="about_title">За StrokeRateCoach</string>
+    <string name="menu_text">МЕНЮ…</string>
+    <string name="main_notification_channel_name">Първостепенна</string>
 </resources>

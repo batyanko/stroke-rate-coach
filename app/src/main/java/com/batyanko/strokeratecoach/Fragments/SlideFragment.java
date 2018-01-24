@@ -35,13 +35,10 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.view.ContextThemeWrapper;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.LinearLayout;
@@ -196,7 +193,6 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
     public void onListItemClick(View view, long clickedItemId, int position, String tableName, Cursor cursor, int itemFunction) {
 
 
-        Log.d("BENCH onClick", "START");
         //TODO get only clicked preset for efficiency
 
         if (!cursor.moveToPosition(position)) {
@@ -228,7 +224,6 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                     "\n" +
                     cursor.getString(cursor.getColumnIndex(WorkoutContract.WorkoutEntry1.COLUMN_DESC));
 
-            Log.d("TEHPOSITION", "gotten on click: " + clickedItemId);
             LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             float density = getActivity().getResources().getDisplayMetrics().density;
             workoutInfoLayout = inflater.inflate(R.layout.workout_info_layout, null);
@@ -270,7 +265,6 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
 
             //Number of phases must match number of gears
             if (gears.length != spp.length) {
-                Log.w(WaveActivity.TAG, "Gears count doesn't match SPP count");
                 return;
             }
 
@@ -287,7 +281,6 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
             historyAdapter.swapCursor(getAllHistory(), true, lastWorkoutId);
             startBeeper(sppInts, gearInts, sppType);
         }
-        Log.d("BENCH onClick", "FINISH");
     }
 
     private class SlidePagerAdapter extends PagerAdapter {
@@ -350,7 +343,6 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                             } else if (position == 10) {
                                 setSpmFromDigital(0, view);
                             } else if (position == 9) {
-                                Log.d("TEHACTION", "STOP?");
 //                                checkBeeper();
 //                                stopBeeper();
                             } else if (position == 11) {
@@ -450,6 +442,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
 //        lastClickedEngageButton.setBackgroundResource(R.drawable.ic_menu_play_clip_negative);
     }
 
+    //TODO extract static method and use in Notification stopper
     public void stopBeeper() {
         pref.edit().putInt(WaveActivity.OPERATION_SETTING, WaveActivity.WORKOUT_STOP).apply();
         if (lastClickedEngageButton != null) {
@@ -460,10 +453,8 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         mConnection = BeeperServiceUtils.getServiceConnection();
 
         if (mBeeperService == null) {
-            Log.d("ONDESTROY", "beeperNULL");
             return;
         }
-        Log.d("ONDESTROY", "beeper");
         intent.setAction(BeeperTasks.ACTION_STOP_BEEP);
         mBeeperService.doEpicShit(intent);
     }
@@ -549,7 +540,6 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
     }
 
     private boolean removeWorkout(long position, String tableName) {
-        Log.d("TEHPOSITION", "while removing: " + position);
         return workoutDb.delete(tableName, WorkoutContract.WorkoutEntry1._ID + "=" + position, null) > 0;
     }
 }

@@ -36,7 +36,6 @@ import java.util.Locale;
 import android.location.Location;
 import android.location.LocationManager;
 import android.content.Context;
-import android.util.Log;
 import android.widget.TextView;
 
 import com.batyanko.strokeratecoach.Speed.CLocation;
@@ -60,7 +59,6 @@ public class SpeedActivity extends AppCompatActivity implements IBaseGpsListener
         boolean hasPermission = (permission == manager.PERMISSION_GRANTED);
 //
         if (!hasPermission) {
-            Log.d("I CAN HAZ PERMISSION?", "NO!");
             ActivityCompat.requestPermissions(this, new String[]{"android.permission.ACCESS_FINE_LOCATION"}, MY_LOCATION_PERMISSION);
         }
 
@@ -137,7 +135,6 @@ public class SpeedActivity extends AppCompatActivity implements IBaseGpsListener
     @Override
     public void onLocationChanged(Location location) {
         // TODO Auto-generated method stub
-        Log.d("UPDATESPEED? ", "SpeedActivity");
         toneGen2.startTone(ToneGenerator.TONE_CDMA_EMERGENCY_RINGBACK, 150);
         if (location != null) {
             CLocation myLocation = new CLocation(location, this.useMetricUnits());

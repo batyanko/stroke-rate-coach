@@ -28,7 +28,7 @@
     <string name="big_wave_gears" translatable="false">32,20,32,20,32,20,32,20,32,20</string>
 
     <string name="progress50_name">Progress50</string>
-    <string name="progress50_desc">Prebuilt workout going progressing spm from 22 to 28 with every 50 strokes.</string>
+    <string name="progress50_desc">Prebuilt workout going progressing spm from 22 to 28 with every 50 metres.</string>
     <string name="progress50_spp" translatable="false">50,50,50,50</string>
     <string name="progress50_gears" translatable="false">22,24,26,28</string>
 

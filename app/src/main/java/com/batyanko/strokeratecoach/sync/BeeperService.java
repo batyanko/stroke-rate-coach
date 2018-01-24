@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Yanko Georgiev
+ * Copyright (C) 2018 Yanko Georgiev
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@ import android.location.LocationManager;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 public class BeeperService extends NonStopIntentService {
 
@@ -42,7 +41,6 @@ public class BeeperService extends NonStopIntentService {
 
     public class BeeperBinder extends Binder {
         public BeeperService getService() {
-            Log.d("TEHSERVICE", "at BeeperBinder");
 
             return BeeperService.this;
         }
@@ -50,20 +48,16 @@ public class BeeperService extends NonStopIntentService {
 
     public void doEpicShit(Intent intent) {
         if (intent == null || intent.getAction() == null) {
-            Log.d("EPICSHIT", "null?");
             return;
         }
         String action = intent.getAction();
         if (beeperTasks == null) {
-            Log.d("EPICSHIT", "new BeeperTasks");
             beeperTasks = new BeeperTasks();
         }
 
         int[] workoutSpp = intent.getIntArrayExtra(BeeperTasks.EXTRA_WORKOUT_SPP);
         int[] workoutGears = intent.getIntArrayExtra(BeeperTasks.EXTRA_WORKOUT_GEARS);
         int sppType = intent.getIntExtra(BeeperTasks.EXTRA_WORKOUT_SPP_TYPE, 1);
-
-        Log.d("TEHSERVICE", "at doEpicShit");
 
         beeperTasks.executeTask(this, action, workoutSpp, workoutGears, sppType);
     }
@@ -96,21 +90,17 @@ public class BeeperService extends NonStopIntentService {
         int[] workoutGears = intent.getIntArrayExtra(BeeperTasks.EXTRA_WORKOUT_GEARS);
         int sppType = intent.getIntExtra(BeeperTasks.EXTRA_WORKOUT_SPP_TYPE, 1);
 
-        Log.d("TEHSERVICE", "onHandleIntent");
-
         beeperTasks.executeTask(this, action, workoutSpp, workoutGears, sppType);
     }
 
     @Override
     public boolean stopService(Intent name) {
-        Log.d("Servicee onStop", "check");
         beeperTasks.executeTask(this, BeeperTasks.ACTION_STOP_BEEP, null, null, 0);
         return super.stopService(name);
     }
 
     @Override
     public void onDestroy() {
-        Log.d("Servicee onDestroy", "check");
         beeperTasks.executeTask(this, BeeperTasks.ACTION_STOP_BEEP, null, null, 0);
         stopSelf();
         super.onDestroy();

@@ -14,7 +14,8 @@
      limitations under the License.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.batyanko.strokeratecoach">
+    package="com.batyanko.strokeratecoach"
+    >
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 

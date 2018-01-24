@@ -1,6 +1,5 @@
 package com.batyanko.strokeratecoach.Utils;
 
-import android.util.Log;
 
 /**
  * Created by yanko on 3/31/17.
@@ -96,7 +95,6 @@ public class SpmUtilities {
         //int strokeRate = Integer.parseInt(spmString.substring(0, 2));
         Long strokeDuration = (long) (1 / (((double) spm) / 60) * 1000);
 
-        Log.d("Produced duration: ", spm + " / " + strokeDuration);
         return strokeDuration;
     }
 

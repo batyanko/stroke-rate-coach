@@ -24,7 +24,6 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.support.annotation.ColorInt;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -163,7 +162,6 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
             long clickedTag = (long) itemView.getTag();
             int clickedPosition = getAdapterPosition();
             int viewId = view.getId();
-            Log.d("OnClickItem", "check");
             if (viewId == favButtonId) {
                 mOnClickListener.onListItemClick(
                         view,
@@ -183,7 +181,6 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
                         WaveActivity.ENGAGE_WORKOUT_FUNCTION
                 );
             } else /*if (viewId == descId)*/ {
-                Log.d("WorkoutItemFunc", "check");
                 mOnClickListener.onListItemClick(
                         view,
                         clickedTag,
@@ -203,8 +200,6 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
             if (!gottenCursor.moveToPosition(position))
                 return;
 
-            Log.d("WORKOUTID", "WORKOUTID" + workoutId + "");
-            Log.d("WORKOUTID", "GOTTENID" + gottenCursor.getInt(gottenCursor.getColumnIndex(WorkoutContract.WorkoutEntry1._ID)) + "");
             if (workoutIsRunning && gottenCursor
                     .getInt(gottenCursor.getColumnIndex(WorkoutContract.WorkoutEntry1._ID)) == workoutId) {
                 engageButton.setBackgroundResource(R.drawable.ic_play_2_negative);
@@ -225,7 +220,6 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
 
             String timestampFromSQLite = gottenCursor.getString(gottenCursor.getColumnIndex(COLUMN_TIMESTAMP));
 
-            Log.d("DATE BENCH", "START");
             //TODO add setting for 12/24h format
             Locale locale = Locale.getDefault();
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss", locale);
@@ -243,7 +237,6 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
                 //Current local time?
                     localDate = sdfDate.format(currentEpoch + localOffset);
                     localTime = sdfTime.format(currentEpoch + localOffset);
-                Log.d("DATE BENCH", "FINISH");
 
                 switch (gottenCursor.getInt(gottenCursor.getColumnIndex(COLUMN_SPP_TYPE))) {
                     case BeeperTasks.SPP_TYPE_STROKES: {
@@ -295,7 +288,6 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
             workoutDate.setText(localDate);
 
             this.itemView.setTag(gottenCursor.getLong(gottenCursor.getColumnIndex(WorkoutContract.WorkoutEntry1._ID)));
-            Log.d("TEHWIDTH", "" + delButton.getWidth());
         }
 
         ///////////////////

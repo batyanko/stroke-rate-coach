@@ -21,7 +21,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import com.batyanko.strokeratecoach.R;
 import com.batyanko.strokeratecoach.sync.BeeperTasks;
@@ -73,7 +72,6 @@ public class WorkoutDBHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL(SQL_CREATE_HISTORY_TABLE);
 
         //Initialize with factory presets
-        Log.d("SQLite BENCH", "START");
         addPreset(sqLiteDatabase,
                 mContext.getString(R.string.small_wave_name),
                 mContext.getString(R.string.small_wave_desc),

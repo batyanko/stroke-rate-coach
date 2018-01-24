@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2017 Yanko Georgiev
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+    -->
+
+<resources>
+
+    <string name="small_wave_name">Малка вълна</string>
+    <string name="small_wave_desc">Вградена тренировка - малка вълна от 10 до 30 загребока и обратно до 10.</string>
+
+    <string name="big_wave_name">Голяма вълна</string>
+    <string name="big_wave_desc">Вградена тренировка - малка вълна от 20 до 60 загребока и обратно до 20.</string>
+
+    <string name="progress50_name">Progress50</string>
+    <string name="progress50_desc">Вградена тренировка - нарастващо от 22 до 28 темпо през 50 метра.</string>
+
+
+</resources>

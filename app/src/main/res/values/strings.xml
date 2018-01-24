@@ -15,18 +15,16 @@
     -->
 
 <resources>
-    <string name="app_name">Stroke Rate Coach</string>
+    <string name="app_name" translatable="false">Stroke Rate Coach</string>
     <string name="stopper_button_text">stop</string>
     <!--Depreciated: -->
     <string name="initial_spm" translatable="false">00</string>
-    <string name="default_kph">000.0 hours/hour</string>
-    <string name="use_metric_units">Use metric units?</string>
+    <string name="default_kph" translatable="false">000.0 hours/hour</string>
+    <string name="use_metric_units" translatable="false">Use metric units?</string>
     <string name="create_workout_button_label">Create workout</string>
     <string name="speed_label">Speed</string>
     <string name="min_speed_label">Min Speed</string>
-    <string name="waves_button_text">Waves</string>
 
-    <string name="hello_blank_fragment">Yaba Daba Doo</string>
     <string name="workout_name_title">Workout name:</string>
     <string name="workout_desc_tooltip">Add workout description?</string>
     <string name="button_add_phase_label">+ Phase</string>
@@ -42,8 +40,9 @@
     <string name="empty_workout_warning">Empty workout not created.</string>
     <string name="missing_workout_type_warning">Please select workout unit (strokes, meters or seconds)</string>
     <string name="entry_form_label">Enter new workout</string>
+    <string name="workout_in_progress">Workout in progress. Tap to manage.</string>
 
-    <string name="path_circle">
+    <string name="path_circle" translatable="false">
     M 50,50
     m -48,0
     a 1,1 0 1,0 96,0
@@ -57,6 +56,7 @@
     <string name="speed_unit_500m">/500m</string>
     <string name="preset_added_notification">Preset added.</string>
     <string name="gps_lock_text">Locking on starting GPS location…</string>
+
     <string name="settings_title">Settings</string>
     <string name="help_title">Help</string>
     <string name="starting_loc_accuracy_setting_key" translatable="false">starting-loc-accuracy</string>
@@ -67,6 +67,8 @@
     <string name="speedometer_sample_count_setting_desc">Measure speed for starting n fixes back.\nMore fixes = accurate speed\nFewer fixes = quick and responsive speed</string>
     <string name="theme_setting_key" translatable="false">theme</string>
     <string name="dark_theme_setting_title">Night mode</string>
+
+    <string name="menu_text">MENU…</string>
 
     <!--Help entries-->
     <string name="help_intro1"><i><b>StrokeRateCoach</b></i> is a rowing app that beeps at a desired rate per minute - in other words, a <i><b>metronome</b></i>.
@@ -99,7 +101,12 @@
     <string name="help_about4">Web\nwww.batyanko.com</string>
     <string name="help_about5">Github\ngithub.com/batyanko/stroke-rate-coach</string>
     <string name="help_license1">License</string>
-    <string name="help_license2">StrokeRateCoach is being developed under the Apache 2.0 license http://www.apache.org/licenses/LICENSE-2.0</string>
+    <string name="help_license2">StrokeRateCoach is being developed under the Apache 2.0 license http://www.apache.org/licenses/LICENSE-2.0 .
+        Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.</string>
     <string name="help_license3">Parts of code from other developers have been used and annotated where necessary.
         These parts are licensed under either Apache 2.0 or CC BY-SA 3.0 http://creativecommons.org/licenses/by-sa/3.0</string>
     <string name="help_privacy1">Privacy Policy</string>
@@ -109,4 +116,5 @@
         This location information is neither stored on persistent storage nor disclosed to third parties.</string>
     <string name="help_privacy4"> The StrokeRateCoach app uses no internet connection.</string>
     <string name="about_title">About</string>
+    <string name="main_notification_channel_name">Primary</string>
 </resources>

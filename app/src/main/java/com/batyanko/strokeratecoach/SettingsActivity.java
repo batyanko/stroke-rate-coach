@@ -4,7 +4,6 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.batyanko.strokeratecoach.Fragments.SettingsFragment;
 
@@ -40,7 +39,6 @@ public class SettingsActivity extends AppCompatActivity implements SharedPrefere
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
         if(s.equals(WaveActivity.THEME)) {
-            Log.d("onThemePrefChanged", "check");
             int backgroundColor = (pref.getBoolean(THEME, THEME_LIGHT)) ?
                     getResources().getColor(R.color.backgroundDark)
                     :

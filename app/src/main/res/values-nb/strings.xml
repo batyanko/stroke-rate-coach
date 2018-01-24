@@ -15,12 +15,9 @@
      limitations under the License.
     -->
 <resources>
-    <string name="app_name">Stroke Rate Coach</string>
     <string name="stopper_button_text">Stop</string>
     <string name="speed_label">Hastighet</string>
-    <string name="big_wave_name">Stor Bølge</string>
     <string name="button_add_phase_label">+ fase</string>
-    <string name="small_wave_name">Liten Bølge</string>
     <string name="meters">meter</string>
     <string name="seconds">sekunder</string>
     <string name="create_workout_button_label">Skape trening</string>
@@ -79,7 +76,7 @@
     <string name="help_how_to_create1">- Skape ny trening</string>
     <string name="help_how_to_create2">Trykk på menyknappen (\'⋮\') mens piperen er stoppet, og trykk deretter på \'Skape trening\'.Velg \'slagtall\', \'meter\' eller \'sekunder\' for treningsenheten, skriv inn treningsnavn og skriv inn data for alle treningsfaser:
         \nDet første (venstre hånd) feltet for hver fase.
-        \nThe andre (høyre hånd) feltet for SPM freqvens for hver fase.</string>
+        \nDet andre (høyre hånd) feltet for SPM freqvens for hver fase.</string>
     <string name="help_how_to_create3">Eksempel: for å lage en 2000m trening bestående av 4 faser `a 500m ved 22/24/26/28 SPM, lag 4 faser og sett \'500\' i venstre felt for hver fase.
         Deretter plasser 22 i det andre feltet 22 for den første fasen, deretter 24 for den andre, 26 for den tredje og 28 for fjerde fase.</string>
     <string name="help_about1">Om StrokeRateCoach</string>
@@ -89,7 +86,12 @@
     <string name="help_about4">Web\nwww.batyanko.com</string>
     <string name="help_about5">Github\ngithub.com/batyanko/stroke-rate-coach</string>
     <string name="help_license1">Lisens</string>
-    <string name="help_license2">StrokeRateCoach blir utviklet under Apache 2.0-lisensen http://www.apache.org/licenses/LICENSE-2.0</string>
+    <string name="help_license2">StrokeRateCoach blir utviklet under Apache 2.0-lisensen http://www.apache.org/licenses/LICENSE-2.0.
+    Med mindre det kreves av gjeldende lov eller avtalt skriftlig, programvare
+distribuert under lisensen er distribuert på en "AS IS" BASIS,
+UTEN GARANTIER ELLER BETINGELSER AV NOEN SLAG, enten uttrykks eller underforstått.
+Se Lisensen for det bestemte språket som styrer tillatelser og
+begrensninger under lisensen.</string>
     <string name="help_license3">Deler av kode fra andre utviklere har blitt brukt og merket i kildekoden.
         Disse delene er lisensiert under enten Apache 2.0 eller CC BY-SA 3.0 http://creativecommons.org/licenses/by-sa/3.0</string>
     <string name="help_privacy1">Personvernregler</string>
@@ -99,5 +101,7 @@
         Denne plasseringsinformasjonen er heller ikke lagret på vedvarende lagring eller utlyst til tredjepart.</string>
     <string name="help_privacy4"> StrokeRateCoach-appen bruker ingen Internett-tilkobling.</string>
     <string name="about_title">Om StrokeRateCoach</string>
+    <string name="menu_text">MENY…</string>
+    <string name="main_notification_channel_name">Primær</string>
 
 </resources>
