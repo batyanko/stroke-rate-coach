@@ -15,6 +15,7 @@
      limitations under the License.
     -->
 <resources>
+    <string name="workout_in_progress">Активна тренировка</string>
     <string name="stopper_button_text">Стоп</string>
     <string name="speed_label">Скорост</string>
     <string name="button_add_phase_label">+ отсечка</string>

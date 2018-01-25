@@ -231,7 +231,7 @@
                 android:textSize="128sp" />
 
             <TextView
-                android:id="@+id/menu_text_view"
+                android:id="@+id/menu_image_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"

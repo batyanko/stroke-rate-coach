@@ -20,7 +20,9 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.Build;
 import android.os.IBinder;
+import android.util.Log;
 
 /**
  * Created by batyanko on 10/19/17.
@@ -34,6 +36,7 @@ public class BeeperServiceUtils {
 
     private static BeeperService mBeeperService;
     private static boolean mIsBound = false;
+    private static ServiceConnection serviceConnection;
 
     public static BeeperService getBeeperService() {
         if (mBeeperService == null) {
@@ -43,6 +46,9 @@ public class BeeperServiceUtils {
     }
     public static ServiceConnection getServiceConnection() {
         return createServiceConnection();
+    }
+    public static boolean serviceIsRunning() {
+        return mBeeperService != null;
     }
 
     private static ServiceConnection createServiceConnection() {
@@ -64,17 +70,30 @@ public class BeeperServiceUtils {
 //            Toast.makeText(getContext(), "Unbound", Toast.LENGTH_SHORT).show();
             }
         };
+        serviceConnection = mConnection;
         return mConnection;
     }
 
     public static void doBindService(Intent intent, Context context, ServiceConnection connection) {
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+//            context.startService(intent);
+//            return;
+//        }
+//        if (mIsBound) {
+//            doUnbindService(context, connection);
+//        }
         context.bindService(intent, connection, Context.BIND_AUTO_CREATE);
         mIsBound = true;
     }
 
-    public static void doUnbindService(Context context, ServiceConnection connection) {
+    public static void doUnbindService(Context context) {
+
         if (mIsBound) {
-            context.unbindService(connection);
+            try {
+                context.unbindService(serviceConnection);
+            } catch (IllegalArgumentException exception) {
+                //if not bound then everything is alrighty...
+            }
             mIsBound = false;
         }
     }

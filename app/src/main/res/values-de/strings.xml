@@ -16,6 +16,7 @@
     -->
 
 <resources>
+    <string name="workout_in_progress">Übung läuft</string>
     <string name="stopper_button_text">Stop</string>
     <string name="speed_label">Tacho</string>
     <string name="button_add_phase_label">+ strecke</string>

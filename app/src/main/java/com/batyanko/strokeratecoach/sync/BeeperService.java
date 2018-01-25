@@ -26,6 +26,9 @@ import android.location.LocationManager;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.util.Log;
+
+import com.batyanko.strokeratecoach.Utils.NotificationUtils;
 
 public class BeeperService extends NonStopIntentService {
 
@@ -104,5 +107,11 @@ public class BeeperService extends NonStopIntentService {
         beeperTasks.executeTask(this, BeeperTasks.ACTION_STOP_BEEP, null, null, 0);
         stopSelf();
         super.onDestroy();
+    }
+
+    @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        NotificationUtils.clearAllNotifications(this);
+        super.onTaskRemoved(rootIntent);
     }
 }

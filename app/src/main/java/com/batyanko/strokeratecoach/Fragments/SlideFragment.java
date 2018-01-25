@@ -80,7 +80,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
 
     DialGridAdapter dialAdapter;
     private SvAdapter presetsAdapter;
-    public static SvAdapter historyAdapter;
+    public SvAdapter historyAdapter;
 
     Cursor presetCursor;
     Cursor historyCursor;
@@ -97,7 +97,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
     private ServiceConnection mConnection;
 
     private Intent intent;
-    public static View lastClickedEngageButton;
+    public View lastClickedEngageButton;
 
     public int lastWorkoutId;
     private boolean workoutIsRunning;

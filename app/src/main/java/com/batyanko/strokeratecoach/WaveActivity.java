@@ -479,11 +479,10 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         createButton.setVisibility(View.VISIBLE);
         */
 
-        menuTextView = findViewById(R.id.menu_text_view);
+        menuTextView = findViewById(R.id.menu_image_view);
         menuTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 PopupMenu popup = new PopupMenu(WaveActivity.this, view);
                 popup.inflate(R.menu.menu_options);
                 popup.setOnMenuItemClickListener(WaveActivity.this);
@@ -588,6 +587,10 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+        if (BeeperServiceUtils.serviceIsRunning()) {
+            BeeperServiceUtils.doUnbindService(this);
+        }
 //        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
 //        pref.unregisterOnSharedPreferenceChangeListener(this);
     }

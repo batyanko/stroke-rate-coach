@@ -15,6 +15,7 @@
      limitations under the License.
     -->
 <resources>
+    <string name="workout_in_progress">Trening løper</string>
     <string name="stopper_button_text">Stop</string>
     <string name="speed_label">Hastighet</string>
     <string name="button_add_phase_label">+ fase</string>

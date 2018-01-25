@@ -40,7 +40,7 @@
     <string name="empty_workout_warning">Empty workout not created.</string>
     <string name="missing_workout_type_warning">Please select workout unit (strokes, meters or seconds)</string>
     <string name="entry_form_label">Enter new workout</string>
-    <string name="workout_in_progress">Workout in progress. Tap to manage.</string>
+    <string name="workout_in_progress">Workout in progress</string>
 
     <string name="path_circle" translatable="false">
     M 50,50

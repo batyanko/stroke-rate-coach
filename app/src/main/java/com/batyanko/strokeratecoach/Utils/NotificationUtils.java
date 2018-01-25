@@ -50,12 +50,18 @@ public class NotificationUtils {
     public static void clearAllNotifications(Context context) {
         NotificationManager notificationManager = (NotificationManager)
                 context.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.cancelAll();
+        if (notificationManager == null) {
+            return;
+        }notificationManager.cancelAll();
     }
 
     public static void showWorkoutNotification(Context context) {
         NotificationManager notificationManager = (NotificationManager)
                 context.getSystemService(Context.NOTIFICATION_SERVICE);
+        if (notificationManager == null) {
+            return;
+        }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel mChannel = new NotificationChannel(
                     WORKOUT_NOTIFICATION_CHANNEL_ID,
@@ -64,8 +70,8 @@ public class NotificationUtils {
             notificationManager.createNotificationChannel(mChannel);
         }
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context,WORKOUT_NOTIFICATION_CHANNEL_ID)
-                .setColor(ContextCompat.getColor(context, R.color.colorPrimary))
-                .setSmallIcon(R.drawable.ic_play_2_new)
+                .setColor(ContextCompat.getColor(context, R.color.blueAppColor))
+                .setSmallIcon(R.drawable.ic_icon2_transparent)
                 .setLargeIcon(largeIcon(context))
                 .setContentTitle(context.getString(R.string.app_name))
                 .setContentText(context.getString(R.string.workout_in_progress))
@@ -110,7 +116,7 @@ public class NotificationUtils {
 
     private static Bitmap largeIcon(Context context) {
         Resources res = context.getResources();
-        Bitmap largeIcon = BitmapFactory.decodeResource(res, R.drawable.ic_play_2_negative);
+        Bitmap largeIcon = BitmapFactory.decodeResource(res, R.mipmap.ic_launcher);
         return largeIcon;
     }
 }
