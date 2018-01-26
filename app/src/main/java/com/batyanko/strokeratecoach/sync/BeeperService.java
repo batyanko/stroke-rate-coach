@@ -20,13 +20,11 @@ package com.batyanko.strokeratecoach.sync;
  * Created by batyanko on 9/4/17.
  */
 
-import android.app.Activity;
 import android.content.Intent;
 import android.location.LocationManager;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.batyanko.strokeratecoach.Utils.NotificationUtils;
 

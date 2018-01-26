@@ -228,7 +228,7 @@
                 android:onClick="onSpmClicked"
                 android:text="@string/initial_spm"
                 android:textAlignment="center"
-                android:textSize="128sp" />
+                android:textSize="@dimen/spm_text_view_size" />
 
             <TextView
                 android:id="@+id/menu_image_view"

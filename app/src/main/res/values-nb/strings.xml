@@ -67,7 +67,8 @@
     <string name="help_how_to_simple_beep2">Velg \'HURTIGVALG\' og skriv inn ønsket SPM. Pipetonen starter automatisk ved oppringing av det andre sifferet. Støttede SPM fra 10 til 99.
     </string>
     <string name="help_how_to_preset1">- Forhåndsinnstilt trening</string>
-    <string name="help_how_to_preset2">Velg \'TRENING\' eller \'LOGG\' og trykk den \'PLAY\' knapp av den ønsket trening.</string>
+    <string name="help_how_to_preset2">Velg \'TRENING\' eller \'LOGG\' og trykk den \'PLAY\' knapp av den ønsket trening.
+    Tips: Avstanden måles på en rett linje fra fase-utgangspunktet - kan være uegnet for spor med svinger.</string>
     <string name="help_how_to_speed1">- Hastighetskontroll</string>
     <string name="help_how_to_speed2">Mens pipetonen er aktiv, er to avlesninger synlige i den øvre delen av skjermen:</string>
     <string name="help_how_to_speed3">\'Hastighet\' viser din nåværende hastighet, basert på avstanden dekket for de siste få GPS-fikseringene (10 som standard).</string>
@@ -104,5 +105,8 @@ begrensninger under lisensen.</string>
     <string name="about_title">Om StrokeRateCoach</string>
     <string name="menu_text">MENY…</string>
     <string name="main_notification_channel_name">Primær</string>
+    <string name="welcome_text1">Hei!</string>
+    <string name="agree">Bra</string>
+    <string name="not_fine">Ikke Bra</string>
 
 </resources>

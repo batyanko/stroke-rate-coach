@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
@@ -29,7 +30,9 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -59,6 +62,7 @@ import com.batyanko.strokeratecoach.sync.BeeperService;
 import com.batyanko.strokeratecoach.sync.BeeperServiceUtils;
 import com.batyanko.strokeratecoach.sync.BeeperTasks;
 
+import static com.batyanko.strokeratecoach.WaveActivity.MY_LOCATION_PERMISSION;
 import static com.batyanko.strokeratecoach.WaveActivity.THEME_COLOR;
 import static com.batyanko.strokeratecoach.WaveActivity.windowWidth;
 
@@ -279,7 +283,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
             lastClickedEngageButton.setBackgroundResource(R.drawable.ic_play_2_negative);
             addHistory(workoutDb, name, description, sppCSV, gearCSV, sppType);
             historyAdapter.swapCursor(getAllHistory(), true, lastWorkoutId);
-            startBeeper(sppInts, gearInts, sppType);
+            initIntent(sppInts, gearInts, sppType);
         }
     }
 
@@ -404,7 +408,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
             firstDigitView.setBackgroundColor(Color.TRANSPARENT);
             spm = firstDigit * 10 + digitalInput;
             int[] gearArray = new int[]{spm};
-            startBeeper(null, gearArray, BeeperTasks.SPP_TYPE_STROKES);
+            initIntent(null, gearArray, BeeperTasks.SPP_TYPE_STROKES);
             firstDigit = 0;
 
         } else {
@@ -432,14 +436,22 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         }
     }
 
-    private void startBeeper(int[] sppSettings, int[] gearSettings, int sppType) {
+    private void initIntent(int[] sppSettings, int[] gearSettings, int sppType) {
+
         intent.setAction(BeeperTasks.ACTION_START_BEEP);
         intent.putExtra(BeeperTasks.EXTRA_WORKOUT_SPP, sppSettings);
         intent.putExtra(BeeperTasks.EXTRA_WORKOUT_GEARS, gearSettings);
         intent.putExtra(BeeperTasks.EXTRA_WORKOUT_SPP_TYPE, sppType);
+
+        if (requestLocation()) {
+            startBeeper();
+        };
+    }
+
+    public void startBeeper() {
         this.getActivity().startService(intent);
         BeeperServiceUtils.doBindService(intent, getActivity(), mConnection);
-//        lastClickedEngageButton.setBackgroundResource(R.drawable.ic_menu_play_clip_negative);
+        //        lastClickedEngageButton.setBackgroundResource(R.drawable.ic_menu_play_clip_negative);
     }
 
     //TODO extract static method and use in Notification stopper
@@ -541,5 +553,18 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
 
     private boolean removeWorkout(long position, String tableName) {
         return workoutDb.delete(tableName, WorkoutContract.WorkoutEntry1._ID + "=" + position, null) > 0;
+    }
+
+    private boolean requestLocation() {
+        PackageManager manager = getActivity().getPackageManager();
+        int permission = manager.checkPermission("android.permission.ACCESS_FINE_LOCATION",
+                "com.batyanko.strokeratecoach");
+        boolean hasPermission = (permission == PackageManager.PERMISSION_GRANTED);
+//
+        if (!hasPermission) {
+            ActivityCompat.requestPermissions(getActivity(),
+                    new String[]{"android.permission.ACCESS_FINE_LOCATION"}, MY_LOCATION_PERMISSION);
+        }
+        return hasPermission;
     }
 }

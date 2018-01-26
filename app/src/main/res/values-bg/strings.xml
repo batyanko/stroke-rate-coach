@@ -64,7 +64,8 @@
     <string name="help_how_to_simple_beep2">Отидете на \'БЪРЗ НАБОР\' наберете желаното темпо. Звуковият сигнал започва директно със задаването на втората цифра.
     </string>
     <string name="help_how_to_preset1">- Тренировка</string>
-    <string name="help_how_to_preset2">Отидате на \'ТРЕНИРОВКИ\' или \'ИСТОРИЯ\' и натиснете \'PLAY\' бутона към желаната тренировка.</string>
+    <string name="help_how_to_preset2">Отидате на \'ТРЕНИРОВКИ\' или \'ИСТОРИЯ\' и натиснете \'PLAY\' бутона към желаната тренировка.
+    Забележка: разстоянието се измерва по права линия от началната точка за всяка отсечка, при трасе със завои действително изминатото разстояние ще се различава.</string>
     <string name="help_how_to_speed1">- Наблюдение и контрол на скоростта</string>
     <string name="help_how_to_speed2">Докато звуковият сигнал е активен, в горната част на екрана се виждат следните две полета:</string>
     <string name="help_how_to_speed3">\'Скорост\' показва актуалната скорост, базирана на покритата дистанция от последните 10 GPS замервания (10 по фабрични настройки).</string>
@@ -101,4 +102,7 @@
     <string name="about_title">За StrokeRateCoach</string>
     <string name="menu_text">МЕНЮ…</string>
     <string name="main_notification_channel_name">Първостепенна</string>
+    <string name="welcome_text1">Добре дошли!</string>
+    <string name="agree">Добре</string>
+    <string name="not_fine">Отказвам</string>
 </resources>

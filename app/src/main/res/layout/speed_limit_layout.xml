@@ -17,10 +17,13 @@
         android:id="@+id/speed_limit_switch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/ic_rectangle"
+        android:background="@color/blueAppColor"
         android:text="@string/minimum_speed_warning"
+        android:textSize="16dp"
         android:paddingLeft="20dp"
         android:paddingRight="20dp"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp"
         android:layout_marginLeft="-3dp"
         />
 

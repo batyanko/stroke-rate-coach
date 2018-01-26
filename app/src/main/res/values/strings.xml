@@ -82,7 +82,8 @@
     <string name="help_how_to_simple_beep2">Go to \'SPEED DIAL\' and enter desired SPM. The beeping starts automatically upon dialing the second digit. Supported SPM rates from 10 to 99.
     </string>
     <string name="help_how_to_preset1">- Preset workout</string>
-    <string name="help_how_to_preset2">Go to \'WORKOUTS\' or \'HISTORY\' and tap the \'PLAY\' button of the desired workout.</string>
+    <string name="help_how_to_preset2">Go to \'WORKOUTS\' or \'HISTORY\' and tap the \'PLAY\' button of the desired workout.
+        Hint: distance is measured at a straight line from the phase/leg start point - may be unsuitable for tracks with turns.</string>
     <string name="help_how_to_speed1">- Speed monitor &amp; control</string>
     <string name="help_how_to_speed2">While the beeper is running, two readings are visible in the upper part of the screen:</string>
     <string name="help_how_to_speed3">\'Speed\' shows your current speed, based on the distance covered for the last few GPS fixes (10 by default).</string>
@@ -117,4 +118,8 @@ limitations under the License.</string>
     <string name="help_privacy4"> The StrokeRateCoach app uses no internet connection.</string>
     <string name="about_title">About</string>
     <string name="main_notification_channel_name">Primary</string>
+    <string name="welcome_text1">Hi there!</string>
+    <string name="welcome_text2">" "</string>
+    <string name="agree">Agree</string>
+    <string name="not_fine">Disagree</string>
 </resources>

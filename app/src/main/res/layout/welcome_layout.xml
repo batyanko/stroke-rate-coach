@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/welcome_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        >
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/help_text_size_medium"
+            android:text="@string/welcome_text1"
+            android:autoLink="web"
+            android:paddingBottom="5dp"
+            />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/help_text_size_medium"
+            android:text="@string/welcome_text2"
+            android:autoLink="web"
+            android:paddingBottom="10dp"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/help_text_size_big"
+            android:text="@string/help_privacy1"
+            android:textStyle="bold"
+            android:paddingBottom="5dp"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/help_text_size_small"
+            android:text="@string/help_privacy2"
+            android:paddingBottom="5dp"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/help_text_size_small"
+            android:text="@string/help_privacy3"
+            android:paddingBottom="5dp"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/help_text_size_small"
+            android:text="@string/help_privacy4"
+            android:paddingBottom="10dp"
+            />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="@dimen/activity_horizontal_margin"
+            >
+            <LinearLayout
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                >
+                <Button
+                    android:id="@+id/button_disagree"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:textColor="#ff0088bb"
+                    android:textSize="@dimen/help_text_size_medium"
+                    android:text="@string/not_fine"
+                    />
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="10dp"
+                    android:background="@android:color/holo_red_light"
+                    />
+
+            </LinearLayout>
+            <LinearLayout
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                >
+                <Button
+                    android:id="@+id/button_agree"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:textColor="#ff0088bb"
+                    android:textSize="@dimen/help_text_size_medium"
+                    android:text="@string/agree"
+                    />
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="10dp"
+                    android:background="@android:color/holo_green_light"
+                    />
+            </LinearLayout>
+
+
+
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

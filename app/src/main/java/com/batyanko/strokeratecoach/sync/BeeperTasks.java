@@ -28,6 +28,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
+import android.support.v4.app.ActivityCompat;
 
 import com.batyanko.strokeratecoach.Speed.CLocation;
 import com.batyanko.strokeratecoach.Speed.IBaseGpsListener;

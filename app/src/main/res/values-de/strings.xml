@@ -70,7 +70,8 @@
         Es werden Schlagfrequenzen von 10 bis 99 Schlag pro Minute unterstützt.
     </string>
     <string name="help_how_to_preset1">- Übung starten</string>
-    <string name="help_how_to_preset2">Gehen Sie zu \'ÜBUNGEN\' oder \'VERLAUF\' und tippen Sie auf den \'PLAY\'-Knopf der gewünschten Übung.</string>
+    <string name="help_how_to_preset2">Gehen Sie zu \'ÜBUNGEN\' oder \'VERLAUF\' und tippen Sie auf den \'PLAY\'-Knopf der gewünschten Übung.
+    Hinweis: Der Abstand wird auf einer geraden Linie vom Startpunkt der Phase / Startlinie aus gemessen - Strecken mit Kurven werden ungenau gemessen.</string>
     <string name="help_how_to_speed1">- Geschwindigkeitsmessung und -Kontrolle</string>
     <string name="help_how_to_speed2">Während der Pieper aktiv ist, kann man zwei Messwerte im oberen Bereich des Bildschirms sehen:</string>
     <string name="help_how_to_speed3">\'Tacho\' zeight Ihre aktuelle geschwindigkeit an. basiert auf der Distanz, die Sie seit einer bestimmten von GPS-Messungen zurückgelegt haben (Werkeinstellung auf 10).</string>
@@ -108,5 +109,8 @@ Einschränkungen unter der Lizenz.</string>
     <string name="about_title">Über StrokeRateCoach</string>
     <string name="menu_text">MENÜ…</string>
     <string name="main_notification_channel_name">Primär</string>
+    <string name="welcome_text1">Willkommen!</string>
+    <string name="agree">Zustimmen</string>
+    <string name="not_fine">Ablehnen</string>
 
 </resources>

@@ -20,9 +20,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.os.Build;
 import android.os.IBinder;
-import android.util.Log;
 
 /**
  * Created by batyanko on 10/19/17.

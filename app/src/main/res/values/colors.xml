@@ -7,6 +7,7 @@
     <color name="normalButtonColor">#0000FF</color>
     <color name="activeButtonColor">#ffffff</color>
     <color name="grey">#888888</color>
+    <color name="greyLight">#bbbbbb</color>
 
     <color name="backgroundDark">#303030</color>
     <color name="backgroundLight">#ffffff</color>
