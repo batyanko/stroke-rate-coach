@@ -58,7 +58,7 @@
 
     <!--Help entries-->
     <string name="help_intro1"><i><b>StrokeRateCoach</b></i>er en roingapp som piper til ønsket frekvens per minutt - med andre ord en <i><b>metronom</b></i>, eller <i><b>taktmåler</b></i>.</string>
-    <string name="help_intro2">Enkel SPM (Slag Per Minutt) freqvensinnstilling støttes, samt komplekse treningsøkter basert på avstand, tid eller slagtall.
+    <string name="help_intro2">Enkel SPM (Slag Per Minutt) frekvensinnstilling støttes, samt komplekse treningsøkter basert på avstand, tid eller slagtall.
     </string>
     <string name="help_intro3">StrokeRateCoach vil gjerne pipe fra bakgrunnen, så at du kan kombinere den med andre sportsapper!
     </string>
@@ -78,7 +78,7 @@
     <string name="help_how_to_create1">- Skape ny trening</string>
     <string name="help_how_to_create2">Trykk på menyknappen (\'⋮\') mens piperen er stoppet, og trykk deretter på \'Skape trening\'.Velg \'slagtall\', \'meter\' eller \'sekunder\' for treningsenheten, skriv inn treningsnavn og skriv inn data for alle treningsfaser:
         \nDet første (venstre hånd) feltet for hver fase.
-        \nDet andre (høyre hånd) feltet for SPM freqvens for hver fase.</string>
+        \nDet andre (høyre hånd) feltet for SPM frekvens for hver fase.</string>
     <string name="help_how_to_create3">Eksempel: for å lage en 2000m trening bestående av 4 faser `a 500m ved 22/24/26/28 SPM, lag 4 faser og sett \'500\' i venstre felt for hver fase.
         Deretter plasser 22 i det andre feltet 22 for den første fasen, deretter 24 for den andre, 26 for den tredje og 28 for fjerde fase.</string>
     <string name="help_about1">Om StrokeRateCoach</string>
@@ -97,7 +97,7 @@ begrensninger under lisensen.</string>
     <string name="help_license3">Deler av kode fra andre utviklere har blitt brukt og merket i kildekoden.
         Disse delene er lisensiert under enten Apache 2.0 eller CC BY-SA 3.0 http://creativecommons.org/licenses/by-sa/3.0</string>
     <string name="help_privacy1">Personvernregler</string>
-    <string name="help_privacy2">StrokeRateCoach app lagrer en database med dine lagrede og brukte treninger (data som blir lagret er den skrivede inn treningsdata som måleenhet, navn, beskrivelse, fase lengde og freqvens, samt tidsstempel fra opprettelse og bruk).
+    <string name="help_privacy2">StrokeRateCoach app lagrer en database med dine lagrede og brukte treninger (data som blir lagret er den skrivede inn treningsdata som måleenhet, navn, beskrivelse, fase lengde og frekvens, samt tidsstempel fra opprettelse og bruk).
         Disse dataene deles ikke med noen som helst og kan slettes på vilkårlig måte ved hjelp av \'delete\' (bin) -knappen som finnes ved siden av hver treningsoppføring.</string>
     <string name="help_privacy3">For å aktivere avstands- og hastighetsmåling, bruker StrokeRateCoach-appen midlertidig din presise plassering.
         Denne plasseringsinformasjonen er heller ikke lagret på vedvarende lagring eller utlyst til tredjepart.</string>

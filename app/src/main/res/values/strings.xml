@@ -119,7 +119,7 @@ limitations under the License.</string>
     <string name="about_title">About</string>
     <string name="main_notification_channel_name">Primary</string>
     <string name="welcome_text1">Hi there!</string>
-    <string name="welcome_text2">" "</string>
+    <string name="welcome_text2" translatable="false">" "</string>
     <string name="agree">Agree</string>
     <string name="not_fine">Disagree</string>
 </resources>

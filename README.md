@@ -2,11 +2,11 @@ Android rowing app that beeps at a desired stroke rate per minute (SPM).
 
 PROJECT IS IN DEVELOPMENT. Feel free to contribute or request new features.
 
-Get the .apk here:
+Get v. 1.00 on Google Play:
 
-[https://drive.google.com/open?id=1zh9wZEysVNrdqUm0mcsOExT0wBA47ag_](https://drive.google.com/open?id=1zh9wZEysVNrdqUm0mcsOExT0wBA47ag_)
+[https://play.google.com/store/apps/details?id=com.batyanko.strokeratecoach](https://play.google.com/store/apps/details?id=com.batyanko.strokeratecoach)
 
-![giphy](https://media.giphy.com/media/3ohs7PyrDpwQCDqOXe/giphy.gif)
+![giphy](https://media.giphy.com/media/3o7WItSv8U3WpZ0Ums/giphy.gif)
 
 Current features:
 - Workouts based on stroke count, distance (GPS Location) and time
@@ -19,6 +19,7 @@ Planned features:
 - Share workouts with friends?
 
 Known bugs:
+- Moto G (falcon) with Cyanogenmod 13. Unable to replicate on other devices or API versions.
 - Location listener sometimes persists in the background thread SOLVED?
 - you tell me
 
