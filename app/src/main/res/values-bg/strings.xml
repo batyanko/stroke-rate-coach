@@ -105,4 +105,5 @@
     <string name="welcome_text1">Добре дошли!</string>
     <string name="agree">Добре</string>
     <string name="not_fine">Отказвам</string>
+    <string name="custom_sound_title">Потребителски тон</string>
 </resources>

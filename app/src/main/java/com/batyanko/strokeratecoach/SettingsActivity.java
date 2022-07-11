@@ -1,9 +1,15 @@
 package com.batyanko.strokeratecoach;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.preference.PreferenceManager;
-import android.support.v7.app.AppCompatActivity;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
 import android.os.Bundle;
+import android.util.Log;
 
 import com.batyanko.strokeratecoach.Fragments.SettingsFragment;
 
@@ -37,8 +43,8 @@ public class SettingsActivity extends AppCompatActivity implements SharedPrefere
     }
 
     @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
-        if(s.equals(WaveActivity.THEME)) {
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals(WaveActivity.THEME)) {
             int backgroundColor = (pref.getBoolean(THEME, THEME_LIGHT)) ?
                     getResources().getColor(R.color.backgroundDark)
                     :
@@ -47,4 +53,22 @@ public class SettingsActivity extends AppCompatActivity implements SharedPrefere
             this.getWindow().getDecorView().setBackgroundColor(backgroundColor);
         }
     }
+
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+//        Log.d("OAR CHECK", "BOOOOO");
+//
+//        if (requestCode != 123 || resultCode != RESULT_OK) {
+//            return;
+//        }
+//
+//        Uri stuffs;
+//        if (data != null) {
+//            stuffs = data.getData();
+//            Log.d("FILE URI STUFFS", stuffs.getPath());
+//        }
+//
+//
+//        super.onActivityResult(requestCode, resultCode, data);
+//    }
 }

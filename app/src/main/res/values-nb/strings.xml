@@ -108,5 +108,6 @@ begrensninger under lisensen.</string>
     <string name="welcome_text1">Hei!</string>
     <string name="agree">Bra</string>
     <string name="not_fine">Ikke Bra</string>
+    <string name="custom_sound_title">Tilpasset lyd</string>
 
 </resources>

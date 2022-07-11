@@ -1,41 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    >
+    xmlns:tools="http://schemas.android.com/tools">
 
     <SwitchPreference
-        android:key="@string/theme_setting_key"
-        android:title="@string/dark_theme_setting_title"
         android:defaultValue="false"
-        />
+        android:key="@string/theme_setting_key"
+        android:title="@string/dark_theme_setting_title" />
     <EditTextPreference
-        android:key="@string/starting_loc_accuracy_setting_key"
-        android:title="@string/starting_loc_accuracy_setting_title"
-        android:summary="@string/starting_loc_accuracy_setting_desc"
-        android:inputType="numberDecimal"
         android:defaultValue="5"
+        android:inputType="numberDecimal"
+        android:key="@string/starting_loc_accuracy_setting_key"
+        android:summary="@string/starting_loc_accuracy_setting_desc"
         android:textColor="@color/colorAccent"
-        />
+        android:title="@string/starting_loc_accuracy_setting_title" />
     <EditTextPreference
-        android:key="@string/speed_sample_count_setting_key"
-        android:title="@string/speedometer_sample_length_setting_title"
-        android:summary="@string/speedometer_sample_count_setting_desc"
-        android:inputType="number"
         android:defaultValue="10"
+        android:inputType="number"
+        android:key="@string/speed_sample_count_setting_key"
+        android:summary="@string/speedometer_sample_count_setting_desc"
+        android:title="@string/speedometer_sample_length_setting_title" />
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="@string/custom_sound"
+        android:title="@string/custom_sound_title" />
+
+<!--    <RingtonePreference-->
+<!--        android:key="@string/custom_sound_path"-->
+<!--        android:summary="Select sound..."-->
+<!--        android:title="@string/beep_ringtone_setting_title"-->
+<!--        android:ringtoneType="all"-->
+<!--        android:showSilent="true"-->
+<!--        android:showDefault="false" />-->
+
+    <Preference
+        android:title="Pick file"
+        android:key="filePicker"
         />
+    <!--
 
-<!--
-
-    <CheckBoxPreference
-        android:key="pref_sync"
-        android:title="@string/pref_sync"
-        android:summary="@string/pref_sync_summ"
-        android:defaultValue="true" />
-    <ListPreference
-        android:dependency="pref_sync"
-        android:key="pref_syncConnectionType"
-        android:title="@string/pref_syncConnectionType"
-        android:dialogTitle="@string/pref_syncConnectionType"
-        android:entries="@array/pref_syncConnectionTypes_entries"
-        android:entryValues="@array/pref_syncConnectionTypes_values"
-        android:defaultValue="@string/pref_syncConnectionTypes_default" />-->
+        <CheckBoxPreference
+            android:key="pref_sync"
+            android:title="@string/pref_sync"
+            android:summary="@string/pref_sync_summ"
+            android:defaultValue="true" />
+        <ListPreference
+            android:dependency="pref_sync"
+            android:key="pref_syncConnectionType"
+            android:title="@string/pref_syncConnectionType"
+            android:dialogTitle="@string/pref_syncConnectionType"
+            android:entries="@array/pref_syncConnectionTypes_entries"
+            android:entryValues="@array/pref_syncConnectionTypes_values"
+            android:defaultValue="@string/pref_syncConnectionTypes_default" />-->
 </PreferenceScreen>

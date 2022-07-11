@@ -19,20 +19,19 @@ package com.batyanko.strokeratecoach;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.graphics.drawable.*;
 import android.media.AudioManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.constraint.ConstraintLayout;
-import android.support.constraint.ConstraintSet;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.*;
+import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.*;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -41,6 +40,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
@@ -115,6 +115,8 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     public static final String THEME = "theme";
     //R.string.starting_loc_accuracy_setting_key
     public static final String LOCATION_ACCURACY_ACCEPTABLE = "starting-loc-accuracy";
+    public static final String CUSTOM_SOUND_PATH = "custom-sound-path";
+    public static final String CUSTOM_SOUND = "custom-sound";
     //R.string.speed_sample_count_setting_key
     public static final String SPEED_SAMPLE_COUNT = "speed-sample-count";
 
@@ -200,6 +202,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_wave);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         viewGroup = (ViewGroup) findViewById(R.id.activity_wave);
         speedStrip = (ViewGroup) findViewById(R.id.speed_strip);
         final LayoutInflater inflater = (LayoutInflater) WaveActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);

@@ -30,14 +30,14 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.Fragment;
+import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager.widget.ViewPager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -158,8 +158,8 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         presetCursor = getAllPresets();
         historyCursor = getAllHistory();
 
-        presetsAdapter = new SvAdapter(getContext(), presetCursor, WorkoutContract.WorkoutEntry1.TABLE_NAME_PRESETS, this);
-        historyAdapter = new SvAdapter(getContext(), historyCursor, WorkoutContract.WorkoutEntry1.TABLE_NAME_HISTORY, this);
+        presetsAdapter = new SvAdapter(getContext(), presetCursor, WorkoutEntry1.TABLE_NAME_PRESETS, this);
+        historyAdapter = new SvAdapter(getContext(), historyCursor, WorkoutEntry1.TABLE_NAME_HISTORY, this);
 
         viewGroup = container;
 //        viewGroup.setBackgroundColor(color);
@@ -219,14 +219,14 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
 
         } else if (itemFunction == WaveActivity.WORKOUT_ITEM_FUNCTION) {
 
-            message = cursor.getString(cursor.getColumnIndex(WorkoutContract.WorkoutEntry1.COLUMN_NAME)) +
+            message = cursor.getString(cursor.getColumnIndex(WorkoutEntry1.COLUMN_NAME)) +
                     " : " +
                     "\n" +
-                    cursor.getString(cursor.getColumnIndex(WorkoutContract.WorkoutEntry1.COLUMN_SPP_CSV)) +
+                    cursor.getString(cursor.getColumnIndex(WorkoutEntry1.COLUMN_SPP_CSV)) +
                     " at " +
-                    cursor.getString(cursor.getColumnIndex(WorkoutContract.WorkoutEntry1.COLUMN_GEARS_CSV)) +
+                    cursor.getString(cursor.getColumnIndex(WorkoutEntry1.COLUMN_GEARS_CSV)) +
                     "\n" +
-                    cursor.getString(cursor.getColumnIndex(WorkoutContract.WorkoutEntry1.COLUMN_DESC));
+                    cursor.getString(cursor.getColumnIndex(WorkoutEntry1.COLUMN_DESC));
 
             LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             float density = getActivity().getResources().getDisplayMetrics().density;
@@ -257,13 +257,13 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
             stopBeeper();
 
             lastClickedEngageButton = view;
-            final String name = cursor.getString(cursor.getColumnIndex(WorkoutContract.WorkoutEntry1.COLUMN_NAME));
-            final String description = cursor.getString(cursor.getColumnIndex(WorkoutContract.WorkoutEntry1.COLUMN_DESC));
+            final String name = cursor.getString(cursor.getColumnIndex(WorkoutEntry1.COLUMN_NAME));
+            final String description = cursor.getString(cursor.getColumnIndex(WorkoutEntry1.COLUMN_DESC));
             final int sppType =
-                    cursor.getInt(cursor.getColumnIndex(WorkoutContract.WorkoutEntry1.COLUMN_SPP_TYPE));
+                    cursor.getInt(cursor.getColumnIndex(WorkoutEntry1.COLUMN_SPP_TYPE));
             lastWorkoutId = cursor.getInt(cursor.getColumnIndex(WorkoutEntry1._ID));
-            final String gearCSV = cursor.getString(cursor.getColumnIndex(WorkoutContract.WorkoutEntry1.COLUMN_GEARS_CSV));
-            final String sppCSV = cursor.getString(cursor.getColumnIndex(WorkoutContract.WorkoutEntry1.COLUMN_SPP_CSV));
+            final String gearCSV = cursor.getString(cursor.getColumnIndex(WorkoutEntry1.COLUMN_GEARS_CSV));
+            final String sppCSV = cursor.getString(cursor.getColumnIndex(WorkoutEntry1.COLUMN_SPP_CSV));
             final String[] gears = gearCSV.split("\\s*,\\s*");
             final String[] spp = sppCSV.split("\\s*,\\s*");
 
@@ -493,25 +493,25 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
     //TODO use getAllRows
     private Cursor getAllPresets() {
         return workoutDb.query(
-                WorkoutContract.WorkoutEntry1.TABLE_NAME_PRESETS,
+                WorkoutEntry1.TABLE_NAME_PRESETS,
                 null,
                 null,
                 null,
                 null,
                 null,
-                WorkoutContract.WorkoutEntry1.COLUMN_TIMESTAMP
+                WorkoutEntry1.COLUMN_TIMESTAMP
         );
     }
 
     public static Cursor getAllHistory() {
         return workoutDb.query(
-                WorkoutContract.WorkoutEntry1.TABLE_NAME_HISTORY,
+                WorkoutEntry1.TABLE_NAME_HISTORY,
                 null,
                 null,
                 null,
                 null,
                 null,
-                WorkoutContract.WorkoutEntry1.COLUMN_TIMESTAMP + " DESC"
+                WorkoutEntry1.COLUMN_TIMESTAMP + " DESC"
         );
     }
 
@@ -523,13 +523,13 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                 null,
                 null,
                 null,
-                WorkoutContract.WorkoutEntry1.COLUMN_TIMESTAMP
+                WorkoutEntry1.COLUMN_TIMESTAMP
         );
     }
 
     private Cursor getPreset(long position) {
         return workoutDb.query(
-                WorkoutContract.WorkoutEntry1.TABLE_NAME_PRESETS,
+                WorkoutEntry1.TABLE_NAME_PRESETS,
                 null,
                 WorkoutEntry1._ID + "=" + position,
                 null,
@@ -542,17 +542,17 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
     private long addHistory(SQLiteDatabase db, String name, String description,
                             String spp, String gears, int sppType) {
         ContentValues cv = new ContentValues();
-        cv.put(WorkoutContract.WorkoutEntry1.COLUMN_NAME, name);
-        cv.put(WorkoutContract.WorkoutEntry1.COLUMN_DESC, description);
-        cv.put(WorkoutContract.WorkoutEntry1.COLUMN_SPP_CSV, spp);
+        cv.put(WorkoutEntry1.COLUMN_NAME, name);
+        cv.put(WorkoutEntry1.COLUMN_DESC, description);
+        cv.put(WorkoutEntry1.COLUMN_SPP_CSV, spp);
         cv.put(WorkoutEntry1.COLUMN_GEARS_CSV, gears);
 //        cv.put(WorkoutEntry1.COLUMN_TIMESTAMP, time);
-        cv.put(WorkoutContract.WorkoutEntry1.COLUMN_SPP_TYPE, sppType);
-        return db.insert(WorkoutContract.WorkoutEntry1.TABLE_NAME_HISTORY, null, cv);
+        cv.put(WorkoutEntry1.COLUMN_SPP_TYPE, sppType);
+        return db.insert(WorkoutEntry1.TABLE_NAME_HISTORY, null, cv);
     }
 
     private boolean removeWorkout(long position, String tableName) {
-        return workoutDb.delete(tableName, WorkoutContract.WorkoutEntry1._ID + "=" + position, null) > 0;
+        return workoutDb.delete(tableName, WorkoutEntry1._ID + "=" + position, null) > 0;
     }
 
     private boolean requestLocation() {

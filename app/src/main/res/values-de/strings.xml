@@ -112,5 +112,6 @@ Einschränkungen unter der Lizenz.</string>
     <string name="welcome_text1">Willkommen!</string>
     <string name="agree">Zustimmen</string>
     <string name="not_fine">Ablehnen</string>
+    <string name="custom_sound_title">Benutzerdefinierter Klang</string>
 
 </resources>

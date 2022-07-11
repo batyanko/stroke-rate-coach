@@ -122,4 +122,8 @@ limitations under the License.</string>
     <string name="welcome_text2" translatable="false">" "</string>
     <string name="agree">Agree</string>
     <string name="not_fine">Disagree</string>
+<!--    <string name="beep_ringtone_setting_title">Custom Beep Sound</string>-->
+    <string name="custom_sound_title">Custom Beep Sound</string>
+    <string name="custom_sound" translatable="false">custom-sound</string>
+    <string name="custom_sound_path" translatable="false">custom-sound-path</string>
 </resources>
