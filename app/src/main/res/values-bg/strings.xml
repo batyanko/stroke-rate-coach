@@ -105,5 +105,11 @@
     <string name="welcome_text1">Добре дошли!</string>
     <string name="agree">Добре</string>
     <string name="not_fine">Отказвам</string>
-    <string name="custom_sound_title">Потребителски тон</string>
+    <string name="custom_sound_title">Потребителски тон (бета)</string>
+    <string name="help_location1">Достъп до местоположение</string>
+    <string name="help_location2">StrokeRateCoach може да използва вашето точно местоположение, което позволява тренировки, базирани на разстояние и измерване на скоростта.</string>
+    <string name="help_location3">Искате ли да активирате използването на местоположение?</string>
+    <string name="use_location_text">Вкл. позицициониране</string>
+    <string name="use_no_location_text">Изкл. Позициониране</string>
+    <string name="use_location_text_description">Нужно за измерване на скоростта и тренировки, базирани на разстояние.</string>
 </resources>

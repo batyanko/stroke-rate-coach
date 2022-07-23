@@ -28,7 +28,6 @@ import android.preference.PreferenceManager;
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
-import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.*;
@@ -54,6 +53,7 @@ import android.widget.PopupMenu;
 
 import com.batyanko.strokeratecoach.Fragments.SlideFragment;
 import com.batyanko.strokeratecoach.Utils.SpeedViewAdapter;
+import com.batyanko.strokeratecoach.Utils.WaveUtilities;
 import com.batyanko.strokeratecoach.sync.BeeperService;
 import com.batyanko.strokeratecoach.sync.BeeperServiceUtils;
 import com.batyanko.strokeratecoach.sync.BeeperTasks;
@@ -87,7 +87,10 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     public static final int MY_LOCATION_PERMISSION = 22;
 
     //Shared preferences
-    public static final String FIRST_RUN = "first-run";
+    public static final String NOT_AGREED = "not-agreed";
+    public static final String USE_LOC = "use-location";
+    public static final String REQUEST_LOC = "request-location";
+
     public static final String PHASE_LENGTH = "phase-length";
     public static final String WORKOUT_LENGTH = "workout-length";
     public static final String PHASE_PROGRESS = "phase-strokes-elapsed";
@@ -1019,7 +1022,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     private void animateSplash(long duration) {
 
         //first run splash handled at firstRunInit()
-        if (pref.getBoolean(FIRST_RUN, true)) return;
+        if (pref.getBoolean(NOT_AGREED, true)) return;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             countdownView.setVisibility(View.VISIBLE);
@@ -1169,7 +1172,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     }
 
     private void firstRunInit() {
-        if (pref.getBoolean(FIRST_RUN, true)) {
+        if (pref.getBoolean(NOT_AGREED, true)) {
 
             final LayoutInflater inflater = (LayoutInflater) WaveActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             final float density = WaveActivity.this.getResources().getDisplayMetrics().density;
@@ -1205,16 +1208,16 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
             agreeButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    pref.edit().putBoolean(FIRST_RUN, false).apply();
+                    pref.edit().putBoolean(NOT_AGREED, false).apply();
                     welcomePopupWindow.dismiss();
-                    animateSplash(3000);
+//                    animateSplash(3000);
 //                    requestLocation();
                 }
             });
             disagreeButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    pref.edit().putBoolean(FIRST_RUN, true).apply();
+                    pref.edit().putBoolean(NOT_AGREED, true).apply();
                     welcomePopupWindow.dismiss();
                 }
             });
@@ -1222,12 +1225,14 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
             welcomePopupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
                 @Override
                 public void onDismiss() {
-                    if (pref.getBoolean(FIRST_RUN, true)) {
+                    if (pref.getBoolean(NOT_AGREED, true)) {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                             WaveActivity.this.finishAffinity();
                         } else {
                             WaveActivity.this.finish();
                         }
+                    } else {
+                        locPopup();
                     }
                 }
             });
@@ -1237,6 +1242,60 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         }
     }
 
+    private void locPopup() {
+        final LayoutInflater inflater = (LayoutInflater) WaveActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View locationLayout = inflater.inflate(R.layout.location_layout, null);
+
+        final PopupWindow locPopupWindow = new PopupWindow(locationLayout, windowWidth, LinearLayout.LayoutParams.WRAP_CONTENT, true);
+        locPopupWindow.setBackgroundDrawable(
+                new ColorDrawable(pref.getInt(THEME_COLOR, getResources().getColor(R.color.backgroundLight))));
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            locPopupWindow.setElevation(100f);
+        } else {
+            int backgroundColor = (pref.getBoolean(THEME, THEME_LIGHT)) ?
+                    getResources().getColor(R.color.backgroundLight)
+                    :
+                    getResources().getColor(R.color.backgroundDark);
+            locPopupWindow.setBackgroundDrawable(
+                    new ColorDrawable(backgroundColor)
+            );
+        }
+
+        findViewById(R.id.activity_wave).post(new Runnable() {
+            @Override
+            public void run() {
+                countdownView.setAlpha(1f);
+                countdownView.setVisibility(View.VISIBLE);
+                locPopupWindow.showAtLocation(menuTextView, Gravity.CENTER, 0, 100);
+            }
+        });
+
+        Button agreeButton = locationLayout.findViewById(R.id.button_use_loc);
+        Button disagreeButton = locationLayout.findViewById(R.id.button_no_loc);
+        agreeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                pref.edit().putBoolean(USE_LOC, true).apply();
+                locPopupWindow.dismiss();
+                    WaveUtilities.requestLocation(WaveActivity.this);
+            }
+        });
+        disagreeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                pref.edit().putBoolean(USE_LOC, false).apply();
+                locPopupWindow.dismiss();
+            }
+        });
+
+        locPopupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                animateSplash(3000);
+            }
+        });
+    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {

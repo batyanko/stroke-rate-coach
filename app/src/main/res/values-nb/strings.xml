@@ -108,6 +108,12 @@ begrensninger under lisensen.</string>
     <string name="welcome_text1">Hei!</string>
     <string name="agree">Bra</string>
     <string name="not_fine">Ikke Bra</string>
-    <string name="custom_sound_title">Tilpasset lyd</string>
+    <string name="custom_sound_title">Tilpasset lyd (beta)</string>
+    <string name="help_location1">Tilgang til plassering</string>
+    <string name="help_location2">StrokeRateCoach kan få tilgang til din nøyaktige plassering for å aktivere avstandsbaserte treningsøkter og hastighetsindikering.</string>
+    <string name="help_location3">Vil du aktivere plasseringsbruk?</string>
+    <string name="use_location_text">Bruke Plasering</string>
+    <string name="use_no_location_text">Ikke Bruke Plasering</string>
+    <string name="use_location_text_description">Nødvendig for hastighetsmåling og avstandstrening.</string>
 
 </resources>

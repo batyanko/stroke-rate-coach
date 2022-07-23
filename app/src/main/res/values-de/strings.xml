@@ -112,6 +112,12 @@ Einschränkungen unter der Lizenz.</string>
     <string name="welcome_text1">Willkommen!</string>
     <string name="agree">Zustimmen</string>
     <string name="not_fine">Ablehnen</string>
-    <string name="custom_sound_title">Benutzerdefinierter Klang</string>
+    <string name="custom_sound_title">Benutzerdefinierter Klang (beta)</string>
+    <string name="help_location1">Standortzugriff</string>
+    <string name="help_location2">StrokeRateCoach kann auf Ihren genauen Standort zugreifen, um streckenbasierte Trainingseinheiten und Geschwindigkeitsangaben zu ermöglichen.</string>
+    <string name="help_location3">Möchten Sie die Standortzugang aktivieren?</string>
+    <string name="use_location_text">Position Zugreifen</string>
+    <string name="use_no_location_text">Position nicht Zugreifen</string>
+    <string name="use_location_text_description">Notwendig für Geschwindigkeitsmessung und Distanztraining.</string>
 
 </resources>

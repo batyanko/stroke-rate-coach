@@ -1,7 +1,14 @@
 package com.batyanko.strokeratecoach.Utils;
 
+import static com.batyanko.strokeratecoach.WaveActivity.MY_LOCATION_PERMISSION;
+
+import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.util.Log;
 import android.widget.Toast;
+
+import androidx.core.app.ActivityCompat;
 
 /**
  * Created by yanko on 6/12/17.
@@ -10,6 +17,20 @@ import android.widget.Toast;
 public class WaveUtilities {
     private static Toast mToast;
 
+    public static void requestLocation(Activity activity) {
+        Log.d("ITSA ME", "MARIO");
+        PackageManager manager = activity.getPackageManager();
+        int permission = manager.checkPermission("android.permission.ACCESS_FINE_LOCATION",
+                "com.batyanko.strokeratecoach");
+        boolean hasPermission = (permission == PackageManager.PERMISSION_GRANTED);
+//
+        if (!hasPermission) {
+            ActivityCompat.requestPermissions(activity,
+                    new String[]{"android.permission.ACCESS_FINE_LOCATION"}, MY_LOCATION_PERMISSION);
+        }
+        Log.d("REQUESTED LOCATION", "");
+    }
+
     public static void showShortToast (String string, Context context) {
         if (mToast != null) {
             mToast.cancel();
@@ -17,6 +38,7 @@ public class WaveUtilities {
         mToast = Toast.makeText(context, string, Toast.LENGTH_SHORT);
         mToast.show();
     }
+
     public void showLongToast (String string, Context context) {
         if (mToast != null) {
             mToast.cancel();

@@ -30,6 +30,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
@@ -38,6 +39,8 @@ import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -443,9 +446,11 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         intent.putExtra(BeeperTasks.EXTRA_WORKOUT_GEARS, gearSettings);
         intent.putExtra(BeeperTasks.EXTRA_WORKOUT_SPP_TYPE, sppType);
 
-        if (requestLocation()) {
+//        if (requestLocation()) {
+//            Log.d("HAS PERMISSON", "HAS LOCATION");
             startBeeper();
-        };
+//        }
+        ;
     }
 
     public void startBeeper() {
@@ -555,16 +560,5 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         return workoutDb.delete(tableName, WorkoutEntry1._ID + "=" + position, null) > 0;
     }
 
-    private boolean requestLocation() {
-        PackageManager manager = getActivity().getPackageManager();
-        int permission = manager.checkPermission("android.permission.ACCESS_FINE_LOCATION",
-                "com.batyanko.strokeratecoach");
-        boolean hasPermission = (permission == PackageManager.PERMISSION_GRANTED);
-//
-        if (!hasPermission) {
-            ActivityCompat.requestPermissions(getActivity(),
-                    new String[]{"android.permission.ACCESS_FINE_LOCATION"}, MY_LOCATION_PERMISSION);
-        }
-        return hasPermission;
-    }
+
 }

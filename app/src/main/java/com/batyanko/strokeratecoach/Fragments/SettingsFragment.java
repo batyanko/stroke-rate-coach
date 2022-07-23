@@ -1,11 +1,9 @@
 package com.batyanko.strokeratecoach.Fragments;
 
-import static com.batyanko.strokeratecoach.WaveActivity.CUSTOM_SOUND;
 import static com.batyanko.strokeratecoach.WaveActivity.CUSTOM_SOUND_PATH;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
@@ -13,6 +11,8 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.batyanko.strokeratecoach.R;
+import com.batyanko.strokeratecoach.Utils.WaveUtilities;
+import com.batyanko.strokeratecoach.WaveActivity;
 
 /**
  * Created by yankog on 14.01.18.
@@ -24,7 +24,17 @@ public class SettingsFragment extends PreferenceFragment {
         super.onCreate(savedInstanceState);
 
         addPreferencesFromResource(R.xml.preferences);
+        Preference requestLocation = findPreference(WaveActivity.REQUEST_LOC);
         Preference filePicker = findPreference("filePicker");
+
+        requestLocation.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                WaveUtilities.requestLocation(getActivity());
+                return true;
+            }
+        });
+
         filePicker.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {

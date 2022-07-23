@@ -116,14 +116,21 @@ limitations under the License.</string>
     <string name="help_privacy3">To enable distance and speed measurement, the StrokeRateCoach app makes temporary use of your precise location.
         This location information is neither stored on persistent storage nor disclosed to third parties.</string>
     <string name="help_privacy4"> The StrokeRateCoach app uses no internet connection.</string>
+    <string name="help_location1">Location Access</string>
+    <string name="help_location2">StrokeRateCoach can access your precise location to enable distance-based workouts and speed indication.</string>
+    <string name="help_location3">Do you want to enable location usage?</string>
     <string name="about_title">About</string>
     <string name="main_notification_channel_name">Primary</string>
     <string name="welcome_text1">Hi there!</string>
     <string name="welcome_text2" translatable="false">" "</string>
     <string name="agree">Agree</string>
     <string name="not_fine">Disagree</string>
-<!--    <string name="beep_ringtone_setting_title">Custom Beep Sound</string>-->
-    <string name="custom_sound_title">Custom Beep Sound</string>
+    <string name="use_location_text">Use Location</string>
+    <string name="use_no_location_text">Don\'t Use Location</string>
+    <string name="use_location_text_description">Necessary for speed measurement and distance workouts.</string>
+    <!--    <string name="beep_ringtone_setting_title">Custom Beep Sound</string>-->
+    <string name="custom_sound_title">Custom Beep Sound (beta)</string>
+    <string name="request_location" translatable="false">request-location</string>
     <string name="custom_sound" translatable="false">custom-sound</string>
     <string name="custom_sound_path" translatable="false">custom-sound-path</string>
 </resources>
