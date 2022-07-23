@@ -92,11 +92,19 @@ public class NotificationUtils {
 
     private static PendingIntent contentIntent(Context context) {
         Intent startActivityIntent = new Intent(context, WaveActivity.class);
-        return PendingIntent.getActivity(
-                context,
-                WORKOUT_PENDING_INTENT_ID,
-                startActivityIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return PendingIntent.getActivity(
+                    context,
+                    WORKOUT_PENDING_INTENT_ID,
+                    startActivityIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        } else {
+            return PendingIntent.getActivity(
+                    context,
+                    WORKOUT_PENDING_INTENT_ID,
+                    startActivityIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT);
+        }
     }
 
     //TODO add stop action
