@@ -90,7 +90,7 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
 
         //Get style background color
         typedValue = new TypedValue();
-        mContext.getTheme().resolveAttribute(R.attr.colorBackgroundFloating, typedValue, true);
+        mContext.getTheme().resolveAttribute(androidx.appcompat.R.attr.colorBackgroundFloating, typedValue, true);
         color = typedValue.data;
     }
 
@@ -135,10 +135,9 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
         private TextView workoutTime;
         private TextView workoutDate;
         private TextView workoutDesc;
-        private Button delButton;
+//        private Button delButton;
         private ImageView engageButton;
-        private final int descId;
-        private final int favButtonId;
+//        private final int delButtonId;
         private final int engageButtonId;
 
 
@@ -149,11 +148,9 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
             workoutTime = (TextView) itemView.findViewById(R.id.workout_time);
             workoutDate = (TextView) itemView.findViewById(R.id.workout_date);
             workoutDesc = (TextView) itemView.findViewById(R.id.exercise_desc);
-            delButton = (Button) itemView.findViewById(R.id.del_button);
+//            delButton = (Button) itemView.findViewById(R.id.del_button);
             engageButton = (ImageView) itemView.findViewById(R.id.engage_button);
-            //TODO Make sure IDs are unique?
-            descId = workoutDesc.getId();
-            favButtonId = delButton.getId();
+//            delButtonId = delButton.getId();
             engageButtonId = engageButton.getId();
         }
 
@@ -162,16 +159,16 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
             long clickedTag = (long) itemView.getTag();
             int clickedPosition = getAdapterPosition();
             int viewId = view.getId();
-            if (viewId == favButtonId) {
-                mOnClickListener.onListItemClick(
-                        view,
-                        clickedTag,
-                        clickedPosition,
-                        tableName,
-                        gottenCursor,
-                        WaveActivity.DEL_BUTTON_FUNCTION
-                );
-            } else if (viewId == engageButtonId) {
+//            if (viewId == delButtonId) {
+//                mOnClickListener.onListItemClick(
+//                        view,
+//                        clickedTag,
+//                        clickedPosition,
+//                        tableName,
+//                        gottenCursor,
+//                        WaveActivity.DEL_BUTTON_FUNCTION
+//                );
+            if (viewId == engageButtonId) {
                 mOnClickListener.onListItemClick(
                         view,
                         clickedTag,
@@ -180,7 +177,7 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
                         gottenCursor,
                         WaveActivity.ENGAGE_WORKOUT_FUNCTION
                 );
-            } else /*if (viewId == descId)*/ {
+            } else {
                 mOnClickListener.onListItemClick(
                         view,
                         clickedTag,
@@ -202,15 +199,15 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
 
             if (workoutIsRunning && gottenCursor
                     .getInt(gottenCursor.getColumnIndex(WorkoutContract.WorkoutEntry1._ID)) == workoutId) {
-                engageButton.setBackgroundResource(R.drawable.ic_play_2_negative);
+                engageButton.setBackgroundResource(R.drawable.ic_play_3_negative);
 
             } else {
 //                engageButton.setBackgroundResource(android.R.drawable.ic_media_play);
-                engageButton.setBackgroundResource(R.drawable.ic_play_2_new);
+                engageButton.setBackgroundResource(R.drawable.ic_play_3);
             }
 //            delButton.setBackgroundResource(R.drawable.dialog_ic_close_focused_holo_light);
-            delButton.setBackgroundResource(R.drawable.ic_delete);
-            delButton.setOnClickListener(this);
+//            delButton.setBackgroundResource(R.drawable.ic_delete);
+//            delButton.setOnClickListener(this);
             workoutDesc.setOnClickListener(this);
             engageButton.setOnClickListener(this);
             itemView.setOnClickListener(this);

@@ -25,12 +25,14 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.*;
+
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -80,9 +82,9 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     public static final int WORKOUT_STOP = 0;
 
     //Workout item function IDs
-    public static final int DEL_BUTTON_FUNCTION = 1;
-    public static final int WORKOUT_ITEM_FUNCTION = 2;
-    public static final int ENGAGE_WORKOUT_FUNCTION = 3;
+    public static int DEL_BUTTON_FUNCTION = 1;
+    public static int WORKOUT_ITEM_FUNCTION = 2;
+    public static int ENGAGE_WORKOUT_FUNCTION = 3;
 
     public static final int MY_LOCATION_PERMISSION = 22;
 
@@ -539,6 +541,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     @Override
     protected void onStart() {
         super.onStart();
+//        WaveActivity act = WaveActivity.this;
         onProgressChange();
     }
 
@@ -1278,7 +1281,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
             public void onClick(View view) {
                 pref.edit().putBoolean(USE_LOC, true).apply();
                 locPopupWindow.dismiss();
-                    WaveUtilities.requestLocation(WaveActivity.this);
+                WaveUtilities.requestLocation(WaveActivity.this);
             }
         });
         disagreeButton.setOnClickListener(new View.OnClickListener() {

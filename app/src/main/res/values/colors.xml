@@ -15,7 +15,7 @@
 
     <color name="blueAppColor">@android:color/holo_blue_light</color>
     <color name="blueAppColorLight">#bb33b5e5</color>
-    ff33b5e5
+
 <!--
     <color name="holo_blue_light">#ff33b5e5</color>
     <color name="holo_blue_dark">#ff0099cc</color>

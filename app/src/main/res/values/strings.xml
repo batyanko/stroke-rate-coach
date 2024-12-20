@@ -22,6 +22,7 @@
     <string name="default_kph" translatable="false">000.0 hours/hour</string>
     <string name="use_metric_units" translatable="false">Use metric units?</string>
     <string name="create_workout_button_label">Create workout</string>
+    <string name="edit_workout_button_label">Edit workout</string>
     <string name="speed_label">Speed</string>
     <string name="min_speed_label">Min Speed</string>
 
@@ -133,4 +134,7 @@ limitations under the License.</string>
     <string name="request_location" translatable="false">request-location</string>
     <string name="custom_sound" translatable="false">custom-sound</string>
     <string name="custom_sound_path" translatable="false">custom-sound-path</string>
+    <string name="engage_workout">Engage workout</string>
+    <string name="edit_workout">Edit workout</string>
+    <string name="delete_workout">Delete workout</string>
 </resources>

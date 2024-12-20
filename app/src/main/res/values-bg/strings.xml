@@ -112,4 +112,5 @@
     <string name="use_location_text">Вкл. позицициониране</string>
     <string name="use_no_location_text">Изкл. Позициониране</string>
     <string name="use_location_text_description">Нужно за измерване на скоростта и тренировки, базирани на разстояние.</string>
+    <string name="engage_workout">Старт тренировка</string>
 </resources>

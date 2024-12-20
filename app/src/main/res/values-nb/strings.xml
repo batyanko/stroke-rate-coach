@@ -115,5 +115,6 @@ begrensninger under lisensen.</string>
     <string name="use_location_text">Bruke Plasering</string>
     <string name="use_no_location_text">Ikke Bruke Plasering</string>
     <string name="use_location_text_description">Nødvendig for hastighetsmåling og avstandstrening.</string>
+    <string name="engage_workout">Trening start</string>
 
 </resources>

@@ -55,7 +55,7 @@ public class DialGridAdapter extends BaseAdapter {
 
         //Get style background color
         typedValue = new TypedValue();
-        mContext.getTheme().resolveAttribute(R.attr.colorBackgroundFloating, typedValue, true);
+        mContext.getTheme().resolveAttribute(androidx.appcompat.R.attr.colorBackgroundFloating, typedValue, true);
         color = typedValue.data;
     }
 

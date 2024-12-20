@@ -57,6 +57,7 @@ public class BeeperTasks {
     public static final String EXTRA_WORKOUT_SPP = "workout_spp";   //Units per phase
     public static final String EXTRA_WORKOUT_GEARS = "workout_gears";
     public static final String EXTRA_WORKOUT_SPP_TYPE = "workout-spp-type";
+    public static final String EXTRA_WORKOUT_ID = "workout-id";
     public static final String ACTION_START_BEEP = "start-beep";
     public static final String ACTION_STOP_BEEP = "stop-beep";
     public static final String ACTION_CHECK_SERVICE = "check-service";

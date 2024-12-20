@@ -41,6 +41,7 @@ import android.widget.TextView;
 import com.batyanko.strokeratecoach.Speed.CLocation;
 import com.batyanko.strokeratecoach.Speed.IBaseGpsListener;
 
+// TODO delete
 public class SpeedActivity extends AppCompatActivity implements IBaseGpsListener {
 
     private static final int MY_LOCATION_PERMISSION = 22;

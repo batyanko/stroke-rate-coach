@@ -29,12 +29,12 @@
     <string name="gear_title_text">mit</string>
     <string name="workout_desc_tooltip">Beschreibung (optional)</string>
     <string name="speed_dial_title">Kurzwahl</string>
-    <string name="workouts_title">Übungen</string>
+    <string name="workouts_title">Trainings</string>
     <string name="history_title">Verlauf</string>
     <string name="minimum_speed_warning">Geschwindigkeitsalarm</string>
     <string name="speed_unit_mps">m/s</string>
     <string name="speed_unit_500m">/500m</string>
-    <string name="entry_form_label">Übung erstellen</string>
+    <string name="entry_form_label">Training erstellen</string>
     <string name="missing_workout_type_warning">Wählen Sie bitte eine Maßeinheit (Schlagzahl, Meter, Sekunden)</string>
     <string name="empty_workout_warning">Leere Übung nicht erstellt.</string>
     <string name="empty_data_notification">Leere Strecken werden ausgelassen…</string>
@@ -119,5 +119,6 @@ Einschränkungen unter der Lizenz.</string>
     <string name="use_location_text">Position Zugreifen</string>
     <string name="use_no_location_text">Position nicht Zugreifen</string>
     <string name="use_location_text_description">Notwendig für Geschwindigkeitsmessung und Distanztraining.</string>
+    <string name="engage_workout">Training starten</string>
 
 </resources>

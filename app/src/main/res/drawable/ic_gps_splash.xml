@@ -11,6 +11,7 @@
         <path
             android:fillColor="#ff33b5e5"
             android:pathData="M 0 200 L 1000 200 L 1000 201 L 0 201z" />
+<!--        TODO color constant-->
         <path
             android:fillColor="#ff33b5e5"
             android:pathData="M 0 400 L 1000 400 L 1000 401 L 0 401z" />

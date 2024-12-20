@@ -35,6 +35,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -52,6 +53,7 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.batyanko.strokeratecoach.EntryFormActivity;
 import com.batyanko.strokeratecoach.R;
 import com.batyanko.strokeratecoach.Sliding.*;
 import com.batyanko.strokeratecoach.Utils.DialGridAdapter;
@@ -68,6 +70,7 @@ import com.batyanko.strokeratecoach.sync.BeeperTasks;
 import static com.batyanko.strokeratecoach.WaveActivity.MY_LOCATION_PERMISSION;
 import static com.batyanko.strokeratecoach.WaveActivity.THEME_COLOR;
 import static com.batyanko.strokeratecoach.WaveActivity.windowWidth;
+import static com.batyanko.strokeratecoach.sync.BeeperTasks.EXTRA_WORKOUT_ID;
 
 
 /**
@@ -122,6 +125,9 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
      */
     private ViewPager mViewPager;
     private View workoutInfoLayout;
+    private View workoutCopyButton;
+    private View workoutEditButton;
+    private View workoutDelButton;
     private PopupWindow descPopupWindow;
     private TextView descPopupTextView;
 
@@ -208,19 +214,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         }
         String message;
 
-        if (itemFunction == WaveActivity.DEL_BUTTON_FUNCTION) {
-//            Toast.makeText(getActivity(), "Removing entry...", Toast.LENGTH_SHORT).show();
-            WaveUtilities.showShortToast("Removing entry...", getContext());
-            removeWorkout(clickedItemId, tableName);
-
-            //refresh ScrollView after DB update
-            if (tableName.equals(WorkoutEntry1.TABLE_NAME_PRESETS)) {
-                presetsAdapter.swapCursor(getAllPresets(), workoutIsRunning, lastWorkoutId);
-            } else if (tableName.equals(WorkoutEntry1.TABLE_NAME_HISTORY)) {
-                historyAdapter.swapCursor(getAllHistory(), workoutIsRunning, lastWorkoutId);
-            }
-
-        } else if (itemFunction == WaveActivity.WORKOUT_ITEM_FUNCTION) {
+        if (itemFunction == WaveActivity.WORKOUT_ITEM_FUNCTION) { // Tap anywhere on workout
 
             message = cursor.getString(cursor.getColumnIndex(WorkoutEntry1.COLUMN_NAME)) +
                     " : " +
@@ -234,6 +228,9 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
             LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             float density = getActivity().getResources().getDisplayMetrics().density;
             workoutInfoLayout = inflater.inflate(R.layout.workout_info_layout, null);
+            workoutDelButton = workoutInfoLayout.findViewById(R.id.delete_button_inside);
+            workoutEditButton = workoutInfoLayout.findViewById(R.id.edit_button);
+            workoutCopyButton = workoutInfoLayout.findViewById(R.id.copy_button);
             descPopupTextView = workoutInfoLayout.findViewById(R.id.popup_desc_text_view);
             descPopupTextView.setText(message);
             descPopupWindow = new PopupWindow(workoutInfoLayout, windowWidth, LinearLayout.LayoutParams.WRAP_CONTENT, true);
@@ -241,12 +238,45 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                     new ColorDrawable(pref.getInt(THEME_COLOR, getResources().getColor(R.color.backgroundLight)))
             );
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                descPopupWindow.setElevation(100f);
-            }
+            descPopupWindow.setElevation(100f);
 
-//            descPopupWindow.showAsDropDown(view);
             descPopupWindow.showAtLocation(workoutInfoLayout, Gravity.CENTER, 0, (int) density * 100);
+
+            workoutEditButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    String wId = cursor.getString(cursor.getColumnIndex(WorkoutEntry1._ID));
+//                    WaveActivity act = (WaveActivity) SlideFragment.super.getActivity();
+//                    cursor.close();
+//                    workoutDb.close();
+                    intent = new Intent(getActivity(), EntryFormActivity.class);
+                    intent.putExtra(EXTRA_WORKOUT_ID, wId);
+                    startActivity(intent);
+//                    return true;
+                }
+            });
+            workoutCopyButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    WaveUtilities.showShortToast("Not implemented, sorry", getContext());
+                }
+            });
+            workoutDelButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    //            TODO Confirm Delete!
+                    WaveUtilities.showShortToast("Removing entry...", getContext());
+                    removeWorkout(clickedItemId, tableName);
+
+                    //refresh ScrollView after DB update
+                    if (tableName.equals(WorkoutEntry1.TABLE_NAME_PRESETS)) {
+                        presetsAdapter.swapCursor(getAllPresets(), workoutIsRunning, lastWorkoutId);
+                    } else if (tableName.equals(WorkoutEntry1.TABLE_NAME_HISTORY)) {
+                        historyAdapter.swapCursor(getAllHistory(), workoutIsRunning, lastWorkoutId);
+                    }
+                    descPopupWindow.dismiss();
+                }
+            });
 
             workoutInfoLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -254,7 +284,6 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                     descPopupWindow.dismiss();
                 }
             });
-//            Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
 
         } else if (itemFunction == WaveActivity.ENGAGE_WORKOUT_FUNCTION) {
             stopBeeper();
@@ -283,9 +312,11 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
             }
 
             //Update History db table
-            lastClickedEngageButton.setBackgroundResource(R.drawable.ic_play_2_negative);
+            lastClickedEngageButton.setBackgroundResource(R.drawable.ic_play_3_negative);
             addHistory(workoutDb, name, description, sppCSV, gearCSV, sppType);
             historyAdapter.swapCursor(getAllHistory(), true, lastWorkoutId);
+
+            // Start beeping?
             initIntent(sppInts, gearInts, sppType);
         }
     }
@@ -448,7 +479,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
 
 //        if (requestLocation()) {
 //            Log.d("HAS PERMISSON", "HAS LOCATION");
-            startBeeper();
+        startBeeper();
 //        }
         ;
     }
@@ -463,7 +494,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
     public void stopBeeper() {
         pref.edit().putInt(WaveActivity.OPERATION_SETTING, WaveActivity.WORKOUT_STOP).apply();
         if (lastClickedEngageButton != null) {
-            lastClickedEngageButton.setBackgroundResource(R.drawable.ic_play_2_new);
+            lastClickedEngageButton.setBackgroundResource(R.drawable.ic_play_3);
         }
 
         mBeeperService = BeeperServiceUtils.getBeeperService();
