@@ -22,13 +22,14 @@ package com.batyanko.strokeratecoach.Utils;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+
 import androidx.annotation.ColorInt;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -72,7 +73,8 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
     private int workoutId;
 
     TypedValue typedValue;
-    @ColorInt int color;
+    @ColorInt
+    int color;
 
     public interface ListItemClickListener {
         void onListItemClick(View vie, long clickedItemIndex, int position, String tableName, Cursor cursor, int itemFunction);
@@ -109,7 +111,7 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
     public ExerciseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
         Context context = parent.getContext();
-        int layoutIdForListItem = R.layout.exercise_item;
+        int layoutIdForListItem = R.layout.preset_item;
         LayoutInflater inflater = LayoutInflater.from(context); //TODO use mContext
         boolean shouldAttachToParentImmediately = false;
 
@@ -135,9 +137,9 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
         private TextView workoutTime;
         private TextView workoutDate;
         private TextView workoutDesc;
-//        private Button delButton;
+        //        private Button delButton;
         private ImageView engageButton;
-//        private final int delButtonId;
+        //        private final int delButtonId;
         private final int engageButtonId;
 
 
@@ -159,15 +161,6 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
             long clickedTag = (long) itemView.getTag();
             int clickedPosition = getAdapterPosition();
             int viewId = view.getId();
-//            if (viewId == delButtonId) {
-//                mOnClickListener.onListItemClick(
-//                        view,
-//                        clickedTag,
-//                        clickedPosition,
-//                        tableName,
-//                        gottenCursor,
-//                        WaveActivity.DEL_BUTTON_FUNCTION
-//                );
             if (viewId == engageButtonId) {
                 mOnClickListener.onListItemClick(
                         view,
@@ -199,11 +192,11 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
 
             if (workoutIsRunning && gottenCursor
                     .getInt(gottenCursor.getColumnIndex(WorkoutContract.WorkoutEntry1._ID)) == workoutId) {
-                engageButton.setBackgroundResource(R.drawable.ic_play_3_negative);
+                engageButton.setBackgroundResource(R.drawable.ic_play_4_negative);
 
             } else {
 //                engageButton.setBackgroundResource(android.R.drawable.ic_media_play);
-                engageButton.setBackgroundResource(R.drawable.ic_play_3);
+                engageButton.setBackgroundResource(R.drawable.ic_play_4);
             }
 //            delButton.setBackgroundResource(R.drawable.dialog_ic_close_focused_holo_light);
 //            delButton.setBackgroundResource(R.drawable.ic_delete);
@@ -232,12 +225,12 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
 
                 long localOffset = TimeZone.getDefault().getOffset(currentEpoch);
                 //Current local time?
-                    localDate = sdfDate.format(currentEpoch + localOffset);
-                    localTime = sdfTime.format(currentEpoch + localOffset);
+                localDate = sdfDate.format(currentEpoch + localOffset);
+                localTime = sdfTime.format(currentEpoch + localOffset);
 
-                switch (gottenCursor.getInt(gottenCursor.getColumnIndex(COLUMN_SPP_TYPE))) {
+                switch (gottenCursor.getString(gottenCursor.getColumnIndex(COLUMN_SPP_TYPE))) {
                     case BeeperTasks.SPP_TYPE_STROKES: {
-                        sppType = "" + mContext.getString(R.string.strokes)+ "";
+                        sppType = "" + mContext.getString(R.string.strokes) + "";
                         break;
                     }
                     case BeeperTasks.SPP_TYPE_METERS: {

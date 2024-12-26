@@ -111,7 +111,7 @@ public class WorkoutDBHelper extends SQLiteOpenHelper {
     }
 
     private long addPreset(SQLiteDatabase db, String name, String description,
-                           String spp, String gears, int sppType) {
+                           String spp, String gears, String sppType) {
         ContentValues cv = new ContentValues();
         cv.put(WorkoutEntry1.COLUMN_NAME, name);
         cv.put(WorkoutEntry1.COLUMN_DESC, description);

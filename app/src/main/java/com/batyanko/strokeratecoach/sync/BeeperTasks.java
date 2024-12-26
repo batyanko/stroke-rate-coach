@@ -66,9 +66,9 @@ public class BeeperTasks {
     public static final String ACTION_STOP_WARNING = "stop-warning";
 
     //SPP (strokes or stuff per phase) unit types
-    public static final int SPP_TYPE_STROKES = 0;
-    public static final int SPP_TYPE_METERS = 1;
-    public static final int SPP_TYPE_SECONDS = 2;
+    public static final String SPP_TYPE_STROKES = "0";
+    public static final String SPP_TYPE_METERS = "1";
+    public static final String SPP_TYPE_SECONDS = "2";
 
     //VALUES FROM WaveActivity
 
@@ -107,7 +107,7 @@ public class BeeperTasks {
     private static int workoutProgress;
     private static int workoutLength;       //Length (in strokes, meters or seconds)
 
-    private int mSppType;
+    private String mSppType;
 
     private static int[] sppSettings;
 
@@ -156,7 +156,7 @@ public class BeeperTasks {
     private static boolean warningIsRunning = false;
 
     void executeTask(BeeperService beeperService, String action,
-                     int[] sppSettings, int[] gearSettings, int sppType) {
+                     int[] sppSettings, int[] gearSettings, String sppType) {
         if (action.equals(ACTION_START_BEEP)) {
             NotificationUtils.showWorkoutNotification(beeperService);
             mSppType = sppType;

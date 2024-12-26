@@ -1,0 +1,51 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="1695"
+    android:viewportHeight="1695.9153">
+    <group
+        android:translateX="250.45764"
+        android:translateY="320.45764">
+
+        <group
+            android:translateX="380"
+            android:translateY="450">
+            <path
+                android:pathData="M9.5,7.5l0,9l7,-4.5z"
+                android:strokeWidth="680"
+                android:strokeColor="#ff0099cc" />
+        </group>
+
+        <group
+            android:translateX="380"
+            android:translateY="450">
+            <path
+                android:pathData="M9.5,7.5l0,9l7,-4.5z"
+                android:strokeWidth="580"
+                android:strokeColor="@color/colorAccent" />
+        </group>
+
+        <!--Oar-->
+        <group
+            android:scaleX="3.5"
+            android:scaleY="3.5"
+            android:translateX="-1750"
+            android:translateY="610">
+            <group
+                android:pivotX="5"
+                android:pivotY="52"
+                android:rotation="0"
+                android:scaleX="1.5"
+                android:scaleY="1.9">
+                <group android:translateX="50">
+                    <path
+                        android:fillColor="@color/colorAccent"
+                        android:pathData="M512 14.4244C479.675 18.6669 447.968 22.4026 416 29.4244C399.036 33.1506 381.528 40.8621 364.424 42.9776C329.493 47.2982 291.091 42.8743 256 42.0147C209.344 40.8717 162.59 43.0795 116 41.0394C89.1114 39.8619 61.9169 41 35 41C27.3307 41 10.2214 37.7383 3.6034 41.6034C0.583506 43.3671 1.59519 53.8484 2.14815 56.8519C3.41188 63.7159 24.6922 61 30 61L122 61L284 61C309.847 61 338.438 57.5232 364 61.2099C376.802 63.0563 387.351 74.8887 394.11 85C396.706 88.8824 399.027 97.342 403.39 99.3966C411.42 103.177 425.295 101 434 101C458.111 101 482.007 101.132 506 98.8302C511.878 98.2663 532.472 97.751 535.686 92.2724C538.115 88.1322 533.847 77.5026 533.081 73C530.753 59.3096 528.123 45.6176 525.4 32C524.504 27.52 524.518 19.2442 521.683 15.6034C519.664 13.011 514.766 14.0614 512 14.4244z" />
+                </group>
+            </group>
+        </group>
+
+
+    </group>
+
+</vector>

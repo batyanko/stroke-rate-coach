@@ -39,7 +39,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="EDIT"
-                android:textSize="@dimen/help_text_size_medium" />
+                android:textSize="@dimen/text_size_medium" />
         </LinearLayout>
 
 
@@ -62,7 +62,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="COPY"
-                android:textSize="@dimen/help_text_size_medium" />
+                android:textSize="@dimen/text_size_medium" />
         </LinearLayout>
 
         <LinearLayout
@@ -84,7 +84,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="DELETE"
-                android:textSize="@dimen/help_text_size_medium" />
+                android:textSize="@dimen/text_size_medium" />
         </LinearLayout>
     </LinearLayout>
 

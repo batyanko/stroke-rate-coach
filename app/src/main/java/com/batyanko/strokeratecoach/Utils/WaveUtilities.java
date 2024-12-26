@@ -31,7 +31,7 @@ public class WaveUtilities {
         Log.d("REQUESTED LOCATION", "");
     }
 
-    public static void showShortToast (String string, Context context) {
+    public static void ShowShortToast (String string, Context context) {
         if (mToast != null) {
             mToast.cancel();
         }
@@ -39,7 +39,7 @@ public class WaveUtilities {
         mToast.show();
     }
 
-    public void showLongToast (String string, Context context) {
+    public static void ShowLongToast (String string, Context context) {
         if (mToast != null) {
             mToast.cancel();
         }

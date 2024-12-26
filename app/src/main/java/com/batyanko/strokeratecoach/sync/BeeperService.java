@@ -24,6 +24,7 @@ import android.content.Intent;
 import android.location.LocationManager;
 import android.os.Binder;
 import android.os.IBinder;
+
 import androidx.annotation.Nullable;
 
 import com.batyanko.strokeratecoach.Utils.NotificationUtils;
@@ -58,7 +59,7 @@ public class BeeperService extends NonStopIntentService {
 
         int[] workoutSpp = intent.getIntArrayExtra(BeeperTasks.EXTRA_WORKOUT_SPP);
         int[] workoutGears = intent.getIntArrayExtra(BeeperTasks.EXTRA_WORKOUT_GEARS);
-        int sppType = intent.getIntExtra(BeeperTasks.EXTRA_WORKOUT_SPP_TYPE, 1);
+        String sppType = intent.getStringExtra(BeeperTasks.EXTRA_WORKOUT_SPP_TYPE);
 
         beeperTasks.executeTask(this, action, workoutSpp, workoutGears, sppType);
     }
@@ -89,20 +90,20 @@ public class BeeperService extends NonStopIntentService {
         beeperTasks = new BeeperTasks();
         int[] workoutSpp = intent.getIntArrayExtra(BeeperTasks.EXTRA_WORKOUT_SPP);
         int[] workoutGears = intent.getIntArrayExtra(BeeperTasks.EXTRA_WORKOUT_GEARS);
-        int sppType = intent.getIntExtra(BeeperTasks.EXTRA_WORKOUT_SPP_TYPE, 1);
+        String sppType = intent.getStringExtra(BeeperTasks.EXTRA_WORKOUT_SPP_TYPE);
 
         beeperTasks.executeTask(this, action, workoutSpp, workoutGears, sppType);
     }
 
     @Override
     public boolean stopService(Intent name) {
-        beeperTasks.executeTask(this, BeeperTasks.ACTION_STOP_BEEP, null, null, 0);
+        beeperTasks.executeTask(this, BeeperTasks.ACTION_STOP_BEEP, null, null, BeeperTasks.SPP_TYPE_STROKES);
         return super.stopService(name);
     }
 
     @Override
     public void onDestroy() {
-        beeperTasks.executeTask(this, BeeperTasks.ACTION_STOP_BEEP, null, null, 0);
+        beeperTasks.executeTask(this, BeeperTasks.ACTION_STOP_BEEP, null, null, BeeperTasks.SPP_TYPE_STROKES);
         stopSelf();
         super.onDestroy();
     }

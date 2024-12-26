@@ -22,7 +22,7 @@
     <string name="default_kph" translatable="false">000.0 hours/hour</string>
     <string name="use_metric_units" translatable="false">Use metric units?</string>
     <string name="create_workout_button_label">Create workout</string>
-    <string name="edit_workout_button_label">Edit workout</string>
+    <string name="edit_workout_button_label">Update workout</string>
     <string name="speed_label">Speed</string>
     <string name="min_speed_label">Min Speed</string>
 
@@ -137,4 +137,15 @@ limitations under the License.</string>
     <string name="engage_workout">Engage workout</string>
     <string name="edit_workout">Edit workout</string>
     <string name="delete_workout">Delete workout</string>
+    <string name="menu_image">Details image</string>
+    <string name="backup_title">Backup/Restore</string>
+    <string name="backup_howto">You can backup your workout presets by simple copy / paste.\n\n- To *create* a backup of all presets, hit \"Get Backup\". All presets will be copied as text, which you can then paste in your favorite app (like e-mail or docs/notes app).\n\n- To *restore* a previously created backup, copy the same text from the source you stored it in, then hit \"Restore/Paste Backup\". All backup workouts will be added automatically.</string>
+    <string name="create_backup">Create (copy) from StrokeRateCoach</string>
+    <string name="restore_backup">Restore (paste) to StrokeRateCoach</string>
+    <string name="backup_comment">-------\n#Copy this whole text to backup/restore StrokeRateCoach workouts\n#Workouts are described by several lines. Workouts starting with # are ignored.\n#Format:\n#1. Title\n#2. Description\n#3. Type: 0 - strokes, 1 - meters, 2 - seconds.\n#4. Strokes per minute for each phase\n#5. Duration of each phase (in strokes, metres or seconds).\n-------\n\n</string>
+    <string name="preset_delimiter" translatable="false">-------</string>
+    <string name="restore_result_text">Restore Result:</string>
+    <string name="restore_added_text">Added:</string>
+    <string name="restore_failed_text">Failed:</string>
+    <string name="restore_summary_text">"Summary: "</string>
 </resources>

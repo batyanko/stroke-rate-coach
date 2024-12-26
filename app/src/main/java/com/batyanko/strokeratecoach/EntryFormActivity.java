@@ -127,7 +127,7 @@ public class EntryFormActivity extends AppCompatActivity {
             descEt.setText(workoutDesc);
 
             int cIdxType = cursor.getColumnIndex(WorkoutContract.WorkoutEntry1.COLUMN_SPP_TYPE);
-            int workoutType = cursor.getInt(cIdxType);
+            String workoutType = cursor.getString(cIdxType);
             switch (workoutType) {
                 case BeeperTasks.SPP_TYPE_STROKES:
                     radioStrokes.toggle();
@@ -247,10 +247,10 @@ public class EntryFormActivity extends AppCompatActivity {
         @Override
         public void onClick(View view) {
 
-            int sppType = getSPPFromRadio();
+            String sppType = getSPPFromRadio();
 
             //Don't create training if no SPP type selected
-            if (sppType == 9) {
+            if (sppType.equals("9")) {
                 Toast.makeText(EntryFormActivity.this, R.string.missing_workout_type_warning, Toast.LENGTH_LONG).show();
                 return;
             }
@@ -319,10 +319,10 @@ public class EntryFormActivity extends AppCompatActivity {
         @Override
         public void onClick(View view) {
 
-            int sppType = getSPPFromRadio();
+            String sppType = getSPPFromRadio();
 
             //Don't create training if no SPP type selected
-            if (sppType == 9) {
+            if (sppType.equals("9")) {
                 Toast.makeText(EntryFormActivity.this, R.string.missing_workout_type_warning, Toast.LENGTH_LONG).show();
                 return;
             }
@@ -389,8 +389,9 @@ public class EntryFormActivity extends AppCompatActivity {
         }
     };
 
+    // TODO use same SQLite methods from all activities?
     private long addPreset(SQLiteDatabase db, String name, String description,
-                           String spp, String gears, int sppType) {
+                           String spp, String gears, String sppType) {
         ContentValues cv = new ContentValues();
         cv.put(WorkoutContract.WorkoutEntry1.COLUMN_NAME, name);
         cv.put(WorkoutContract.WorkoutEntry1.COLUMN_DESC, description);
@@ -402,13 +403,12 @@ public class EntryFormActivity extends AppCompatActivity {
     }
 
     private long updatePreset(SQLiteDatabase db, String workoutId, String name, String description,
-                              String spp, String gears, int sppType) {
+                              String spp, String gears, String sppType) {
         ContentValues cv = new ContentValues();
         cv.put(WorkoutContract.WorkoutEntry1.COLUMN_NAME, name);
         cv.put(WorkoutContract.WorkoutEntry1.COLUMN_DESC, description);
         cv.put(WorkoutContract.WorkoutEntry1.COLUMN_SPP_CSV, spp);
         cv.put(WorkoutContract.WorkoutEntry1.COLUMN_GEARS_CSV, gears);
-//        cv.put(WorkoutEntry1.COLUMN_TIMESTAMP, time);
         cv.put(WorkoutContract.WorkoutEntry1.COLUMN_SPP_TYPE, sppType);
         return db.update(WorkoutContract.WorkoutEntry1.TABLE_NAME_PRESETS,
                 cv,
@@ -439,14 +439,14 @@ public class EntryFormActivity extends AppCompatActivity {
         );
     }
 
-    private int getSPPFromRadio() {
+    private String getSPPFromRadio() {
         if (radioStrokes.isChecked()) {
             return BeeperTasks.SPP_TYPE_STROKES;
         } else if (radioMeters.isChecked()) {
             return BeeperTasks.SPP_TYPE_METERS;
         } else if (radioSeconds.isChecked()) {
             return BeeperTasks.SPP_TYPE_SECONDS;
-        } else return 9;
+        } else return "9";
     }
 
     /*@Override
@@ -457,7 +457,6 @@ public class EntryFormActivity extends AppCompatActivity {
             this.getWindow().getDecorView().setBackgroundColor(backgroundColor);
         }
     }*/
-
     //TODO Delete
     public class CustomWatcher implements TextWatcher {
 

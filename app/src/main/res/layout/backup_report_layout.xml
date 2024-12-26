@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/backup_report_layout"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:descendantFocusability="beforeDescendants"
+    android:orientation="vertical"
+    android:paddingHorizontal="@dimen/activity_horizontal_margin"
+    android:paddingVertical="@dimen/activity_vertical_margin">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/blueAppColor"
+        android:paddingHorizontal="@dimen/activity_horizontal_margin"
+        android:paddingVertical="@dimen/activity_vertical_margin"
+        android:text="@string/restore_result_text"
+        android:textAlignment="center"
+        android:textColor="@color/colorAccent"
+        android:textSize="@dimen/text_size_big" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/activity_horizontal_margin"
+        android:background="@color/blueAppColor"
+        android:text="@string/restore_summary_text"
+        android:textColor="@color/colorAccent"
+        android:textSize="@dimen/text_size_medium" />
+
+    <TextView
+        android:id="@+id/report_summary_tv"
+        android:textSize="@dimen/text_size_medium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/activity_horizontal_margin"
+        android:background="@color/blueAppColor"
+        android:text="@string/restore_added_text"
+        android:textColor="@color/colorAccent"
+        android:textSize="@dimen/text_size_medium" />
+
+    <EditText
+        android:id="@+id/report_added_tv"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:background="@color/backgroundLight" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/activity_horizontal_margin"
+        android:background="@color/blueAppColor"
+        android:text="@string/restore_failed_text"
+        android:textColor="@color/colorAccent"
+        android:textSize="@dimen/text_size_medium" />
+
+    <EditText
+        android:id="@+id/report_failed_tv"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:background="@color/backgroundLight" />
+</LinearLayout>

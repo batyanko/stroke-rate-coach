@@ -17,6 +17,11 @@
 
 package com.batyanko.strokeratecoach.Fragments;
 
+import static android.content.Context.CLIPBOARD_SERVICE;
+import static androidx.core.content.ContextCompat.getSystemService;
+
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -47,6 +52,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
@@ -70,7 +76,14 @@ import com.batyanko.strokeratecoach.sync.BeeperTasks;
 import static com.batyanko.strokeratecoach.WaveActivity.MY_LOCATION_PERMISSION;
 import static com.batyanko.strokeratecoach.WaveActivity.THEME_COLOR;
 import static com.batyanko.strokeratecoach.WaveActivity.windowWidth;
+import static com.batyanko.strokeratecoach.data.WorkoutContract.WorkoutEntry1.COLUMN_DESC;
+import static com.batyanko.strokeratecoach.data.WorkoutContract.WorkoutEntry1.COLUMN_GEARS_CSV;
+import static com.batyanko.strokeratecoach.data.WorkoutContract.WorkoutEntry1.COLUMN_NAME;
+import static com.batyanko.strokeratecoach.data.WorkoutContract.WorkoutEntry1.COLUMN_SPP_CSV;
+import static com.batyanko.strokeratecoach.data.WorkoutContract.WorkoutEntry1.COLUMN_SPP_TYPE;
 import static com.batyanko.strokeratecoach.sync.BeeperTasks.EXTRA_WORKOUT_ID;
+
+import java.util.Objects;
 
 
 /**
@@ -112,12 +125,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
     public int lastWorkoutId;
     private boolean workoutIsRunning;
 
-    private View lastDigitView;
-
-    /*TypedValue typedValue;
-    @ColorInt
-    int color;
-*/
+    public static final String SPP_VALID = "[0123456789,]+";
 
     public SlidingTabLayout mSlidingTabLayout;
     /**
@@ -225,8 +233,8 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                     "\n" +
                     cursor.getString(cursor.getColumnIndex(WorkoutEntry1.COLUMN_DESC));
 
-            LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            float density = getActivity().getResources().getDisplayMetrics().density;
+            LayoutInflater inflater = (LayoutInflater) requireActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            float density = requireActivity().getResources().getDisplayMetrics().density;
             workoutInfoLayout = inflater.inflate(R.layout.workout_info_layout, null);
             workoutDelButton = workoutInfoLayout.findViewById(R.id.delete_button_inside);
             workoutEditButton = workoutInfoLayout.findViewById(R.id.edit_button);
@@ -246,26 +254,41 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                 @Override
                 public void onClick(View view) {
                     String wId = cursor.getString(cursor.getColumnIndex(WorkoutEntry1._ID));
-//                    WaveActivity act = (WaveActivity) SlideFragment.super.getActivity();
-//                    cursor.close();
-//                    workoutDb.close();
                     intent = new Intent(getActivity(), EntryFormActivity.class);
                     intent.putExtra(EXTRA_WORKOUT_ID, wId);
                     startActivity(intent);
-//                    return true;
+                    descPopupWindow.dismiss();
                 }
             });
             workoutCopyButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    WaveUtilities.showShortToast("Not implemented, sorry", getContext());
+//                    WaveUtilities.showShortToast("Not implemented, sorry", getContext());
+                    Cursor bkpCursor = getAllPresets();
+                    bkpCursor.moveToFirst();
+                    String dump = "";
+                    while (!bkpCursor.isAfterLast()) {
+                        dump = dump + bkpCursor.getString(bkpCursor.getColumnIndex(COLUMN_NAME)) + "\n" +
+                                bkpCursor.getString(bkpCursor.getColumnIndex(COLUMN_DESC)) + "\n" +
+                                bkpCursor.getString(bkpCursor.getColumnIndex(COLUMN_SPP_TYPE)) + "\n" +
+                                bkpCursor.getString(bkpCursor.getColumnIndex(COLUMN_GEARS_CSV)) + "\n" +
+                                bkpCursor.getString(bkpCursor.getColumnIndex(COLUMN_SPP_CSV)) + "\n" +
+                                "\n";
+                        bkpCursor.moveToNext();
+                    }
+                    bkpCursor.close();
+                    ClipboardManager clipboard = (ClipboardManager)
+                            requireActivity().getSystemService(CLIPBOARD_SERVICE);
+                    ClipData clip = ClipData.newPlainText("simple text", dump);
+                    clipboard.setPrimaryClip(clip);
+                    String gottenDump = clipboard.getPrimaryClip().getItemAt(0).getText().toString();
                 }
             });
             workoutDelButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     //            TODO Confirm Delete!
-                    WaveUtilities.showShortToast("Removing entry...", getContext());
+                    WaveUtilities.ShowShortToast("Removing entry...", getContext());
                     removeWorkout(clickedItemId, tableName);
 
                     //refresh ScrollView after DB update
@@ -291,11 +314,12 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
             lastClickedEngageButton = view;
             final String name = cursor.getString(cursor.getColumnIndex(WorkoutEntry1.COLUMN_NAME));
             final String description = cursor.getString(cursor.getColumnIndex(WorkoutEntry1.COLUMN_DESC));
-            final int sppType =
-                    cursor.getInt(cursor.getColumnIndex(WorkoutEntry1.COLUMN_SPP_TYPE));
+            final String sppType =
+                    cursor.getString(cursor.getColumnIndex(WorkoutEntry1.COLUMN_SPP_TYPE));
             lastWorkoutId = cursor.getInt(cursor.getColumnIndex(WorkoutEntry1._ID));
             final String gearCSV = cursor.getString(cursor.getColumnIndex(WorkoutEntry1.COLUMN_GEARS_CSV));
             final String sppCSV = cursor.getString(cursor.getColumnIndex(WorkoutEntry1.COLUMN_SPP_CSV));
+            //TODO check validity
             final String[] gears = gearCSV.split("\\s*,\\s*");
             final String[] spp = sppCSV.split("\\s*,\\s*");
 
@@ -312,7 +336,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
             }
 
             //Update History db table
-            lastClickedEngageButton.setBackgroundResource(R.drawable.ic_play_3_negative);
+            lastClickedEngageButton.setBackgroundResource(R.drawable.ic_play_4_negative);
             addHistory(workoutDb, name, description, sppCSV, gearCSV, sppType);
             historyAdapter.swapCursor(getAllHistory(), true, lastWorkoutId);
 
@@ -367,7 +391,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
 
             switch (position) {
                 case 0: {
-                    view = getActivity().getLayoutInflater().inflate(R.layout.fragment_dial, container, false);
+                    view = requireActivity().getLayoutInflater().inflate(R.layout.fragment_dial, container, false);
                     dialGrid = (GridView) view.findViewById(R.id.dial_grid_frag);
                     dialGrid.setAdapter(dialAdapter);
                     dialGrid.setBackgroundColor(pref.getInt(THEME_COLOR, 0xfffafafa));
@@ -397,7 +421,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                     break;
                 }
                 case 1: {
-                    view = getActivity().getLayoutInflater().inflate(R.layout.fragment_presets, container, false);
+                    view = requireActivity().getLayoutInflater().inflate(R.layout.fragment_presets, container, false);
                     presetRV = (RecyclerView) view.findViewById(R.id.preset_rv);
                     LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
                     presetRV.setLayoutManager(layoutManager);
@@ -408,7 +432,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                     break;
                 }
                 case 2: {
-                    view = getActivity().getLayoutInflater().inflate(R.layout.fragment_history, container, false);
+                    view = requireActivity().getLayoutInflater().inflate(R.layout.fragment_history, container, false);
                     historyRV = (RecyclerView) view.findViewById(R.id.history_rv);
                     LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
                     historyRV.setLayoutManager(layoutManager);
@@ -419,7 +443,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                     break;
                 }
                 default: {
-                    view = getActivity().getLayoutInflater().inflate(R.layout.fragment_dial, container, false);
+                    view = requireActivity().getLayoutInflater().inflate(R.layout.fragment_dial, container, false);
                 }
             }
 
@@ -446,7 +470,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
             firstDigit = 0;
 
         } else {
-            view.setBackgroundColor(getActivity().getResources().getColor(R.color.colorAccent));
+            view.setBackgroundColor(requireActivity().getResources().getColor(R.color.colorAccent));
             //Bug fix - scaled view does not accept touches on API 17 / Nexus 4
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
                 view.animate().scaleX(1.15f).setDuration(50).start();
@@ -456,7 +480,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
             //SPM lower than 10 not allowed
             if (digitalInput == 0) {
                 view.startAnimation(WaveActivity.warningAnimation);
-                view.setBackgroundColor(getActivity().getResources().getColor(R.color.colorTransparent));
+                view.setBackgroundColor(requireActivity().getResources().getColor(R.color.colorTransparent));
             } else {
                 firstDigit = digitalInput;
                 firstDigitView = view;
@@ -470,7 +494,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         }
     }
 
-    private void initIntent(int[] sppSettings, int[] gearSettings, int sppType) {
+    private void initIntent(int[] sppSettings, int[] gearSettings, String sppType) {
 
         intent.setAction(BeeperTasks.ACTION_START_BEEP);
         intent.putExtra(BeeperTasks.EXTRA_WORKOUT_SPP, sppSettings);
@@ -485,8 +509,8 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
     }
 
     public void startBeeper() {
-        this.getActivity().startService(intent);
-        BeeperServiceUtils.doBindService(intent, getActivity(), mConnection);
+        this.requireActivity().startService(intent);
+        BeeperServiceUtils.doBindService(intent, requireActivity(), mConnection);
         //        lastClickedEngageButton.setBackgroundResource(R.drawable.ic_menu_play_clip_negative);
     }
 
@@ -494,7 +518,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
     public void stopBeeper() {
         pref.edit().putInt(WaveActivity.OPERATION_SETTING, WaveActivity.WORKOUT_STOP).apply();
         if (lastClickedEngageButton != null) {
-            lastClickedEngageButton.setBackgroundResource(R.drawable.ic_play_3);
+            lastClickedEngageButton.setBackgroundResource(R.drawable.ic_play_4);
         }
 
         mBeeperService = BeeperServiceUtils.getBeeperService();
@@ -576,7 +600,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
     }
 
     private long addHistory(SQLiteDatabase db, String name, String description,
-                            String spp, String gears, int sppType) {
+                            String spp, String gears, String sppType) {
         ContentValues cv = new ContentValues();
         cv.put(WorkoutEntry1.COLUMN_NAME, name);
         cv.put(WorkoutEntry1.COLUMN_DESC, description);

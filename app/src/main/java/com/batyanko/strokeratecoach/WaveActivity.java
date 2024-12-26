@@ -75,14 +75,13 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     public static final String SPM_SETTING = "spm";
 
     //Workout types
-    public static final int WORKOUT_WAVE = 1;   //Depreciated
+    public static final int WORKOUT_WAVE = 1;   //Deprecated
     public static final int WORKOUT_INTERVAL = 2;
     public static final int WORKOUT_SIMPLE = 3;
     public static final int WORKOUT_LAST = 9;
     public static final int WORKOUT_STOP = 0;
 
     //Workout item function IDs
-    public static int DEL_BUTTON_FUNCTION = 1;
     public static int WORKOUT_ITEM_FUNCTION = 2;
     public static int ENGAGE_WORKOUT_FUNCTION = 3;
 
@@ -1140,6 +1139,11 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         switch (menuItem.getItemId()) {
             case R.id.item_add_workout: {
                 Intent intent = new Intent(WaveActivity.this, EntryFormActivity.class);
+                startActivity(intent);
+                return true;
+            }
+            case R.id.menu_item_backup: {
+                Intent intent = new Intent(WaveActivity.this, BackupActivity.class);
                 startActivity(intent);
                 return true;
             }
