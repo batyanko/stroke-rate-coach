@@ -5,10 +5,15 @@ import static com.batyanko.strokeratecoach.WaveActivity.CUSTOM_SOUND_PATH;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.preference.PreferenceScreen;
+import android.preference.SwitchPreference;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import com.batyanko.strokeratecoach.R;
 import com.batyanko.strokeratecoach.Utils.WaveUtilities;
@@ -25,7 +30,11 @@ public class SettingsFragment extends PreferenceFragment {
 
         addPreferencesFromResource(R.xml.preferences);
         Preference requestLocation = findPreference(WaveActivity.REQUEST_LOC);
-        Preference filePicker = findPreference("filePicker");
+//        Preference filePicker = findPreference("filePicker");
+//        SwitchPreference customSoundSwitch = (SwitchPreference) findPreference(getActivity().getString(R.string.custom_sound_switch_key));
+        ListPreference soundPicker = (ListPreference) findPreference(getActivity().getString(R.string.beep_sound_list_key));
+//        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
 
         requestLocation.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
@@ -35,53 +44,64 @@ public class SettingsFragment extends PreferenceFragment {
             }
         });
 
-        filePicker.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                // Got this from
-                // https://riptutorial.com/android/example/14425/showing-a-file-chooser-and-reading-the-result
-                Intent intent;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
-                    intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-                } else {
-                intent = new Intent(Intent.ACTION_GET_CONTENT);
-                }
-
-                // Update with mime types
-                intent.setType("audio/*");
-
-                // Update with additional mime types here using a String[].
-//                intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
-
-                // Only pick openable and local files. Theoretically we could pull files from google drive
-                // or other applications that have networked files, but that's unnecessary for this example.
-                intent.addCategory(Intent.CATEGORY_OPENABLE);
-//                intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
-
-                // REQUEST_CODE = <some-integer>
-                startActivityForResult(intent, 123);
-                return true;
-            }
-        });
+//        filePicker.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+//            @Override
+//            public boolean onPreferenceClick(Preference preference) {
+//
+//                return true;
+//                // Got this from
+//                // https://riptutorial.com/android/example/14425/showing-a-file-chooser-and-reading-the-result
+//                Intent intent;
+//                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+//                    intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+//                } else {
+//                intent = new Intent(Intent.ACTION_GET_CONTENT);
+//                }
+//
+//                // Update with mime types
+//                intent.setType("audio/*");
+//
+//                // Update with additional mime types here using a String[].
+////                intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
+//
+//                // Only pick openable and local files. Theoretically we could pull files from google drive
+//                // or other applications that have networked files, but that's unnecessary for this example.
+//                intent.addCategory(Intent.CATEGORY_OPENABLE);
+////                intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+//
+//                // REQUEST_CODE = <some-integer>
+//                startActivityForResult(intent, 123);
+//            }
+//        });
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.d("OAR CHECK", "BOOOOO");
-
-        if (requestCode != 123) {
-            return;
-        }
-
-        if (data != null) {
-            String uri = data.getData().toString();
-
-            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this.getActivity());
-//            pref.edit().putString(CUSTOM_SOUND_PATH, uri).apply();
-            pref.edit().putString(CUSTOM_SOUND_PATH, uri).apply();
-            Log.d("FILE URI STUFFS", uri);
-            Log.d("FILE URI IN PREF", pref.getString(CUSTOM_SOUND_PATH, ""));
-        }
-        super.onActivityResult(requestCode, resultCode, data);
+    public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
+//        String key = preference.getKey();
+//        if (key.equals(getString(R.string.custom_sound_switch_key))) {
+//            Intent intent = new Intent(this, FAQActivity.class);
+//            startActivity(intent);
+//            return true;
+//        }
+        return false;
+        //        return super.onPreferenceTreeClick(preferenceScreen, preference);
     }
+//    @Override
+//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        Log.d("OAR CHECK", "BOOOOO");
+//
+//        if (requestCode != 123) {
+//            return;
+//        }
+//
+//        if (data != null) {
+//            String uri = data.getData().toString();
+//
+//            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this.getActivity());
+//            pref.edit().putString(CUSTOM_SOUND_PATH, uri).apply();
+//            Log.d("FILE URI STUFFS", uri);
+//            Log.d("FILE URI IN PREF", pref.getString(CUSTOM_SOUND_PATH, ""));
+//        }
+//        super.onActivityResult(requestCode, resultCode, data);
+//    }
 }

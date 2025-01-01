@@ -81,6 +81,7 @@ import static com.batyanko.strokeratecoach.data.WorkoutContract.WorkoutEntry1.CO
 import static com.batyanko.strokeratecoach.data.WorkoutContract.WorkoutEntry1.COLUMN_NAME;
 import static com.batyanko.strokeratecoach.data.WorkoutContract.WorkoutEntry1.COLUMN_SPP_CSV;
 import static com.batyanko.strokeratecoach.data.WorkoutContract.WorkoutEntry1.COLUMN_SPP_TYPE;
+import static com.batyanko.strokeratecoach.data.WorkoutContract.WorkoutEntry1.TABLE_NAME_HISTORY;
 import static com.batyanko.strokeratecoach.sync.BeeperTasks.EXTRA_WORKOUT_ID;
 
 import java.util.Objects;
@@ -236,19 +237,35 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
             LayoutInflater inflater = (LayoutInflater) requireActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             float density = requireActivity().getResources().getDisplayMetrics().density;
             workoutInfoLayout = inflater.inflate(R.layout.workout_info_layout, null);
-            workoutDelButton = workoutInfoLayout.findViewById(R.id.delete_button_inside);
-            workoutEditButton = workoutInfoLayout.findViewById(R.id.edit_button);
-            workoutCopyButton = workoutInfoLayout.findViewById(R.id.copy_button);
+
             descPopupTextView = workoutInfoLayout.findViewById(R.id.popup_desc_text_view);
             descPopupTextView.setText(message);
             descPopupWindow = new PopupWindow(workoutInfoLayout, windowWidth, LinearLayout.LayoutParams.WRAP_CONTENT, true);
             descPopupWindow.setBackgroundDrawable(
                     new ColorDrawable(pref.getInt(THEME_COLOR, getResources().getColor(R.color.backgroundLight)))
             );
-
             descPopupWindow.setElevation(100f);
-
             descPopupWindow.showAtLocation(workoutInfoLayout, Gravity.CENTER, 0, (int) density * 100);
+
+            workoutDelButton = workoutInfoLayout.findViewById(R.id.delete_button_inside);
+            workoutEditButton = workoutInfoLayout.findViewById(R.id.edit_button);
+            workoutCopyButton = workoutInfoLayout.findViewById(R.id.copy_button);
+
+
+            workoutInfoLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    descPopupWindow.dismiss();
+                }
+            });
+
+            // No preset functions on History items
+            if (tableName.equals(TABLE_NAME_HISTORY)) {
+                ((ViewGroup) workoutDelButton.getParent()).removeView(workoutDelButton);
+                ((ViewGroup) workoutEditButton.getParent()).removeView(workoutEditButton);
+                ((ViewGroup) workoutCopyButton.getParent()).removeView(workoutCopyButton);
+                return;
+            }
 
             workoutEditButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -263,25 +280,22 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
             workoutCopyButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-//                    WaveUtilities.showShortToast("Not implemented, sorry", getContext());
-                    Cursor bkpCursor = getAllPresets();
+                    Cursor bkpCursor = getPreset(clickedItemId);
                     bkpCursor.moveToFirst();
-                    String dump = "";
-                    while (!bkpCursor.isAfterLast()) {
-                        dump = dump + bkpCursor.getString(bkpCursor.getColumnIndex(COLUMN_NAME)) + "\n" +
-                                bkpCursor.getString(bkpCursor.getColumnIndex(COLUMN_DESC)) + "\n" +
-                                bkpCursor.getString(bkpCursor.getColumnIndex(COLUMN_SPP_TYPE)) + "\n" +
-                                bkpCursor.getString(bkpCursor.getColumnIndex(COLUMN_GEARS_CSV)) + "\n" +
-                                bkpCursor.getString(bkpCursor.getColumnIndex(COLUMN_SPP_CSV)) + "\n" +
-                                "\n";
-                        bkpCursor.moveToNext();
+                    long added = addPreset(workoutDb,
+                            bkpCursor.getString(bkpCursor.getColumnIndex(COLUMN_NAME)),
+                            bkpCursor.getString(bkpCursor.getColumnIndex(COLUMN_DESC)),
+                            bkpCursor.getString(bkpCursor.getColumnIndex(COLUMN_SPP_CSV)),
+                            bkpCursor.getString(bkpCursor.getColumnIndex(COLUMN_GEARS_CSV)),
+                            bkpCursor.getString(bkpCursor.getColumnIndex(COLUMN_SPP_TYPE))
+                    );
+                    if (added != -1) {
+                        presetsAdapter.swapCursor(getAllPresets(), workoutIsRunning, lastWorkoutId);
+                        WaveUtilities.ShowShortToast("Workout duplicated!", getContext());
+                    } else {
+                        WaveUtilities.ShowLongToast("Copy failed. Try backup from settings instead.", getContext());
                     }
                     bkpCursor.close();
-                    ClipboardManager clipboard = (ClipboardManager)
-                            requireActivity().getSystemService(CLIPBOARD_SERVICE);
-                    ClipData clip = ClipData.newPlainText("simple text", dump);
-                    clipboard.setPrimaryClip(clip);
-                    String gottenDump = clipboard.getPrimaryClip().getItemAt(0).getText().toString();
                 }
             });
             workoutDelButton.setOnClickListener(new View.OnClickListener() {
@@ -292,18 +306,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                     removeWorkout(clickedItemId, tableName);
 
                     //refresh ScrollView after DB update
-                    if (tableName.equals(WorkoutEntry1.TABLE_NAME_PRESETS)) {
-                        presetsAdapter.swapCursor(getAllPresets(), workoutIsRunning, lastWorkoutId);
-                    } else if (tableName.equals(WorkoutEntry1.TABLE_NAME_HISTORY)) {
-                        historyAdapter.swapCursor(getAllHistory(), workoutIsRunning, lastWorkoutId);
-                    }
-                    descPopupWindow.dismiss();
-                }
-            });
-
-            workoutInfoLayout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
+                    presetsAdapter.swapCursor(getAllPresets(), workoutIsRunning, lastWorkoutId);
                     descPopupWindow.dismiss();
                 }
             });
@@ -536,18 +539,6 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         mBeeperService.doEpicShit(intent);
     }
 
-/*    public void doBindService(Intent intent) {
-        getActivity().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-        mIsBound = true;
-    }
-
-    public void doUnbindService() {
-        if (mIsBound) {
-            getActivity().unbindService(mConnection);
-            mIsBound = false;
-        }
-    }*/
-
     /////////////////
     //DBStuff
     //TODO use getAllRows
@@ -599,6 +590,17 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         );
     }
 
+    private long addPreset(SQLiteDatabase db, String name, String description,
+                           String spp, String gears, String sppType) {
+        ContentValues cv = new ContentValues();
+        cv.put(WorkoutEntry1.COLUMN_NAME, name);
+        cv.put(WorkoutEntry1.COLUMN_DESC, description);
+        cv.put(WorkoutEntry1.COLUMN_SPP_CSV, spp);
+        cv.put(WorkoutEntry1.COLUMN_GEARS_CSV, gears);
+        cv.put(WorkoutEntry1.COLUMN_SPP_TYPE, sppType);
+        return addToDb(db, WorkoutEntry1.TABLE_NAME_PRESETS, cv);
+    }
+
     private long addHistory(SQLiteDatabase db, String name, String description,
                             String spp, String gears, String sppType) {
         ContentValues cv = new ContentValues();
@@ -606,9 +608,12 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         cv.put(WorkoutEntry1.COLUMN_DESC, description);
         cv.put(WorkoutEntry1.COLUMN_SPP_CSV, spp);
         cv.put(WorkoutEntry1.COLUMN_GEARS_CSV, gears);
-//        cv.put(WorkoutEntry1.COLUMN_TIMESTAMP, time);
         cv.put(WorkoutEntry1.COLUMN_SPP_TYPE, sppType);
-        return db.insert(WorkoutEntry1.TABLE_NAME_HISTORY, null, cv);
+        return addToDb(db, WorkoutEntry1.TABLE_NAME_HISTORY, cv);
+    }
+
+    private long addToDb(SQLiteDatabase db, String table, android.content.ContentValues values) {
+        return db.insert(table, null, values);
     }
 
     private boolean removeWorkout(long position, String tableName) {

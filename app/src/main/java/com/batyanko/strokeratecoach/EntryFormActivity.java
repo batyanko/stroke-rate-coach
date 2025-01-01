@@ -85,7 +85,7 @@ public class EntryFormActivity extends AppCompatActivity {
 
         this.getWindow().getDecorView().setBackgroundColor(
                 pref.getInt(THEME_COLOR, getResources().getColor(R.color.backgroundLight)));
-
+        //TODO implement back button?
         numberOfLines = 0;
         sppEditTexts = new ArrayList<>();
         gearEditTexts = new ArrayList<>();
@@ -308,11 +308,7 @@ public class EntryFormActivity extends AppCompatActivity {
             Toast.makeText(EntryFormActivity.this,
                     emptyPhasesPresent + getString(R.string.preset_added_notification),
                     Toast.LENGTH_LONG).show();
-
             finish();
-
-/*            Intent intent = new Intent(EntryFormActivity.this, WaveActivity.class);
-            NavUtils.navigateUpTo(EntryFormActivity.this, intent);*/
         }
     };
     private View.OnClickListener EditButtonListener = new View.OnClickListener() {
@@ -383,9 +379,6 @@ public class EntryFormActivity extends AppCompatActivity {
                     Toast.LENGTH_LONG).show();
 
             finish();
-
-/*            Intent intent = new Intent(EntryFormActivity.this, WaveActivity.class);
-            NavUtils.navigateUpTo(EntryFormActivity.this, intent);*/
         }
     };
 
@@ -449,14 +442,6 @@ public class EntryFormActivity extends AppCompatActivity {
         } else return "9";
     }
 
-    /*@Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
-        if(s.equals(WaveActivity.THEME_COLOR)) {
-            int backgroundColor = pref.getInt(WaveActivity.THEME_COLOR,
-                    getResources().getColor(R.color.backgroundLight));
-            this.getWindow().getDecorView().setBackgroundColor(backgroundColor);
-        }
-    }*/
     //TODO Delete
     public class CustomWatcher implements TextWatcher {
 

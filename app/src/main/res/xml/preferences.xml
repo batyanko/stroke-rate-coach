@@ -1,51 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-    <SwitchPreference
-        android:defaultValue="false"
-        android:key="@string/custom_sound"
-        android:title="@string/custom_sound_title" />
-    <Preference
-        android:key="filePicker"
-        android:title="Sound File ..." />
-
-        <Preference
-            android:key="@string/request_location"
-            android:title="@string/use_location_text"
-            android:summary="@string/use_location_text_description"
-            />
         <SwitchPreference
             android:defaultValue="false"
-            android:key="@string/theme_setting_key"
-            android:title="@string/dark_theme_setting_title" />
-        <EditTextPreference
-            android:defaultValue="5"
-            android:inputType="numberDecimal"
-            android:key="@string/starting_loc_accuracy_setting_key"
-            android:summary="@string/starting_loc_accuracy_setting_desc"
-            android:textColor="@color/colorAccent"
-            android:title="@string/starting_loc_accuracy_setting_title" />
-        <EditTextPreference
-            android:defaultValue="10"
-            android:inputType="number"
-            android:key="@string/speed_sample_count_setting_key"
-            android:summary="@string/speedometer_sample_count_setting_desc"
-            android:title="@string/speedometer_sample_length_setting_title" />
-        />
+            android:key="@string/custom_sound_switch_key"
+            android:title="@string/custom_sound_title" />
+    <ListPreference
+        android:key="@string/beep_sound_list_key"
+        android:entries="@array/pref_beep_labels"
+        android:entryValues="@array/pref_beep_values"
+        android:defaultValue="@string/beep_sound_default"
+        android:positiveButtonText="OK"
+        android:negativeButtonText="Cancel"
+        
+        android:title="Custom beep sound" />
 
-<!--
-
-            <CheckBoxPreference
-                android:key="pref_sync"
-                android:title="@string/pref_sync"
-                android:summary="@string/pref_sync_summ"
-                android:defaultValue="true" />
-            <ListPreference
-                android:dependency="pref_sync"
-                android:key="pref_syncConnectionType"
-                android:title="@string/pref_syncConnectionType"
-                android:dialogTitle="@string/pref_syncConnectionType"
-                android:entries="@array/pref_syncConnectionTypes_entries"
-                android:entryValues="@array/pref_syncConnectionTypes_values"
-                android:defaultValue="@string/pref_syncConnectionTypes_default" />-->
+    <EditTextPreference
+        android:key="@string/starting_loc_accuracy_setting_key"
+        android:defaultValue="5"
+        android:inputType="numberDecimal"
+        android:summary="@string/starting_loc_accuracy_setting_desc"
+        android:textColor="@color/colorAccent"
+        android:title="@string/starting_loc_accuracy_setting_title" />
+    <EditTextPreference
+        android:key="@string/speed_sample_count_setting_key"
+        android:defaultValue="10"
+        android:inputType="number"
+        android:summary="@string/speedometer_sample_count_setting_desc"
+        android:title="@string/speedometer_sample_length_setting_title" />
+    <Preference
+        android:key="@string/request_location_key"
+        android:summary="@string/use_location_text_description"
+        android:title="@string/use_location_text" />
+    <SwitchPreference
+        android:key="@string/theme_setting_key"
+        android:defaultValue="false"
+        android:title="@string/dark_theme_setting_title" />
 </PreferenceScreen>

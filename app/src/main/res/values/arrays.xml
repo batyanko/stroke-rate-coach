@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Label ordering must match values -->
+    <array name="pref_beep_labels">
+        <item>default</item>
+        <item>riff 5</item>
+        <item>riff 6</item>
+        <item>riff 7</item>
+        <item>high 1</item>
+        <item>high 2</item>
+        <item>high 3</item>
+    </array>
+
+    <array name="pref_beep_values">
+        <item>default</item>
+        <item>bm5</item>
+        <item>bm6</item>
+        <item>bm7</item>
+        <item>high1</item>
+        <item>high2</item>
+        <item>high3</item>
+    </array>
+</resources>

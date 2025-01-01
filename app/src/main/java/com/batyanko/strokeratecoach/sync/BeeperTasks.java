@@ -22,6 +22,8 @@ import static com.batyanko.strokeratecoach.WaveActivity.CUSTOM_SOUND_PATH;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.AssetFileDescriptor;
+import android.content.res.AssetManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
@@ -148,7 +150,7 @@ public class BeeperTasks {
     private int countdownCyclesElapsed;
     private int countdownCycleDuration;
     private int countdownDuration;
-
+    private String beepSound;
     private static int oldWorkoutProgress;
 
     private static int beeps;
@@ -213,33 +215,41 @@ public class BeeperTasks {
     private void initBeeper(BeeperService beeperService) {
         resetVariables(beeperService);
 
-        workoutToneGen = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
         countdownToneGen = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
         warningToneGen = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
 
-        if (pref.getBoolean(CUSTOM_SOUND, false)) {
-            String sndUri = pref.getString(CUSTOM_SOUND_PATH, "");
-            if (sndUri.equals("")) {
-                pref.edit().putBoolean(CUSTOM_SOUND, false).apply();
-            } else {
-                pref.edit().putBoolean(CUSTOM_SOUND, true).apply();
-                try {
-                    Uri beepURI = Uri.parse(sndUri);
-                    Log.d("LE BEEP URI: ", "" + beepURI);
-                    player = new MediaPlayer();
+        beepSound = pref.getString(beeperService.getString(R.string.beep_sound_list_key), beeperService.getString(R.string.beep_sound_default));
 
-                    player.setDataSource(beeperService, beepURI);
-                    player.prepare();
-//            player.start();
-
-                } catch (IOException e) {
-                    pref.edit().putBoolean(CUSTOM_SOUND, false).apply();
-                    e.printStackTrace();
-                }
+        if (beepSound.equals(beeperService.getString(R.string.beep_sound_default))) {
+            workoutToneGen = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
+        } else {
+            AssetFileDescriptor afd;
+            try {
+                afd = beeperService.getAssets().openFd(beepSound + ".wav");
+                player = new MediaPlayer();
+                player.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+                player.prepare();
+                player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                    @Override
+                    public void onCompletion(MediaPlayer mp) {
+                        mp.seekTo(0);
+                    }
+                });
+                player.setLooping(false);
+            } catch (IOException e) {
+                workoutToneGen = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
+                SharedPreferences.Editor editor = pref.edit();
+                beepSound = beeperService.getString(R.string.beep_sound_default);
+                editor.putString(beeperService.getString(R.string.beep_sound_list_key), beeperService.getString(R.string.beep_sound_default));
+                editor.apply();
             }
-        }
 
+//            player = MediaPlayer.create(beeperService.getApplicationContext(),
+//                    R.raw.bm3);
+
+        }
     }
+
 
     private void resetVariables(BeeperService beeperService) {
         pref = PreferenceManager.getDefaultSharedPreferences(beeperService);
@@ -421,22 +431,22 @@ public class BeeperTasks {
                         }
                     }
                 }
-
-                Log.d("CUSTOM_SOUND", pref.getBoolean(CUSTOM_SOUND, false) + "");
-                if (!pref.getBoolean(CUSTOM_SOUND, false)) {
+                Log.d("BEEPER SOUND", beepSound + " " + beeperService.getString(R.string.beep_sound_default));
+                if (beepSound.equals(beeperService.getString(R.string.beep_sound_default))) {
                     workoutToneGen.startTone(ToneGenerator.TONE_CDMA_EMERGENCY_RINGBACK, 150);
-                } else if (player.isPlaying()) {
-                    player.seekTo(0);
                 } else {
+                    player.seekTo(0);
                     player.start();
                 }
-
                 // Register OnErrorListener
                 pref.edit().putInt(WaveActivity.BEEP, ++beeps).apply();
-
             }
-        };
-        workoutTimer = new Timer();
+        }
+
+        ;
+        workoutTimer = new
+
+                Timer();
         workoutTimer.scheduleAtFixedRate(workoutTimerTask, 1, strokeDuration);
     }
 

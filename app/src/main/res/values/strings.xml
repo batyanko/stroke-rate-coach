@@ -60,6 +60,10 @@
 
     <string name="settings_title">Settings</string>
     <string name="help_title">Help</string>
+    <string name="beep_sound_default" translatable="false">default</string>
+    <string name="file_picker_key" translatable="false">file-picker</string>
+    <string name="beep_sound_list_key" translatable="false">beep-sound</string>
+    <string name="request_location_key" translatable="false">request-location</string>
     <string name="starting_loc_accuracy_setting_key" translatable="false">starting-loc-accuracy</string>
     <string name="starting_loc_accuracy_setting_title">Starting GPS accuracy (metres)</string>
     <string name="starting_loc_accuracy_setting_desc">Acceptable GPS standard deviation for starting workout (only for distance workouts). \nLower = better accuracy\nHigher = faster start</string>
@@ -131,8 +135,7 @@ limitations under the License.</string>
     <string name="use_location_text_description">Necessary for speed measurement and distance workouts.</string>
     <!--    <string name="beep_ringtone_setting_title">Custom Beep Sound</string>-->
     <string name="custom_sound_title">Custom Beep Sound (beta)</string>
-    <string name="request_location" translatable="false">request-location</string>
-    <string name="custom_sound" translatable="false">custom-sound</string>
+    <string name="custom_sound_switch_key" translatable="false">custom-sound</string>
     <string name="custom_sound_path" translatable="false">custom-sound-path</string>
     <string name="engage_workout">Engage workout</string>
     <string name="edit_workout">Edit workout</string>
