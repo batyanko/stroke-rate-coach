@@ -17,27 +17,22 @@
 package com.batyanko.strokeratecoach.sync;
 
 import static com.batyanko.strokeratecoach.WaveActivity.CUSTOM_SOUND;
-import static com.batyanko.strokeratecoach.WaveActivity.CUSTOM_SOUND_PATH;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
-import android.content.res.AssetManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.ToneGenerator;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.util.Log;
-
-import androidx.core.app.ActivityCompat;
 
 import com.batyanko.strokeratecoach.R;
 import com.batyanko.strokeratecoach.Speed.CLocation;
@@ -80,7 +75,7 @@ public class BeeperTasks {
     private static long strokeDuration;
     public static String spmString;
 
-    private static MediaPlayer player;
+    private MediaPlayer player;
     private static ToneGenerator workoutToneGen;
     private static ToneGenerator countdownToneGen;
     private static ToneGenerator warningToneGen;
@@ -150,7 +145,7 @@ public class BeeperTasks {
     private int countdownCyclesElapsed;
     private int countdownCycleDuration;
     private int countdownDuration;
-    private String beepSound;
+    private String sndPref;
     private static int oldWorkoutProgress;
 
     private static int beeps;
@@ -218,14 +213,14 @@ public class BeeperTasks {
         countdownToneGen = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
         warningToneGen = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
 
-        beepSound = pref.getString(beeperService.getString(R.string.beep_sound_list_key), beeperService.getString(R.string.beep_sound_default));
+        sndPref = pref.getString(beeperService.getString(R.string.beep_sound_list_key), beeperService.getString(R.string.beep_sound_default));
 
-        if (beepSound.equals(beeperService.getString(R.string.beep_sound_default))) {
+        if (sndPref.equals(beeperService.getString(R.string.beep_sound_default))) {
             workoutToneGen = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
         } else {
             AssetFileDescriptor afd;
             try {
-                afd = beeperService.getAssets().openFd(beepSound + ".wav");
+                afd = beeperService.getAssets().openFd(sndPref + ".wav");
                 player = new MediaPlayer();
                 player.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
                 player.prepare();
@@ -238,15 +233,11 @@ public class BeeperTasks {
                 player.setLooping(false);
             } catch (IOException e) {
                 workoutToneGen = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
+                sndPref = beeperService.getString(R.string.beep_sound_default);
                 SharedPreferences.Editor editor = pref.edit();
-                beepSound = beeperService.getString(R.string.beep_sound_default);
                 editor.putString(beeperService.getString(R.string.beep_sound_list_key), beeperService.getString(R.string.beep_sound_default));
                 editor.apply();
             }
-
-//            player = MediaPlayer.create(beeperService.getApplicationContext(),
-//                    R.raw.bm3);
-
         }
     }
 
@@ -422,7 +413,6 @@ public class BeeperTasks {
                                 if (timeTimerTask == null) {
 
                                 }
-                                //pref.edit().putInt(WaveActivity.PHASE_PROGRESS, phaseProgress/1000).apply();
                             }
                             break;
                         }
@@ -431,8 +421,7 @@ public class BeeperTasks {
                         }
                     }
                 }
-                Log.d("BEEPER SOUND", beepSound + " " + beeperService.getString(R.string.beep_sound_default));
-                if (beepSound.equals(beeperService.getString(R.string.beep_sound_default))) {
+                if (sndPref.equals(beeperService.getString(R.string.beep_sound_default))) {
                     workoutToneGen.startTone(ToneGenerator.TONE_CDMA_EMERGENCY_RINGBACK, 150);
                 } else {
                     player.seekTo(0);
@@ -444,9 +433,7 @@ public class BeeperTasks {
         }
 
         ;
-        workoutTimer = new
-
-                Timer();
+        workoutTimer = new Timer();
         workoutTimer.scheduleAtFixedRate(workoutTimerTask, 1, strokeDuration);
     }
 
@@ -456,7 +443,6 @@ public class BeeperTasks {
             @Override
             public void run() {
                 if (phase != 0 && timeTimerPhaseProgress == 0) workoutProgress--;
-//                workoutProgress = (int) (System.currentTimeMillis() - workoutStartTime)/1000;
                 pref.edit().putInt(WaveActivity.WORKOUT_PROGRESS, ++workoutProgress).apply();
                 pref.edit().putInt(WaveActivity.PHASE_PROGRESS, timeTimerPhaseProgress++).apply();
             }
@@ -481,8 +467,6 @@ public class BeeperTasks {
     //TODO cancel countdown on interrupt
     private void startCountdown(final BeeperService beeperService) {
 
-//        pref.edit().putInt(WaveActivity.COUNTDOWN_RUNNING, 1).apply();
-
         countdownTimerTask = new TimerTask() {
 
             @Override
@@ -498,7 +482,6 @@ public class BeeperTasks {
                 }
                 if (++countdownCyclesElapsed >= countdownCyclesTotal) {
                     pref.edit().putInt(WaveActivity.COUNTDOWN_DURATION_LEFT, 0).apply();
-                    //workoutStartTime = System.currentTimeMillis();
                     autoProgress(beeperService);
                     cancelTimer(countdownTimer, this);
                 } else
@@ -641,16 +624,7 @@ public class BeeperTasks {
             }
             averageSpeed = (currentLocation.distanceTo(locationPool[locCycleCount]) / (((float) timeDiffMillis) / 1000));
 
-
-/*            float z = 0;
-            for(float x : averageSpeedPool) {
-                z+=x;
-                Log.d("SPEEDCYCLE TEHZ", "" + z);
-            }
-            z/=10;
-            Log.d("SPEEDCYCLE TEHZfinal(", "" + z);*/
             pref.edit().putFloat(WaveActivity.CURRENT_SPEED, averageSpeed).apply();
-//            pref.edit().putFloat(WaveActivity.CURRENT_SPEED_TIMESTAMP, currentLocation.getTime()).apply();
         }
     }
 
@@ -676,15 +650,7 @@ public class BeeperTasks {
                 if (startingPhaseLocation == null &&
                         locationAccuracy <= acceptableAccuracy) {
 
-                    long timeDiffMillis;
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-                        timeDiffMillis =
-                                (SystemClock.elapsedRealtimeNanos() - location.getElapsedRealtimeNanos()) / 1000000;
-
-                    } else {
-                        timeDiffMillis =
-                                System.currentTimeMillis() - location.getTime();
-                    }
+                    long timeDiffMillis = (SystemClock.elapsedRealtimeNanos() - location.getElapsedRealtimeNanos()) / 1000000;
 
                     //TESTING
                    /* long getNanos = 0;

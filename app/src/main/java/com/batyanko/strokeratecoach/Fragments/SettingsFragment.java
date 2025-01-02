@@ -1,21 +1,14 @@
 package com.batyanko.strokeratecoach.Fragments;
 
-import static com.batyanko.strokeratecoach.WaveActivity.CUSTOM_SOUND_PATH;
-
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import android.preference.SwitchPreference;
-import android.util.Log;
-
-import androidx.annotation.NonNull;
 
 import com.batyanko.strokeratecoach.R;
+import com.batyanko.strokeratecoach.SoundsActivity;
 import com.batyanko.strokeratecoach.Utils.WaveUtilities;
 import com.batyanko.strokeratecoach.WaveActivity;
 
@@ -77,12 +70,12 @@ public class SettingsFragment extends PreferenceFragment {
 
     @Override
     public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
-//        String key = preference.getKey();
-//        if (key.equals(getString(R.string.custom_sound_switch_key))) {
-//            Intent intent = new Intent(this, FAQActivity.class);
-//            startActivity(intent);
-//            return true;
-//        }
+        String key = preference.getKey();
+        if (key.equals(getString(R.string.beep_sound_screen_key))) {
+            Intent intent = new Intent(getActivity(), SoundsActivity.class);
+            startActivity(intent);
+            return true;
+        }
         return false;
         //        return super.onPreferenceTreeClick(preferenceScreen, preference);
     }

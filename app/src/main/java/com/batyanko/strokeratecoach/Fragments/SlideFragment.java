@@ -17,63 +17,6 @@
 
 package com.batyanko.strokeratecoach.Fragments;
 
-import static android.content.Context.CLIPBOARD_SERVICE;
-import static androidx.core.content.ContextCompat.getSystemService;
-
-import android.content.ClipData;
-import android.content.ClipboardManager;
-import android.content.ContentValues;
-import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
-import android.os.Bundle;
-import android.preference.PreferenceManager;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-import androidx.viewpager.widget.PagerAdapter;
-import androidx.viewpager.widget.ViewPager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.EditText;
-import android.widget.GridView;
-import android.widget.LinearLayout;
-import android.widget.PopupWindow;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import com.batyanko.strokeratecoach.EntryFormActivity;
-import com.batyanko.strokeratecoach.R;
-import com.batyanko.strokeratecoach.Sliding.*;
-import com.batyanko.strokeratecoach.Utils.DialGridAdapter;
-import com.batyanko.strokeratecoach.Utils.SvAdapter;
-import com.batyanko.strokeratecoach.Utils.WaveUtilities;
-import com.batyanko.strokeratecoach.WaveActivity;
-import com.batyanko.strokeratecoach.data.WorkoutContract;
-import com.batyanko.strokeratecoach.data.WorkoutContract.WorkoutEntry1;
-import com.batyanko.strokeratecoach.data.WorkoutDBHelper;
-import com.batyanko.strokeratecoach.sync.BeeperService;
-import com.batyanko.strokeratecoach.sync.BeeperServiceUtils;
-import com.batyanko.strokeratecoach.sync.BeeperTasks;
-
-import static com.batyanko.strokeratecoach.WaveActivity.MY_LOCATION_PERMISSION;
 import static com.batyanko.strokeratecoach.WaveActivity.THEME_COLOR;
 import static com.batyanko.strokeratecoach.WaveActivity.windowWidth;
 import static com.batyanko.strokeratecoach.data.WorkoutContract.WorkoutEntry1.COLUMN_DESC;
@@ -84,7 +27,48 @@ import static com.batyanko.strokeratecoach.data.WorkoutContract.WorkoutEntry1.CO
 import static com.batyanko.strokeratecoach.data.WorkoutContract.WorkoutEntry1.TABLE_NAME_HISTORY;
 import static com.batyanko.strokeratecoach.sync.BeeperTasks.EXTRA_WORKOUT_ID;
 
-import java.util.Objects;
+import android.content.ContentValues;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.GridView;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager.widget.ViewPager;
+
+import com.batyanko.strokeratecoach.EntryFormActivity;
+import com.batyanko.strokeratecoach.R;
+import com.batyanko.strokeratecoach.Sliding.SlidingTabLayout;
+import com.batyanko.strokeratecoach.Utils.DialGridAdapter;
+import com.batyanko.strokeratecoach.Utils.SvAdapter;
+import com.batyanko.strokeratecoach.Utils.WaveUtilities;
+import com.batyanko.strokeratecoach.WaveActivity;
+import com.batyanko.strokeratecoach.data.WorkoutContract.WorkoutEntry1;
+import com.batyanko.strokeratecoach.data.WorkoutDBHelper;
+import com.batyanko.strokeratecoach.sync.BeeperService;
+import com.batyanko.strokeratecoach.sync.BeeperServiceUtils;
+import com.batyanko.strokeratecoach.sync.BeeperTasks;
 
 
 /**
@@ -116,7 +100,6 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
     private static SQLiteDatabase workoutDb;
 
     ViewGroup viewGroup;
-    private boolean mIsBound;
     private BeeperService mBeeperService;
     private ServiceConnection mConnection;
 
@@ -155,13 +138,6 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        //TODO delete as we are not using android theme?
-        /*//Get style background color
-        typedValue = new TypedValue();
-        getActivity().getTheme().resolveAttribute(R.attr.colorBackgroundFloating, typedValue, true);
-        color = typedValue.data;
-        Log.d("Teh color", ""+color);
-*/
         pref = PreferenceManager.getDefaultSharedPreferences(getActivity());
         intent = new Intent(this.getActivity(), BeeperService.class);
 
@@ -180,7 +156,6 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         historyAdapter = new SvAdapter(getContext(), historyCursor, WorkoutEntry1.TABLE_NAME_HISTORY, this);
 
         viewGroup = container;
-//        viewGroup.setBackgroundColor(color);
         return inflater.inflate(R.layout.fragment_slide, viewGroup, false);
 
 
@@ -197,8 +172,6 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         // it's PagerAdapter set.
         mSlidingTabLayout = (SlidingTabLayout) view.findViewById(R.id.sliding_tabs);
         mSlidingTabLayout.setViewPager(mViewPager);
-
-//        mSlidingTabLayout.setDividerColors(getActivity().getResources().getColor(R.color.));
     }
 
     //Force workout ScrollView update, as it seems to persist after return from another activity.
@@ -296,14 +269,18 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                         WaveUtilities.ShowLongToast("Copy failed. Try backup from settings instead.", getContext());
                     }
                     bkpCursor.close();
+                    descPopupWindow.dismiss();
                 }
             });
             workoutDelButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     //            TODO Confirm Delete!
-                    WaveUtilities.ShowShortToast("Removing entry...", getContext());
-                    removeWorkout(clickedItemId, tableName);
+                    if (removeWorkout(clickedItemId, tableName)) {
+                        WaveUtilities.ShowShortToast("Preset removed.", getContext());
+                    } else {
+                        WaveUtilities.ShowShortToast("Sorry, failed.", getContext());
+                    }
 
                     //refresh ScrollView after DB update
                     presetsAdapter.swapCursor(getAllPresets(), workoutIsRunning, lastWorkoutId);

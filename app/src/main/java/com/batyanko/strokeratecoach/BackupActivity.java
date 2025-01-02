@@ -1,7 +1,6 @@
 package com.batyanko.strokeratecoach;
 
 import static com.batyanko.strokeratecoach.Fragments.SlideFragment.SPP_VALID;
-import static com.batyanko.strokeratecoach.WaveActivity.windowHeight;
 import static com.batyanko.strokeratecoach.WaveActivity.windowWidth;
 import static com.batyanko.strokeratecoach.data.WorkoutContract.WorkoutEntry1.COLUMN_DESC;
 import static com.batyanko.strokeratecoach.data.WorkoutContract.WorkoutEntry1.COLUMN_GEARS_CSV;
@@ -31,7 +30,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -42,8 +40,6 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.batyanko.strokeratecoach.data.WorkoutContract;
 import com.batyanko.strokeratecoach.data.WorkoutDBHelper;
-
-import org.w3c.dom.Text;
 
 import java.util.Arrays;
 
