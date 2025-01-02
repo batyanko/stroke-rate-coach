@@ -16,8 +16,9 @@
 
 package com.batyanko.strokeratecoach.Utils;
 
+import static android.gesture.GestureOverlayView.ORIENTATION_VERTICAL;
+
 import android.content.Context;
-import androidx.annotation.ColorInt;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,10 +26,10 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import androidx.annotation.ColorInt;
+
 import com.batyanko.strokeratecoach.R;
 import com.batyanko.strokeratecoach.WaveActivity;
-
-import static android.gesture.GestureOverlayView.ORIENTATION_VERTICAL;
 
 /**
  * Created by yanko on 4/4/17.

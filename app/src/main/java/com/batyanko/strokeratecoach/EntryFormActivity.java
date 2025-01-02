@@ -16,16 +16,17 @@
 
 package com.batyanko.strokeratecoach;
 
+import static android.text.TextUtils.join;
+import static com.batyanko.strokeratecoach.WaveActivity.THEME_COLOR;
+import static com.batyanko.strokeratecoach.sync.BeeperTasks.EXTRA_WORKOUT_ID;
+
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.preference.PreferenceManager;
-
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -38,17 +39,15 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.batyanko.strokeratecoach.data.WorkoutDBHelper;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.batyanko.strokeratecoach.data.WorkoutContract;
+import com.batyanko.strokeratecoach.data.WorkoutDBHelper;
 import com.batyanko.strokeratecoach.sync.BeeperTasks;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import static android.text.TextUtils.join;
-import static com.batyanko.strokeratecoach.WaveActivity.THEME_COLOR;
-import static com.batyanko.strokeratecoach.sync.BeeperTasks.EXTRA_WORKOUT_ID;
 
 public class EntryFormActivity extends AppCompatActivity {
 

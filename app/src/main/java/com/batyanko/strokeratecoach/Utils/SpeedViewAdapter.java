@@ -1,12 +1,11 @@
 package com.batyanko.strokeratecoach.Utils;
 
+import static com.batyanko.strokeratecoach.WaveActivity.THEME_COLOR;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
 import android.preference.PreferenceManager;
-import androidx.annotation.LayoutRes;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,9 +13,11 @@ import android.widget.ArrayAdapter;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
-import com.batyanko.strokeratecoach.R;
+import androidx.annotation.LayoutRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
-import static com.batyanko.strokeratecoach.WaveActivity.THEME_COLOR;
+import com.batyanko.strokeratecoach.R;
 /*
  * Copyright (C) 2018 Yanko Georgiev
  *

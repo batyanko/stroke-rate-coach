@@ -1,11 +1,12 @@
 package com.batyanko.strokeratecoach;
 
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
-import androidx.appcompat.app.AppCompatActivity;
-import android.os.Bundle;
-
 import static com.batyanko.strokeratecoach.WaveActivity.THEME_COLOR;
+
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 public class HelpActivity extends AppCompatActivity {
 

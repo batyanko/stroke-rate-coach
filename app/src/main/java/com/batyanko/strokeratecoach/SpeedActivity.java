@@ -14,32 +14,23 @@
 
 package com.batyanko.strokeratecoach;
 
+import android.content.Context;
 import android.content.pm.PackageManager;
-import android.media.AudioManager;
-import android.media.ToneGenerator;
-import androidx.core.app.ActivityCompat;
-import androidx.appcompat.app.AppCompatActivity;
-import android.os.Bundle;
-
-//public class SpeedActivity extends AppCompatActivity {
-//
-//    @Override
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_speed);
-//    }
-//}
-
-import java.util.Formatter;
-import java.util.Locale;
-
 import android.location.Location;
 import android.location.LocationManager;
-import android.content.Context;
+import android.media.AudioManager;
+import android.media.ToneGenerator;
+import android.os.Bundle;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import com.batyanko.strokeratecoach.Speed.CLocation;
 import com.batyanko.strokeratecoach.Speed.IBaseGpsListener;
+
+import java.util.Formatter;
+import java.util.Locale;
 
 // TODO delete
 public class SpeedActivity extends AppCompatActivity implements IBaseGpsListener {

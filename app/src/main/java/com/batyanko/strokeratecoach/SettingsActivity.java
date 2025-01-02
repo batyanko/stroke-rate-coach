@@ -1,19 +1,18 @@
 package com.batyanko.strokeratecoach;
 
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
-
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.os.Bundle;
-import android.util.Log;
-
-import com.batyanko.strokeratecoach.Fragments.SettingsFragment;
-import com.batyanko.strokeratecoach.Utils.WaveUtilities;
-
 import static com.batyanko.strokeratecoach.WaveActivity.THEME;
 import static com.batyanko.strokeratecoach.WaveActivity.THEME_COLOR;
 import static com.batyanko.strokeratecoach.WaveActivity.THEME_LIGHT;
+
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.util.Log;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.batyanko.strokeratecoach.Fragments.SettingsFragment;
+import com.batyanko.strokeratecoach.Utils.WaveUtilities;
 
 public class SettingsActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 

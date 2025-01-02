@@ -32,7 +32,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 import com.batyanko.strokeratecoach.R;
 import com.batyanko.strokeratecoach.Speed.CLocation;
@@ -567,6 +566,18 @@ public class BeeperTasks {
     private void endWorkout(BeeperService beeperService) {
         if (player != null && pref.getBoolean(CUSTOM_SOUND, false)) {
             player.release();
+        }
+        if (countdownToneGen != null) {
+            countdownToneGen.release();
+            countdownToneGen = null;
+        }
+        if (workoutToneGen != null) {
+            workoutToneGen.release();
+            workoutToneGen = null;
+        }
+        if (warningToneGen != null) {
+            warningToneGen.release();
+            warningToneGen = null;
         }
 
         resetVariables(beeperService);
