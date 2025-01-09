@@ -17,6 +17,7 @@
 <resources>
     <string name="workout_in_progress">Trening løper</string>
     <string name="stopper_button_text">Stop</string>
+    <string name="edit_workout_button_label">Oppdater</string>
     <string name="speed_label">Hastighet</string>
     <string name="button_add_phase_label">+ fase</string>
     <string name="meters">meter</string>
@@ -41,7 +42,7 @@
     <string name="tpp_title_text">Tid</string>
     <string name="dpp_title_text">Avstand</string>
     <string name="min_speed_label">Min Hastighet</string>
-    <string name="preset_added_notification">Trening ble skapt.</string>
+    <string name="preset_added_notification">Trening ble sikert.</string>
     <string name="gps_lock_text">Mottar en nøyaktig GPS-fix…</string>
 
     <string name="settings_title">Instillinger</string>
@@ -106,6 +107,8 @@ begrensninger under lisensen.</string>
     <string name="menu_text">MENY…</string>
     <string name="main_notification_channel_name">Primær</string>
     <string name="welcome_text1">Hei!</string>
+    <string name="confirm">OK</string>
+    <string name="cancel">Avbryt</string>
     <string name="agree">Bra</string>
     <string name="not_fine">Ikke Bra</string>
     <string name="custom_sound_title">Tilpasset lyd (beta)</string>
@@ -116,5 +119,15 @@ begrensninger under lisensen.</string>
     <string name="use_no_location_text">Ikke Bruke Plasering</string>
     <string name="use_location_text_description">Nødvendig for hastighetsmåling og avstandstrening.</string>
     <string name="engage_workout">Trening start</string>
+    <string name="create_backup">SKAPE (KOPIERE) fra StrokeRateCoach</string>
+    <string name="menu_image">Detail</string>
+    <string name="backup_title">Trening backup</string>
+    <string name="edit_workout">Rediger</string>
+    <string name="delete_workout">Slett</string>
+    <string name="restore_result_text">Resultat:</string>
+    <string name="restore_added_text">Gjenopprettet:</string>
+    <string name="restore_failed_text">Feil:</string>
+    <string name="restore_backup">GJENOPPRETT (LIM INN) til StrokeRateCoach</string>
+    <string name="restore_summary_text">Resultat:</string>
 
 </resources>

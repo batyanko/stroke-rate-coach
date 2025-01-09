@@ -18,6 +18,7 @@
 <resources>
     <string name="workout_in_progress">Übung läuft</string>
     <string name="stopper_button_text">Stop</string>
+    <string name="edit_workout_button_label">Speichern</string>
     <string name="speed_label">Tacho</string>
     <string name="button_add_phase_label">+ strecke</string>
     <string name="meters">Meter</string>
@@ -42,7 +43,7 @@
     <string name="tpp_title_text">Dauer</string>
     <string name="dpp_title_text">Entfernung</string>
     <string name="min_speed_label">Min Geschw.</string>
-    <string name="preset_added_notification">Übung erstellt.</string>
+    <string name="preset_added_notification">Übung gespeichert.</string>
     <string name="gps_lock_text">Eine genauer GPS-Fix wird empfangen…</string>
     <string name="settings_title">Einstellungen</string>
     <string name="help_title">Hilfe</string>
@@ -110,6 +111,8 @@ Einschränkungen unter der Lizenz.</string>
     <string name="menu_text">MENÜ…</string>
     <string name="main_notification_channel_name">Primär</string>
     <string name="welcome_text1">Willkommen!</string>
+    <string name="confirm">OK</string>
+    <string name="cancel">Abbrechen</string>
     <string name="agree">Zustimmen</string>
     <string name="not_fine">Ablehnen</string>
     <string name="custom_sound_title">Benutzerdefinierter Klang (beta)</string>
@@ -120,5 +123,15 @@ Einschränkungen unter der Lizenz.</string>
     <string name="use_no_location_text">Position nicht Zugreifen</string>
     <string name="use_location_text_description">Notwendig für Geschwindigkeitsmessung und Distanztraining.</string>
     <string name="engage_workout">Training starten</string>
+    <string name="create_backup">KOPIEREN (ERSTELLEN) aus StrokeRateCoach</string>
+    <string name="menu_image">Detaillien</string>
+    <string name="backup_title">Sicherung der Übungen</string>
+    <string name="edit_workout">Bearbeiten</string>
+    <string name="delete_workout">Löschen</string>
+    <string name="restore_result_text">Ergebnis:</string>
+    <string name="restore_added_text">Hinzugefügt:</string>
+    <string name="restore_backup">WIEDERHERSTELLEN (EINFÜGEN) ins StrokeRateCoach</string>
+    <string name="restore_failed_text">Gescheitert:</string>
+    <string name="restore_summary_text">Zusammenfassung:</string>
 
 </resources>

@@ -23,10 +23,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:clipToPadding="false"
-    android:paddingBottom="0dp"
     android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="0dp"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingBottom="0dp"
     tools:context="com.batyanko.strokeratecoach.WaveActivity">
 
 
@@ -35,8 +35,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="-20dp"
-        android:layout_marginRight="-20dp"
         android:layout_marginTop="112dp"
+        android:layout_marginRight="-20dp"
         android:background="@color/blueAppColor"
         android:elevation="3dp"
         android:fontFamily="serif"
@@ -51,19 +51,19 @@
 
     <!--TODO redundant?-->
     <Button
-        android:visibility="gone"
         android:id="@+id/create_workout_button"
         android:layout_width="0dp"
         android:layout_height="50dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
         android:layout_marginStart="0dp"
+        android:layout_marginLeft="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
         android:background="@drawable/ic_rectangle"
         android:text="@string/create_workout_button_label"
         android:textColor="@android:color/white"
         android:textSize="22sp"
+        android:visibility="gone"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -72,34 +72,33 @@
         android:id="@+id/progress_frame_layout"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
         android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="8dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintStart_toStartOf="parent"
 
         >
+
         <ProgressBar
             android:id="@+id/wave_progress_bar"
             style="@android:style/Widget.ProgressBar.Horizontal"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
 
-            android:progressDrawable="@drawable/wave_progress"
-            />
+            android:progressDrawable="@drawable/wave_progress" />
 
         <TextView
             android:id="@+id/progressTextView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:textAlignment="center"
             android:gravity="center"
+            android:textAlignment="center"
             android:textColor="@android:color/white"
-            android:textSize="24sp"
-            />
+            android:textSize="24sp" />
 
     </FrameLayout>
 
@@ -138,8 +137,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="3"
             android:gravity="center"
-            android:text="@string/min_speed_label"
             android:maxEms="30"
+            android:text="@string/min_speed_label"
 
             />
 
@@ -210,8 +209,7 @@
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:textAlignment="center"
-                android:textSize="@dimen/speed_strip_text_size"
-                />
+                android:textSize="@dimen/speed_strip_text_size" />
         </FrameLayout>
 
         <TextView
@@ -231,17 +229,17 @@
         android:id="@+id/spm_text_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
         android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
         android:background="?attr/selectableItemBackground"
         android:clickable="true"
         android:focusable="true"
+        android:gravity="center_horizontal"
         android:onClick="onSpmClicked"
         android:text="@string/initial_spm"
         android:textAlignment="center"
-        android:gravity="center_horizontal"
         android:textSize="@dimen/spm_text_view_size"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -252,10 +250,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="   ⋮   "
-        android:textSize="32sp"
+        android:textSize="42sp"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/spm_text_view"
-        />
+        app:layout_constraintTop_toTopOf="@+id/spm_text_view" />
+
     <FrameLayout
         android:id="@+id/slide_frame_layout"
         android:layout_width="match_parent"
@@ -333,10 +331,10 @@
         android:id="@+id/countdown_image_view"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_marginBottom="-64dp"
         android:layout_marginLeft="-64dp"
-        android:layout_marginRight="-64dp"
         android:layout_marginTop="-64dp"
+        android:layout_marginRight="-64dp"
+        android:layout_marginBottom="-64dp"
         android:elevation="3dp"
         android:fontFamily="serif"
         android:gravity="center"
@@ -352,41 +350,32 @@
         android:id="@+id/gps_splash_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/ic_gps_splash"
-        android:layout_marginBottom="-64dp"
         android:layout_marginLeft="-64dp"
-        android:layout_marginRight="-64dp"
         android:layout_marginTop="-64dp"
-        android:elevation="3dp"
-        >
+        android:layout_marginRight="-64dp"
+        android:layout_marginBottom="-64dp"
+        android:background="@drawable/ic_gps_splash"
+        android:elevation="3dp">
         <!--<ImageView
             android:id="@+id/gps_grid_image"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_gps_splash"/>
         --><ImageView
-            android:id="@+id/gps_locator_image"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_gps_splash_locator"
-            />
+        android:id="@+id/gps_locator_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_gps_splash_locator" />
+
         <TextView
             android:id="@+id/gps_splash_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/gps_lock_text"
-            android:textSize="16sp"
             android:layout_gravity="center"
             android:gravity="center"
-            />
+            android:text="@string/gps_lock_text"
+            android:textSize="16sp" />
 
     </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <!--
-
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
-
-    -->

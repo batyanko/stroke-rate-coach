@@ -140,7 +140,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     //UI elements
     private View progressFrameLayout;
     private ProgressBar waveProgress;
-    private Button createButton;
+    private PopupMenu popupMenu;
     private ImageView countdownView;
     private static boolean countdownBeingAnimated;
     private TextView spmTextView;
@@ -217,6 +217,14 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 
         setContentView(R.layout.activity_wave);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+        //Initialize spm at last setting, or default at 0
+        pref = PreferenceManager.getDefaultSharedPreferences(this);
+        pref.registerOnSharedPreferenceChangeListener(this);
+
+        countdownView = findViewById(R.id.countdown_image_view);
+//        animateSplash(1500);
+
         viewGroup = (ViewGroup) findViewById(R.id.activity_wave);
         speedStrip = (ViewGroup) findViewById(R.id.speed_strip);
         final LayoutInflater inflater = (LayoutInflater) WaveActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -240,11 +248,6 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
             constraintSet = new ConstraintSet();
             constraintSet.clone((ConstraintLayout) viewGroup);
         }
-
-        //Initialize spm at last setting, or default at 0
-        pref = PreferenceManager.getDefaultSharedPreferences(this);
-        pref.registerOnSharedPreferenceChangeListener(this);
-
 
         spm = pref.getInt(SPM_SETTING, 0);
 
@@ -356,18 +359,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
                 speedPopupWindow.setBackgroundDrawable(
                         new ColorDrawable(pref.getInt(THEME_COLOR, getResources().getColor(R.color.backgroundLight))));
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    speedPopupWindow.setElevation(100f);
-                } else {
-                    int backgroundColor = (pref.getBoolean(THEME, THEME_LIGHT)) ?
-                            getResources().getColor(R.color.backgroundLight)
-                            :
-                            getResources().getColor(R.color.backgroundDark);
-                    speedPopupWindow.setBackgroundDrawable(
-                            new ColorDrawable(backgroundColor)
-                    );
-                }
-
+                speedPopupWindow.setElevation(100f);
 
                 speedPopupWindow.showAsDropDown(speedLimitView);
                 speedPopupWindow.showAtLocation(speedLimitPopupLayout, Gravity.CENTER, 0, (int) density * 100);
@@ -403,17 +395,8 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
                     }
                 });
 
-                //                speedLimitEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-//
-//                    @Override
-//                    public void onFocusChange(View view, boolean b) {
-//                        speedPopupWindow.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-//                    }
-//                });
                 final Button setLimit = speedLimitPopupLayout.findViewById(R.id
                         .speed_limit_setter_button);
-//                final Button saveAndExit = speedLimitPopupLayout.findViewById(R.id
-//                        .speed_limit_confirm_button);
                 final ImageView up = speedLimitPopupLayout.findViewById(R.id.increase_speed);
                 final ImageView down = speedLimitPopupLayout.findViewById(R.id.decrease_speed);
 
@@ -495,25 +478,11 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         createButton.setVisibility(View.VISIBLE);
         */
 
-        menuTextView = findViewById(R.id.menu_image_view);
-        menuTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                PopupMenu popup = new PopupMenu(WaveActivity.this, view);
-                popup.inflate(R.menu.menu_options);
-                popup.setOnMenuItemClickListener(WaveActivity.this);
-                popup.show();
-            }
-        });
-
         int resource = getResources().getIdentifier("status_bar_height", "dimen", "android");
         if (resource > 0) {
             statusbarHeight = getResources().getDimensionPixelSize(resource);
 //            Log.d("Statusbar Height!!!: ", "" + statusbarHeight);
         }
-
-        countdownView = findViewById(R.id.countdown_image_view);
-//        countdownView.setVisibility((View.INVISIBLE));
 
         countdownDigit = findViewById(R.id.countdown_digit);
         countdownDigit.setVisibility(View.INVISIBLE);
@@ -539,12 +508,23 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
             }
         });
 
+
+        menuTextView = findViewById(R.id.menu_image_view);
+        popupMenu = new PopupMenu(WaveActivity.this, menuTextView);
+        popupMenu.inflate(R.menu.menu_options);
+        popupMenu.setOnMenuItemClickListener(WaveActivity.this);
+        menuTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                popupMenu.show();
+            }
+        });
+
         //Bind to service if already running (in case of screen rotation / onDestroy)
 
         updateSpeedLimitView(pref.getBoolean(SPEED_LIMIT_SWITCH, false));
         firstRunInit();
         flushGUI();
-        animateSplash(1500);
     }
 
     @Override
@@ -561,7 +541,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         onThemeChange(pref);
 
         if (!countdownBeingAnimated) {
-            animateSplash(1000);
+//            animateSplash(1000);
         }
 
         if (pref.getInt(OPERATION_SETTING, WORKOUT_STOP) == WORKOUT_INTERVAL) {
@@ -605,10 +585,6 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
      * Reset the GUI at workout's end.
      */
     public void flushGUI() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            menuTextView.setTextSize(24);
-            menuTextView.setText(R.string.menu_text);
-        }
         switch (pref.getInt(OPERATION_SETTING, WORKOUT_STOP)) {
             case WORKOUT_STOP: {
                 pref.edit().putBoolean(GPS_LOCKING, false).apply();
@@ -1036,25 +1012,21 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         //first run splash handled at firstRunInit()
         if (pref.getBoolean(NOT_AGREED, true)) return;
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            countdownView.setVisibility(View.VISIBLE);
-            countdownView.setAlpha(1f);
-            countdownView.bringToFront();
+        countdownView.setVisibility(View.VISIBLE);
+        countdownView.setAlpha(1f);
+        countdownView.bringToFront();
 
-            countdownBeingAnimated = true;
-            countdownView.animate().alpha(0f).setDuration(duration).withEndAction(
-                    new Runnable() {
-                        @Override
-                        public void run() {
-                            countdownView.setAlpha(1f);
-                            countdownView.setVisibility(View.INVISIBLE);
-                            countdownBeingAnimated = false;
-                        }
+        countdownBeingAnimated = true;
+        countdownView.animate().alpha(0f).setDuration(duration).withEndAction(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        countdownView.setAlpha(1f);
+                        countdownView.setVisibility(View.INVISIBLE);
+                        countdownBeingAnimated = false;
                     }
-            );
-        } else {
-            countdownView.setVisibility(View.INVISIBLE);
-        }
+                }
+        );
     }
 
     private void updateGpsSplash() {
@@ -1199,17 +1171,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
             welcomePopupWindow.setBackgroundDrawable(
                     new ColorDrawable(pref.getInt(THEME_COLOR, getResources().getColor(R.color.backgroundLight))));
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                welcomePopupWindow.setElevation(100f);
-            } else {
-                int backgroundColor = (pref.getBoolean(THEME, THEME_LIGHT)) ?
-                        getResources().getColor(R.color.backgroundLight)
-                        :
-                        getResources().getColor(R.color.backgroundDark);
-                welcomePopupWindow.setBackgroundDrawable(
-                        new ColorDrawable(backgroundColor)
-                );
-            }
+            welcomePopupWindow.setElevation(100f);
 
             findViewById(R.id.activity_wave).post(new Runnable() {
                 @Override
@@ -1243,11 +1205,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
                 @Override
                 public void onDismiss() {
                     if (pref.getBoolean(NOT_AGREED, true)) {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                            WaveActivity.this.finishAffinity();
-                        } else {
-                            WaveActivity.this.finish();
-                        }
+                        WaveActivity.this.finishAffinity();
                     } else {
                         locPopup();
                     }
@@ -1309,7 +1267,8 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         locPopupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
             public void onDismiss() {
-                animateSplash(3000);
+                // Not showing anyway...
+//                animateSplash(8000);
             }
         });
     }

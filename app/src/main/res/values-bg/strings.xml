@@ -17,6 +17,7 @@
 <resources>
     <string name="workout_in_progress">Активна тренировка</string>
     <string name="stopper_button_text">Стоп</string>
+    <string name="edit_workout_button_label">Запиши</string>
     <string name="speed_label">Скорост</string>
     <string name="button_add_phase_label">+ отсечка</string>
     <string name="meters">метри</string>
@@ -41,7 +42,7 @@
     <string name="tpp_title_text">Време</string>
     <string name="dpp_title_text">Разстояние</string>
     <string name="min_speed_label">Мин Скорост</string>
-    <string name="preset_added_notification">Тренировката е добавена.</string>
+    <string name="preset_added_notification">Тренировката е записана.</string>
     <string name="gps_lock_text">Получаване на точен GPS сигнал…</string>
     <string name="settings_title">Настройки</string>
     <string name="help_title">Помощ</string>
@@ -103,6 +104,8 @@
     <string name="menu_text">МЕНЮ…</string>
     <string name="main_notification_channel_name">Първостепенна</string>
     <string name="welcome_text1">Добре дошли!</string>
+    <string name="confirm">ОК</string>
+    <string name="cancel">Откажи</string>
     <string name="agree">Добре</string>
     <string name="not_fine">Отказвам</string>
     <string name="custom_sound_title">Потребителски тон (бета)</string>
@@ -113,4 +116,14 @@
     <string name="use_no_location_text">Изкл. Позициониране</string>
     <string name="use_location_text_description">Нужно за измерване на скоростта и тренировки, базирани на разстояние.</string>
     <string name="engage_workout">Старт тренировка</string>
+    <string name="restore_result_text">Резултат:</string>
+    <string name="restore_added_text">Добавени:</string>
+    <string name="restore_failed_text">Неуспешни:</string>
+    <string name="restore_summary_text">Резултат:</string>
+    <string name="create_backup">СЪЗДАЙ (КОПИРАЙ)</string>
+    <string name="restore_backup">ВЪЗСТАНОВИ (ПОСТАВИ)</string>
+    <string name="menu_image">Детайли</string>
+    <string name="backup_title">Резервно копие</string>
+    <string name="edit_workout">Редактирай</string>
+    <string name="delete_workout">Изтрий</string>
 </resources>

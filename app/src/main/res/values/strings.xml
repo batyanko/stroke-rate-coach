@@ -55,7 +55,7 @@
     <string name="minimum_speed_warning">Low Speed Alarm</string>
     <string name="speed_unit_mps">m/s</string>
     <string name="speed_unit_500m">/500m</string>
-    <string name="preset_added_notification">Preset added.</string>
+    <string name="preset_added_notification">Preset saved.</string>
     <string name="gps_lock_text">Locking on starting GPS location…</string>
 
     <string name="settings_title">Settings</string>
@@ -144,10 +144,10 @@ limitations under the License.</string>
     <string name="delete_workout">Delete workout</string>
     <string name="menu_image">Details image</string>
     <string name="backup_title">Backup/Restore</string>
-    <string name="backup_howto">You can backup your workout presets by copy / paste.\n\n- To create a backup of all presets, hit CREATE(COPY). All presets will be copied as text, which you can paste in your favorite app (like e-mail or docs/notes).\n\n- To restore a previously created backup, copy the same text from the source you stored it in, then hit RESTORE(PASTE). All backup workouts will be added automatically.</string>
-    <string name="create_backup">Create (copy) from StrokeRateCoach</string>
-    <string name="restore_backup">Restore (paste) to StrokeRateCoach</string>
-    <string name="backup_comment">-------\n#Copy this whole text to backup/restore StrokeRateCoach workouts\n#Workouts are described by several lines. Workouts starting with # are ignored.\n#Format:\n#1. Title\n#2. Description\n#3. Type: 0 - strokes, 1 - meters, 2 - seconds.\n#4. Strokes per minute for each phase\n#5. Duration of each phase (in strokes, metres or seconds).\n-------\n\n</string>
+    <string name="backup_howto" translatable="false">You can backup your workout presets by copy / paste.\n\n- To create a backup of all presets, hit CREATE(COPY). All presets will be copied as text, which you can paste in your favorite app (like e-mail or docs/notes).\n\n- To restore a previously created backup, copy the same text from the source you stored it in, then hit RESTORE(PASTE). All backup workouts will be added automatically.</string>
+    <string name="create_backup">CREATE (COPY) from StrokeRateCoach</string>
+    <string name="restore_backup">RESTORE (PASTE) to StrokeRateCoach</string>
+    <string name="backup_comment" translatable="false">-------\n#Copy this whole text to backup/restore StrokeRateCoach workouts\n#Workouts are described by several lines. Workouts starting with # are ignored.\n#Format:\n#1. Title\n#2. Description\n#3. Type: 0 - strokes, 1 - meters, 2 - seconds.\n#4. Strokes per minute for each phase\n#5. Duration of each phase (in strokes, metres or seconds).\n-------\n\n</string>
     <string name="preset_delimiter" translatable="false">-------</string>
     <string name="restore_result_text">Restore Result:</string>
     <string name="restore_added_text">Added:</string>
