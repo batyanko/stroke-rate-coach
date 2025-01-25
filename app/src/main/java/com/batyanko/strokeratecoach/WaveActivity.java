@@ -21,6 +21,8 @@ import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.ColorDrawable;
 import android.media.AudioManager;
 import android.os.AsyncTask;
@@ -95,6 +97,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 
     public static final int MY_LOCATION_PERMISSION = 22;
     public static final int NOTIFICATION_PERMISSION = 33;
+    public static final String LATEST_VERSION_KEY = "latest-version";
 
     //Shared preferences
     public static final String NOT_AGREED = "not-agreed";
@@ -1178,6 +1181,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     }
 
     private void firstRunInit() {
+        // The whole "Welcome"...
         if (pref.getBoolean(NOT_AGREED, true)) {
 
             final LayoutInflater inflater = (LayoutInflater) WaveActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -1231,6 +1235,53 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 
             pref.edit().putInt(WaveActivity.OPERATION_SETTING, WORKOUT_STOP).apply();
             PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+            //... or handle current version
+        } else {
+            // Get notification permission
+            if (pref.getInt(LATEST_VERSION_KEY, 0) < 120) {
+
+                final LayoutInflater inflater = (LayoutInflater) WaveActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                View whatsNewLayout = inflater.inflate(R.layout.whatsnew_layout, null);
+
+                final PopupWindow whatsnewPopupWindow = new PopupWindow(whatsNewLayout, windowWidth, LinearLayout.LayoutParams.WRAP_CONTENT, true);
+                whatsnewPopupWindow.setBackgroundDrawable(
+                        new ColorDrawable(pref.getInt(THEME_COLOR, getResources().getColor(R.color.backgroundLight))));
+
+                whatsnewPopupWindow.setElevation(100f);
+
+                findViewById(R.id.activity_wave).post(new Runnable() {
+                    @Override
+                    public void run() {
+                        countdownView.setAlpha(1f);
+                        countdownView.setVisibility(View.VISIBLE);
+                        whatsnewPopupWindow.showAtLocation(menuTextView, Gravity.CENTER, 0, 100);
+                    }
+                });
+
+                whatsNewLayout.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        whatsnewPopupWindow.dismiss();
+                    }
+                });
+
+                whatsnewPopupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+                    @Override
+                    public void onDismiss() {
+                        notifPopup(inflater);
+                    }
+                });
+                PackageInfo pInfo;
+                try {
+                    pInfo = this.getPackageManager().getPackageInfo(this.getPackageName(), 0);
+                } catch (PackageManager.NameNotFoundException e) {
+                    e.printStackTrace();
+                    // Here be more robust handling ;)
+                    return;
+                }
+                int verCode = pInfo.versionCode;
+                pref.edit().putInt(LATEST_VERSION_KEY, verCode).apply();
+            }
         }
     }
 

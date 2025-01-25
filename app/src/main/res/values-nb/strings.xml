@@ -135,5 +135,6 @@ begrensninger under lisensen.</string>
     <string name="work_in_background_yes_text">Slå på</string>
     <string name="notification_pref_summary">Fungere i bakgrunnet, for å muliggjøre kombinering med andre apper.</string>
     <string name="notification_desc1">Appen kan fungere i bakgrunnet, for å muliggjøre kombinering med andre sportapper.</string>
+    <string name="whatsnew">NYE FUNKSJONER:\n\n- Rediger og backup av trening.\n- alternativ pipelyd.</string>
 
 </resources>
