@@ -2,10 +2,21 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
     <Preference
-        android:defaultValue="false"
+        android:defaultValue="default"
         android:key="@string/beep_sound_screen_key"
         android:title="@string/custom_sound_title" />
-
+    <CheckBoxPreference
+        android:key="@string/notification_preference_key"
+        android:title="@string/notification_preference_title"
+        android:summary="@string/notification_desc1"/>
+    <CheckBoxPreference
+        android:key="@string/use_location_key"
+        android:summary="@string/use_location_text_description"
+        android:title="@string/use_location_text" />
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="@string/theme_setting_key"
+        android:title="@string/dark_theme_setting_title" />
     <EditTextPreference
         android:defaultValue="5"
         android:inputType="numberDecimal"
@@ -19,12 +30,4 @@
         android:key="@string/speed_sample_count_setting_key"
         android:summary="@string/speedometer_sample_count_setting_desc"
         android:title="@string/speedometer_sample_length_setting_title" />
-    <Preference
-        android:key="@string/request_location_key"
-        android:summary="@string/use_location_text_description"
-        android:title="@string/use_location_text" />
-    <SwitchPreference
-        android:defaultValue="false"
-        android:key="@string/theme_setting_key"
-        android:title="@string/dark_theme_setting_title" />
 </PreferenceScreen>

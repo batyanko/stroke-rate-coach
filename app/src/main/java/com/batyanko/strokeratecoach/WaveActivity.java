@@ -24,7 +24,6 @@ import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
 import android.media.AudioManager;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
@@ -56,7 +55,6 @@ import android.widget.PopupWindow;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -96,11 +94,14 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     public static int ENGAGE_WORKOUT_FUNCTION = 3;
 
     public static final int MY_LOCATION_PERMISSION = 22;
+    public static final int NOTIFICATION_PERMISSION = 33;
 
     //Shared preferences
     public static final String NOT_AGREED = "not-agreed";
-    public static final String USE_LOC = "use-location";
-    public static final String REQUEST_LOC = "request-location";
+
+    //TODO use from R.string
+    public static final String USE_LOC_KEY = "use-location";
+    public static final String USE_BACKGROUND_KEY = "use-in-background";
 
     public static final String PHASE_LENGTH = "phase-length";
     public static final String WORKOUT_LENGTH = "workout-length";
@@ -174,13 +175,8 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     public static int windowHeight;
     public static int statusbarHeight;
 
-    private static BeeperService mBeeperService;
-    private static boolean mIsBound;
-
-    private static Toast mToast;
 
     private SlideFragment slideFragment;
-    static int random;
 
     //SpeedLimit popup UI
     private EditText speedLimitEditText;
@@ -223,6 +219,25 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         pref.registerOnSharedPreferenceChangeListener(this);
 
         countdownView = findViewById(R.id.countdown_image_view);
+        countdownView.setVisibility(View.INVISIBLE);
+        countdownDigit = findViewById(R.id.countdown_digit);
+        countdownDigit.setVisibility(View.INVISIBLE);
+
+//        countdownView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                countdownView.setVisibility(View.INVISIBLE);
+//                countdownDigit.setVisibility(View.INVISIBLE);
+//            }
+//        });
+//        countdownDigit.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                countdownView.setVisibility(View.INVISIBLE);
+//                countdownDigit.setVisibility(View.INVISIBLE);
+//            }
+//        });
+
 //        animateSplash(1500);
 
         viewGroup = (ViewGroup) findViewById(R.id.activity_wave);
@@ -484,9 +499,6 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 //            Log.d("Statusbar Height!!!: ", "" + statusbarHeight);
         }
 
-        countdownDigit = findViewById(R.id.countdown_digit);
-        countdownDigit.setVisibility(View.INVISIBLE);
-
         gpsSplashLayout = findViewById(R.id.gps_splash_layout);
         gpsLocatorImage = findViewById(R.id.gps_locator_image);
         gpsSplashText = findViewById(R.id.gps_splash_text);
@@ -540,6 +552,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 
         onThemeChange(pref);
 
+        // Short splash on return
         if (!countdownBeingAnimated) {
 //            animateSplash(1000);
         }
@@ -567,6 +580,10 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 
     @Override
     protected void onStop() {
+        if (!pref.getBoolean(USE_BACKGROUND_KEY, false)) {
+            slideFragment.stopBeeper();
+        }
+        flushGUI();
         super.onStop();
     }
 
@@ -1003,7 +1020,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         intent.setAction(warningAction);
         BeeperService service = BeeperServiceUtils.getBeeperService();
         if (service != null) {
-            service.doEpicShit(intent);
+            service.modWorkout(intent);
         }
     }
 
@@ -1164,7 +1181,6 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         if (pref.getBoolean(NOT_AGREED, true)) {
 
             final LayoutInflater inflater = (LayoutInflater) WaveActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            final float density = WaveActivity.this.getResources().getDisplayMetrics().density;
             View welcomeLayout = inflater.inflate(R.layout.welcome_layout, null);
 
             final PopupWindow welcomePopupWindow = new PopupWindow(welcomeLayout, windowWidth, LinearLayout.LayoutParams.WRAP_CONTENT, true);
@@ -1184,6 +1200,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 
             Button agreeButton = welcomeLayout.findViewById(R.id.button_agree);
             Button disagreeButton = welcomeLayout.findViewById(R.id.button_disagree);
+
             agreeButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -1207,7 +1224,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
                     if (pref.getBoolean(NOT_AGREED, true)) {
                         WaveActivity.this.finishAffinity();
                     } else {
-                        locPopup();
+                        LocPopup(inflater);
                     }
                 }
             });
@@ -1217,25 +1234,14 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         }
     }
 
-    private void locPopup() {
-        final LayoutInflater inflater = (LayoutInflater) WaveActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    public void LocPopup(LayoutInflater inflater) {
         View locationLayout = inflater.inflate(R.layout.location_layout, null);
 
         final PopupWindow locPopupWindow = new PopupWindow(locationLayout, windowWidth, LinearLayout.LayoutParams.WRAP_CONTENT, true);
         locPopupWindow.setBackgroundDrawable(
                 new ColorDrawable(pref.getInt(THEME_COLOR, getResources().getColor(R.color.backgroundLight))));
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            locPopupWindow.setElevation(100f);
-        } else {
-            int backgroundColor = (pref.getBoolean(THEME, THEME_LIGHT)) ?
-                    getResources().getColor(R.color.backgroundLight)
-                    :
-                    getResources().getColor(R.color.backgroundDark);
-            locPopupWindow.setBackgroundDrawable(
-                    new ColorDrawable(backgroundColor)
-            );
-        }
+        locPopupWindow.setElevation(100f);
 
         findViewById(R.id.activity_wave).post(new Runnable() {
             @Override
@@ -1248,10 +1254,11 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 
         Button agreeButton = locationLayout.findViewById(R.id.button_use_loc);
         Button disagreeButton = locationLayout.findViewById(R.id.button_no_loc);
+
         agreeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                pref.edit().putBoolean(USE_LOC, true).apply();
+                pref.edit().putBoolean(USE_LOC_KEY, true).apply();
                 locPopupWindow.dismiss();
                 WaveUtilities.requestLocation(WaveActivity.this);
             }
@@ -1259,16 +1266,59 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         disagreeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                pref.edit().putBoolean(USE_LOC, false).apply();
+                pref.edit().putBoolean(USE_LOC_KEY, false).apply();
                 locPopupWindow.dismiss();
             }
         });
-
         locPopupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
             public void onDismiss() {
-                // Not showing anyway...
-//                animateSplash(8000);
+                notifPopup(inflater);
+            }
+        });
+    }
+
+    private void notifPopup(LayoutInflater inflater) {
+        View notifLayout = inflater.inflate(R.layout.notif_layout, null);
+
+        final PopupWindow notifPopupWindow = new PopupWindow(notifLayout, windowWidth, LinearLayout.LayoutParams.WRAP_CONTENT, true);
+        notifPopupWindow.setBackgroundDrawable(
+                new ColorDrawable(pref.getInt(THEME_COLOR, getResources().getColor(R.color.backgroundLight))));
+
+        notifPopupWindow.setElevation(100f);
+
+        findViewById(R.id.activity_wave).post(new Runnable() {
+            @Override
+            public void run() {
+                countdownView.setAlpha(1f);
+                countdownView.setVisibility(View.VISIBLE);
+                notifPopupWindow.showAtLocation(menuTextView, Gravity.CENTER, 0, 100);
+            }
+        });
+
+        Button yesButton = notifLayout.findViewById(R.id.button_background_yes);
+        Button noButton = notifLayout.findViewById(R.id.button_background_no);
+
+        yesButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                pref.edit().putBoolean(getString(R.string.notification_preference_key), true).apply();
+                notifPopupWindow.dismiss();
+                WaveUtilities.requestNotifications(WaveActivity.this);
+            }
+        });
+        noButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                pref.edit().putBoolean(getString(R.string.notification_preference_key), false).apply();
+                notifPopupWindow.dismiss();
+            }
+        });
+
+        notifPopupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                animateSplash(3000);
             }
         });
     }

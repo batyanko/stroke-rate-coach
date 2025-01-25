@@ -16,7 +16,10 @@
 
 package com.batyanko.strokeratecoach.sync;
 
+import static android.widget.Toast.LENGTH_LONG;
 import static com.batyanko.strokeratecoach.WaveActivity.CUSTOM_SOUND;
+import static com.batyanko.strokeratecoach.WaveActivity.USE_BACKGROUND_KEY;
+import static com.batyanko.strokeratecoach.WaveActivity.USE_LOC_KEY;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -32,6 +35,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
+import android.util.Log;
+import android.widget.Toast;
 
 import com.batyanko.strokeratecoach.R;
 import com.batyanko.strokeratecoach.Speed.CLocation;
@@ -41,6 +46,7 @@ import com.batyanko.strokeratecoach.Utils.SpmUtilities;
 import com.batyanko.strokeratecoach.WaveActivity;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -159,11 +165,18 @@ public class BeeperTasks {
             initBeeper(beeperService);
             initLocation(beeperService);
 
-            if (mSppType == SPP_TYPE_METERS) {
+            if (Objects.equals(mSppType, SPP_TYPE_METERS)) {
+                boolean enabled = pref.getBoolean(USE_LOC_KEY, false);
+                if (!enabled) {
+                    endWorkout(beeperService);
+                    flushUI();
+                    Toast.makeText(beeperService.getBaseContext(), "Distance based workout.\nPlease enable location in settings.", LENGTH_LONG).show();
+                    return;
+                }
                 pref.edit().putBoolean(WaveActivity.GPS_LOCKING, true).apply();
 //                initLocation(beeperService);
             }
-            if (mSppType == SPP_TYPE_SECONDS) {
+            if (Objects.equals(mSppType, SPP_TYPE_SECONDS)) {
                 startTimeTimerTask();
             }
 
@@ -196,7 +209,7 @@ public class BeeperTasks {
             pref.edit().putInt(WaveActivity.OPERATION_SETTING, workoutRunning).apply();
         } else if (action.equals(ACTION_START_WARNING)) {
 //            cancelTimer(speedLimitTimer, speedLimitTimerTask);
-            if (speedLimitTimer == null || speedLimitTimerTask == null || warningIsRunning == false) {
+            if (speedLimitTimer == null || speedLimitTimerTask == null || !warningIsRunning) {
                 startSpeedLimit(beeperService);
                 warningIsRunning = true;
             }
@@ -429,9 +442,8 @@ public class BeeperTasks {
                 // Register OnErrorListener
                 pref.edit().putInt(WaveActivity.BEEP, ++beeps).apply();
             }
-        }
+        };
 
-        ;
         workoutTimer = new Timer();
         workoutTimer.scheduleAtFixedRate(workoutTimerTask, 1, strokeDuration);
     }
@@ -474,8 +486,7 @@ public class BeeperTasks {
                 if (pref.getBoolean(WaveActivity.GPS_LOCKING, false)) return;
 
                 if (countdownCyclesElapsed % 10 == 0) {
-                    pref.edit().putInt(
-                                    WaveActivity.COUNTDOWN_DURATION_LEFT,
+                    pref.edit().putInt(WaveActivity.COUNTDOWN_DURATION_LEFT,
                                     countdownDuration - countdownCyclesElapsed * 100)
                             .apply();
                 }
@@ -483,8 +494,13 @@ public class BeeperTasks {
                     pref.edit().putInt(WaveActivity.COUNTDOWN_DURATION_LEFT, 0).apply();
                     autoProgress(beeperService);
                     cancelTimer(countdownTimer, this);
-                } else
-                    countdownToneGen.startTone(ToneGenerator.TONE_CDMA_INTERCEPT, 100);
+                } else {
+                    try {
+                        countdownToneGen.startTone(ToneGenerator.TONE_CDMA_INTERCEPT, 100);
+                    } catch (Exception e) {
+//                        Catch undocumented ToneGenerator exception, starting tone after release()
+                    }
+                }
             }
         };
 
@@ -604,9 +620,11 @@ public class BeeperTasks {
 
         PackageManager manager = beeperService.getPackageManager();
         int permission = manager.checkPermission("android.permission.ACCESS_FINE_LOCATION", "com.batyanko.strokeratecoach");
+
+        boolean enabled = pref.getBoolean(USE_LOC_KEY, false);
         boolean hasPermission = (permission == PackageManager.PERMISSION_GRANTED);
 
-        if (!hasPermission) {
+        if (!hasPermission || !enabled) {
             return;
         }
 

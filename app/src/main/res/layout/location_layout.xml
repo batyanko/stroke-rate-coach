@@ -53,6 +53,9 @@
             android:paddingBottom="5dp"
             android:text="@string/help_location2"
             android:textSize="@dimen/text_size_medium" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/activity_vertical_margin"/>
 
         <TextView
             android:layout_width="match_parent"

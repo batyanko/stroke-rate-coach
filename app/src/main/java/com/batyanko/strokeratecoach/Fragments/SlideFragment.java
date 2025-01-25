@@ -50,6 +50,7 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -363,6 +364,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
             return pageTitle;
         }
 
+        @NonNull
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
 
@@ -452,10 +454,8 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         } else {
             view.setBackgroundColor(requireActivity().getResources().getColor(R.color.colorAccent));
             //Bug fix - scaled view does not accept touches on API 17 / Nexus 4
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                view.animate().scaleX(1.15f).setDuration(50).start();
-                view.animate().scaleY(1.15f).setDuration(50).start();
-            }
+            view.animate().scaleX(1.15f).setDuration(50).start();
+            view.animate().scaleY(1.15f).setDuration(50).start();
 
             //SPM lower than 10 not allowed
             if (digitalInput == 0) {
@@ -508,12 +508,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
             return;
         }
         intent.setAction(BeeperTasks.ACTION_STOP_BEEP);
-        mBeeperService.doEpicShit(intent);
-    }
-
-    private void checkBeeper(Intent intent) {
-        intent.setAction(BeeperTasks.ACTION_CHECK_SERVICE);
-        mBeeperService.doEpicShit(intent);
+        mBeeperService.modWorkout(intent);
     }
 
     /////////////////

@@ -63,7 +63,8 @@
     <string name="beep_sound_default" translatable="false">default</string>
     <string name="file_picker_key" translatable="false">file-picker</string>
     <string name="beep_sound_list_key" translatable="false">beep-sound</string>
-    <string name="request_location_key" translatable="false">request-location</string>
+    <string name="use_location_key" translatable="false">use-location</string>
+    <string name="notification_preference_key" translatable="false">use-in-background</string>
     <string name="starting_loc_accuracy_setting_key" translatable="false">starting-loc-accuracy</string>
     <string name="starting_loc_accuracy_setting_title">Starting GPS accuracy (metres)</string>
     <string name="starting_loc_accuracy_setting_desc">Acceptable GPS standard deviation for starting workout (only for distance workouts). \nLower = better accuracy\nHigher = faster start</string>
@@ -80,9 +81,8 @@
     </string>
     <string name="help_intro2">Simple SPM (Strokes Per Minute) rate setting is supported, as well as complex workouts based on distance, time or stroke count.
     </string>
-    <string name="help_intro3">StrokeRateCoach will happily beep from the background, so feel free to combine it with other sports apps!
-    </string>
-    <string name="help_how_to_title">How To…</string>
+    <string name="help_intro3">StrokeRateCoach will happily beep from the background, so feel free to combine it with other sports apps! Make sure to enable background function in settings.</string>
+    <string name="help_how_to_title">How To…</string>t
     <string name="help_how_to_simple_beep1">- Simple beeper</string>
     <string name="help_how_to_simple_beep2">Go to \'SPEED DIAL\' and enter desired SPM. The beeping starts automatically upon dialing the second digit. Supported SPM rates from 10 to 99.
     </string>
@@ -124,8 +124,11 @@ limitations under the License.</string>
     <string name="help_location1">Location Access</string>
     <string name="help_location2">StrokeRateCoach can access your precise location to enable distance-based workouts and speed indication.</string>
     <string name="help_location3">Do you want to enable location usage?</string>
+    <string name="notification_pref_summary">Work in the background and use a notification to access it.\nThis way you can combine it with other sport apps./n(The Android operating system may still decide to stop the background service though, to free up memory).</string>
+    <string name="notification_desc1">StrokeRateCoach can beep from the background, so you can combine it with other sport apps. (Using notification to access it).</string>
+    <string name="notification_desc2">Enable background functionality?</string>
     <string name="about_title">About</string>
-    <string name="main_notification_channel_name">Primary</string>
+    <string name="main_notification_channel_name">Workout running</string>
     <string name="welcome_text1">Hi there!</string>
     <string name="welcome_text2" translatable="false">" "</string>
     <string name="confirm">Confirm</string>
@@ -134,9 +137,11 @@ limitations under the License.</string>
     <string name="not_fine">Disagree</string>
     <string name="use_location_text">Use Location</string>
     <string name="use_no_location_text">Don\'t Use Location</string>
+    <string name="work_in_background_yes_text">Enable</string>
+    <string name="work_in_background_no_text">Disable</string>
     <string name="use_location_text_description">Necessary for speed measurement and distance workouts.</string>
     <!--    <string name="beep_ringtone_setting_title">Custom Beep Sound</string>-->
-    <string name="custom_sound_title">Custom Beep Sound (beta)</string>
+    <string name="custom_sound_title">Custom Beep Sound</string>
     <string name="beep_sound_screen_key" translatable="false">custom-sound</string>
     <string name="custom_sound_path" translatable="false">custom-sound-path</string>
     <string name="engage_workout">Engage workout</string>
@@ -153,4 +158,5 @@ limitations under the License.</string>
     <string name="restore_added_text">Added:</string>
     <string name="restore_failed_text">Failed:</string>
     <string name="restore_summary_text">"Summary: "</string>
+    <string name="notification_preference_title">Work in background</string>
 </resources>

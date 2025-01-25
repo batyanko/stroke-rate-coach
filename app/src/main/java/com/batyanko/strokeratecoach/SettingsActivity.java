@@ -49,8 +49,10 @@ public class SettingsActivity extends AppCompatActivity implements SharedPrefere
                     getResources().getColor(R.color.backgroundLight);
 
             this.getWindow().getDecorView().setBackgroundColor(backgroundColor);
-        } else if (key.equals(WaveActivity.REQUEST_LOC)){
+        } else if (key.equals(WaveActivity.USE_LOC_KEY)){
             WaveUtilities.requestLocation(this);
+        } else if (key.equals(WaveActivity.USE_BACKGROUND_KEY)) {
+            WaveUtilities.requestNotifications(this);
         }
     }
 }

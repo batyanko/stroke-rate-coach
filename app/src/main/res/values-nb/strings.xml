@@ -103,20 +103,22 @@ begrensninger under lisensen.</string>
     <string name="help_privacy3">For å aktivere avstands- og hastighetsmåling, bruker StrokeRateCoach-appen midlertidig din presise plassering.
         Denne plasseringsinformasjonen er heller ikke lagret på vedvarende lagring eller utlyst til tredjepart.</string>
     <string name="help_privacy4"> StrokeRateCoach-appen bruker ingen Internett-tilkobling.</string>
+    <string name="notification_desc2">Slå på?</string>
     <string name="about_title">Om StrokeRateCoach</string>
     <string name="menu_text">MENY…</string>
-    <string name="main_notification_channel_name">Primær</string>
+    <string name="main_notification_channel_name">Pågående trening</string>
     <string name="welcome_text1">Hei!</string>
     <string name="confirm">OK</string>
     <string name="cancel">Avbryt</string>
     <string name="agree">Bra</string>
     <string name="not_fine">Ikke Bra</string>
-    <string name="custom_sound_title">Tilpasset lyd (beta)</string>
+    <string name="custom_sound_title">Tilpasset lyd</string>
     <string name="help_location1">Tilgang til plassering</string>
     <string name="help_location2">StrokeRateCoach kan få tilgang til din nøyaktige plassering for å aktivere avstandsbaserte treningsøkter og hastighetsindikering.</string>
     <string name="help_location3">Vil du aktivere plasseringsbruk?</string>
     <string name="use_location_text">Bruke Plasering</string>
     <string name="use_no_location_text">Ikke Bruke Plasering</string>
+    <string name="work_in_background_no_text">Slå av</string>
     <string name="use_location_text_description">Nødvendig for hastighetsmåling og avstandstrening.</string>
     <string name="engage_workout">Trening start</string>
     <string name="create_backup">SKAPE (KOPIERE) fra StrokeRateCoach</string>
@@ -129,5 +131,9 @@ begrensninger under lisensen.</string>
     <string name="restore_failed_text">Feil:</string>
     <string name="restore_backup">GJENOPPRETT (LIM INN) til StrokeRateCoach</string>
     <string name="restore_summary_text">Resultat:</string>
+    <string name="notification_preference_title">Fungere i bakgrunnen</string>
+    <string name="work_in_background_yes_text">Slå på</string>
+    <string name="notification_pref_summary">Fungere i bakgrunnet, for å muliggjøre kombinering med andre apper.</string>
+    <string name="notification_desc1">Appen kan fungere i bakgrunnet, for å muliggjøre kombinering med andre sportapper.</string>
 
 </resources>

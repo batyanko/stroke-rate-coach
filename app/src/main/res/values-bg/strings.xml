@@ -57,9 +57,7 @@
     </string>
     <string name="help_intro2">Поддържа се както директно задаване на темпо от 10 до 99 загребоци в минута, така и създаване на комплексни тренировки базирани на разстояние, време или брой загребоци.
     </string>
-    <string name="help_intro3">StrokeRateCoach спокойно може да издава звуков сигнал, без в момента да е на фокус на екрана.
-        Това означава, че може да го комбинирате с други спортни приложения по ваше желание!
-    </string>
+    <string name="help_intro3">StrokeRateCoach спокойно може да издава звуков сигнал, без в момента да е на фокус на екрана. Това означава, че може да го комбинирате с други спортни приложения по ваше желание! Необходимо е да включите настройката за работа на заден план.</string>
     <string name="help_how_to_title">How To…</string>
     <string name="help_how_to_simple_beep1">- Директно задаване на темпо</string>
     <string name="help_how_to_simple_beep2">Отидете на \'БЪРЗ НАБОР\' наберете желаното темпо. Звуковият сигнал започва директно със задаването на втората цифра.
@@ -82,8 +80,8 @@
     <string name="help_about1">За StrokeRateCoach</string>
     <string name="help_about2">Приложението направено от batyanko.
         За оплаквания от бъгове (чета всички Е-мейли ;)</string>
-    <string name="help_about3">E-mail\nbatyankodev@gmail.com</string>
-    <string name="help_about4">Web\nwww.batyanko.com</string>
+    <string name="help_about3">E-mail batyankodev@gmail.com</string>
+    <string name="help_about4">batyankodev@gmail.com</string>
     <string name="help_about5">Github\ngithub.com/batyanko/stroke-rate-coach</string>
     <string name="help_license1">Лиценз</string>
     <string name="help_license2">StrokeRateCoach се разработва с отворен лиценз Apache 2.0 http://www.apache.org/licenses/LICENSE-2.0.
@@ -100,20 +98,22 @@
     <string name="help_privacy3">С цел измерване на разстоянието и скоростта, приложението StrokeRateCoach използва временно точната географска позиция на устройството.
         Тази географска позиция, не се записва върху устойчивата памет на устройството, и не бива споделяна с трети лица. Приложението StrokeRateCoach не използва интернет връзка.</string>
     <string name="help_privacy4">Приложението StrokeRateCoach не използва интернет връзка.</string>
+    <string name="notification_desc2">Да включим ли работата на фонов режим?</string>
     <string name="about_title">За StrokeRateCoach</string>
     <string name="menu_text">МЕНЮ…</string>
-    <string name="main_notification_channel_name">Първостепенна</string>
+    <string name="main_notification_channel_name">Вървяща тренировка</string>
     <string name="welcome_text1">Добре дошли!</string>
     <string name="confirm">ОК</string>
     <string name="cancel">Откажи</string>
     <string name="agree">Добре</string>
     <string name="not_fine">Отказвам</string>
-    <string name="custom_sound_title">Потребителски тон (бета)</string>
+    <string name="custom_sound_title">Потребителски тон</string>
     <string name="help_location1">Достъп до местоположение</string>
     <string name="help_location2">StrokeRateCoach може да използва вашето точно местоположение, което позволява тренировки, базирани на разстояние и измерване на скоростта.</string>
     <string name="help_location3">Искате ли да активирате използването на местоположение?</string>
     <string name="use_location_text">Вкл. позицициониране</string>
     <string name="use_no_location_text">Изкл. Позициониране</string>
+    <string name="work_in_background_no_text">Изключи</string>
     <string name="use_location_text_description">Нужно за измерване на скоростта и тренировки, базирани на разстояние.</string>
     <string name="engage_workout">Старт тренировка</string>
     <string name="restore_result_text">Резултат:</string>
@@ -126,4 +126,8 @@
     <string name="backup_title">Резервно копие</string>
     <string name="edit_workout">Редактирай</string>
     <string name="delete_workout">Изтрий</string>
+    <string name="notification_preference_title">Работа на заден план</string>
+    <string name="work_in_background_yes_text">Включи</string>
+    <string name="notification_pref_summary">Работа на заден с план, с цел комбинация с други спортни приложения. (Операционната система все пак е възможно да го спре, за да освободи памет).</string>
+    <string name="notification_desc1">Приложението може да работи на заден план, така че да го ползвате заедно с други спортни приложения.</string>
 </resources>

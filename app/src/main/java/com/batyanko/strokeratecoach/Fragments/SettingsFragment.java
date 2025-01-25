@@ -2,10 +2,12 @@ package com.batyanko.strokeratecoach.Fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
+import android.util.Log;
 
 import com.batyanko.strokeratecoach.R;
 import com.batyanko.strokeratecoach.SoundsActivity;
@@ -22,17 +24,42 @@ public class SettingsFragment extends PreferenceFragment {
         super.onCreate(savedInstanceState);
 
         addPreferencesFromResource(R.xml.preferences);
-        Preference requestLocation = findPreference(WaveActivity.REQUEST_LOC);
+        CheckBoxPreference useLocation = (CheckBoxPreference) findPreference(WaveActivity.USE_LOC_KEY);
+        CheckBoxPreference useInBackground = (CheckBoxPreference) findPreference(WaveActivity.USE_BACKGROUND_KEY);
 //        Preference filePicker = findPreference("filePicker");
 //        SwitchPreference customSoundSwitch = (SwitchPreference) findPreference(getActivity().getString(R.string.custom_sound_switch_key));
         ListPreference soundPicker = (ListPreference) findPreference(getActivity().getString(R.string.beep_sound_list_key));
 //        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
 
-        requestLocation.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+        useLocation.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 WaveUtilities.requestLocation(getActivity());
+                return true;
+            }
+        });
+
+        useLocation.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                if ((boolean) newValue) {
+                    WaveUtilities.requestLocation(getActivity());
+                }
+                return true;
+            }
+        });
+
+        useInBackground.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                if ((boolean) newValue) {
+                    Log.d("PREF TEST", "NOTIF TRUE");
+                    WaveUtilities.requestNotifications(getActivity());
+                } else {
+                    Log.d("PREF TEST", "NOTIF FALSE");
+
+                }
                 return true;
             }
         });

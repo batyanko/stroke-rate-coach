@@ -48,7 +48,8 @@ public class BeeperService extends NonStopIntentService {
         }
     }
 
-    public void doEpicShit(Intent intent) {
+    // Formerly doEpicShit...
+    public void modWorkout(Intent intent) {
         if (intent == null || intent.getAction() == null) {
             return;
         }
@@ -62,10 +63,6 @@ public class BeeperService extends NonStopIntentService {
         String sppType = intent.getStringExtra(BeeperTasks.EXTRA_WORKOUT_SPP_TYPE);
 
         beeperTasks.executeTask(this, action, workoutSpp, workoutGears, sppType);
-    }
-
-    public void stopShit(Intent intent) {
-
     }
 
     @Nullable
