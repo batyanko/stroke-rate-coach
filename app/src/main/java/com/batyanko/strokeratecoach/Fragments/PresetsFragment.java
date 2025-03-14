@@ -13,7 +13,6 @@ import com.batyanko.strokeratecoach.R;
 /**
  * A simple {@link Fragment} subclass.
  */
-// TODO Delete, history and presets fragment?
 public class PresetsFragment extends Fragment {
 
 
@@ -27,7 +26,7 @@ public class PresetsFragment extends Fragment {
                              Bundle savedInstanceState) {
         // TODO swapped presets<>history layouts?
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_history, container, false);
+        return inflater.inflate(R.layout.fragment_trash, container, false);
     }
 
 }

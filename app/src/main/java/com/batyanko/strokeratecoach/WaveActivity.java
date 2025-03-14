@@ -29,6 +29,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -700,7 +701,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
-
+        Log.d("PROGRESS", "Pref changed");
         if (s.equals(SPM_SETTING)) {
             spm = sharedPreferences.getInt(SPM_SETTING, 22);
             spmTextView.setText(String.valueOf(spm));
@@ -1129,6 +1130,9 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         }
         if (slideFragment.historyRV != null) {
             slideFragment.historyRV.setBackgroundColor(backgroundColor);
+        }
+        if (slideFragment.trashRV != null) {
+            slideFragment.trashRV.setBackgroundColor(backgroundColor);
         }
         if (slideFragment.mSlidingTabLayout != null) {
 //                slideFragment.mSlidingTabLayout.setDividerColors(0xffffbb33, 0xffffbb33);

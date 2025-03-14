@@ -161,4 +161,6 @@ limitations under the License.</string>
     <string name="restore_summary_text">"Summary: "</string>
     <string name="notification_preference_title">Work in background</string>
     <string name="whatsnew">NEW FEATURES\n\nHooray! Now available:\n\n- Workout edit, copy and backup.\n- Alternative beep sounds (try if default beep doesn\'t work).</string>
+    <string name="copy">COPY</string>
+    <string name="copy_to_presets">COPY TO PRESETS</string>
 </resources>

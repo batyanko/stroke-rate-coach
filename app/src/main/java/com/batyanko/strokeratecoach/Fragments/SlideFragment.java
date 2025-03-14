@@ -25,6 +25,8 @@ import static com.batyanko.strokeratecoach.data.WorkoutContract.WorkoutEntry1.CO
 import static com.batyanko.strokeratecoach.data.WorkoutContract.WorkoutEntry1.COLUMN_SPP_CSV;
 import static com.batyanko.strokeratecoach.data.WorkoutContract.WorkoutEntry1.COLUMN_SPP_TYPE;
 import static com.batyanko.strokeratecoach.data.WorkoutContract.WorkoutEntry1.TABLE_NAME_HISTORY;
+import static com.batyanko.strokeratecoach.data.WorkoutContract.WorkoutEntry1.TABLE_NAME_PRESETS;
+import static com.batyanko.strokeratecoach.data.WorkoutContract.WorkoutEntry1.TABLE_NAME_TRASH;
 import static com.batyanko.strokeratecoach.sync.BeeperTasks.EXTRA_WORKOUT_ID;
 
 import android.content.ContentValues;
@@ -44,6 +46,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
@@ -52,6 +55,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -70,6 +74,7 @@ import com.batyanko.strokeratecoach.data.WorkoutDBHelper;
 import com.batyanko.strokeratecoach.sync.BeeperService;
 import com.batyanko.strokeratecoach.sync.BeeperServiceUtils;
 import com.batyanko.strokeratecoach.sync.BeeperTasks;
+import com.google.android.material.tabs.TabLayout;
 
 
 /**
@@ -77,7 +82,7 @@ import com.batyanko.strokeratecoach.sync.BeeperTasks;
  */
 public class SlideFragment extends Fragment implements SvAdapter.ListItemClickListener {
 
-    private static final int TAB_COUNT = 3;
+    private static final int TAB_COUNT = 4;
 
     private int firstDigit;
     private View firstDigitView;
@@ -90,12 +95,15 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
     DialGridAdapter dialAdapter;
     private SvAdapter presetsAdapter;
     public SvAdapter historyAdapter;
+    public SvAdapter trashAdapter;
 
     Cursor presetCursor;
     Cursor historyCursor;
+    Cursor trashCursor;
 
     public RecyclerView presetRV;
     public RecyclerView historyRV;
+    public RecyclerView trashRV;
     public GridView dialGrid;
 
     private static SQLiteDatabase workoutDb;
@@ -123,6 +131,11 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
     private View workoutDelButton;
     private PopupWindow descPopupWindow;
     private TextView descPopupTextView;
+    private final int SPEED_DIAL_POSITION = 0;
+    private final int PRESETS_POSITION = 1;
+    private final int HISTORY_POSITION = 2;
+    private final int TRASH_POSITION = 3;
+
 
     public SlideFragment() {
         // Required empty public constructor
@@ -152,9 +165,11 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         workoutDb = presetDbHelper.getWritableDatabase();
         presetCursor = getAllPresets();
         historyCursor = getAllHistory();
+        trashCursor = getAllHistory();
 
         presetsAdapter = new SvAdapter(getContext(), presetCursor, WorkoutEntry1.TABLE_NAME_PRESETS, this);
         historyAdapter = new SvAdapter(getContext(), historyCursor, WorkoutEntry1.TABLE_NAME_HISTORY, this);
+        trashAdapter = new SvAdapter(getContext(), trashCursor, WorkoutEntry1.TABLE_NAME_TRASH, this);
 
         viewGroup = container;
         return inflater.inflate(R.layout.fragment_slide, viewGroup, false);
@@ -173,7 +188,12 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         // it's PagerAdapter set.
         mSlidingTabLayout = (SlidingTabLayout) view.findViewById(R.id.sliding_tabs);
         mSlidingTabLayout.setViewPager(mViewPager);
+
+        ViewGroup bigChild = (ViewGroup) mSlidingTabLayout.getChildAt(0);
+        View tabTitle = bigChild.getChildAt(TRASH_POSITION);
+        tabTitle.setBackground(ResourcesCompat.getDrawable(view.getResources(), R.drawable.ic_delete, view.getContext().getTheme()));
     }
+
 
     //Force workout ScrollView update, as it seems to persist after return from another activity.
     @Override
@@ -182,6 +202,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         //TODO take running workout status from beeper service
         presetsAdapter.swapCursor(getAllPresets(), workoutIsRunning, lastWorkoutId);
         historyAdapter.swapCursor(getAllHistory(), workoutIsRunning, lastWorkoutId);
+        trashAdapter.swapCursor(getAllTrash(), workoutIsRunning, lastWorkoutId);
     }
 
     //OnClickListener for the Workout list items
@@ -233,37 +254,36 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                 }
             });
 
-            // No preset functions on History items
-            if (tableName.equals(TABLE_NAME_HISTORY)) {
-                ((ViewGroup) workoutDelButton.getParent()).removeView(workoutDelButton);
+            // Editing enabled only in Presets tab
+            if (tableName.equals(TABLE_NAME_PRESETS)) {
+                workoutEditButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        String wId = cursor.getString(cursor.getColumnIndex(WorkoutEntry1._ID));
+                        intent = new Intent(getActivity(), EntryFormActivity.class);
+                        intent.putExtra(EXTRA_WORKOUT_ID, wId);
+                        startActivity(intent);
+                        descPopupWindow.dismiss();
+                    }
+                });
+            } else {
                 ((ViewGroup) workoutEditButton.getParent()).removeView(workoutEditButton);
-                ((ViewGroup) workoutCopyButton.getParent()).removeView(workoutCopyButton);
-                return;
+                ((TextView) workoutCopyButton.findViewById(R.id.copy_button_text)).setText(R.string.copy_to_presets);
             }
 
-            workoutEditButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    String wId = cursor.getString(cursor.getColumnIndex(WorkoutEntry1._ID));
-                    intent = new Intent(getActivity(), EntryFormActivity.class);
-                    intent.putExtra(EXTRA_WORKOUT_ID, wId);
-                    startActivity(intent);
-                    descPopupWindow.dismiss();
-                }
-            });
             workoutCopyButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Cursor bkpCursor = getPreset(clickedItemId);
+                    Cursor bkpCursor = getPreset(clickedItemId, tableName);
                     bkpCursor.moveToFirst();
-                    long added = addPreset(workoutDb,
+                    boolean added = addPreset(workoutDb, TABLE_NAME_PRESETS,
                             bkpCursor.getString(bkpCursor.getColumnIndex(COLUMN_NAME)),
                             bkpCursor.getString(bkpCursor.getColumnIndex(COLUMN_DESC)),
                             bkpCursor.getString(bkpCursor.getColumnIndex(COLUMN_SPP_CSV)),
                             bkpCursor.getString(bkpCursor.getColumnIndex(COLUMN_GEARS_CSV)),
                             bkpCursor.getString(bkpCursor.getColumnIndex(COLUMN_SPP_TYPE))
                     );
-                    if (added != -1) {
+                    if (added) {
                         presetsAdapter.swapCursor(getAllPresets(), workoutIsRunning, lastWorkoutId);
                         WaveUtilities.ShowShortToast("Workout duplicated!", getContext());
                     } else {
@@ -276,15 +296,37 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
             workoutDelButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    //            TODO Confirm Delete!
-                    if (removeWorkout(clickedItemId, tableName)) {
-                        WaveUtilities.ShowShortToast("Preset removed.", getContext());
+                    boolean success;
+                    // Move to trash, or...
+                    if (!tableName.equals(TABLE_NAME_TRASH)) {
+                        Cursor bkpCursor = getPreset(clickedItemId, tableName);
+                        bkpCursor.moveToFirst();
+                        success = addPreset(workoutDb, TABLE_NAME_TRASH,
+                                bkpCursor.getString(bkpCursor.getColumnIndex(COLUMN_NAME)),
+                                bkpCursor.getString(bkpCursor.getColumnIndex(COLUMN_DESC)),
+                                bkpCursor.getString(bkpCursor.getColumnIndex(COLUMN_SPP_CSV)),
+                                bkpCursor.getString(bkpCursor.getColumnIndex(COLUMN_GEARS_CSV)),
+                                bkpCursor.getString(bkpCursor.getColumnIndex(COLUMN_SPP_TYPE))
+                        );
+                        trashAdapter.swapCursor(getAllTrash(), workoutIsRunning, lastWorkoutId);
+                        if (success) {
+                            WaveUtilities.ShowShortToast("Moved to trash.", getContext());
+                            if (!removeWorkout(clickedItemId, tableName)) {
+                                WaveUtilities.ShowShortToast("Sorry, failed.", getContext());
+                            }
+                        } else {
+                            WaveUtilities.ShowShortToast("Sorry, failed.", getContext());
+                        }
+                        // ...erase from Trash
                     } else {
-                        WaveUtilities.ShowShortToast("Sorry, failed.", getContext());
+                        success = removeWorkout(clickedItemId, tableName);
+                        if (success) {
+                            WaveUtilities.ShowShortToast("Removed.", getContext());
+                        } else {
+                            WaveUtilities.ShowShortToast("Sorry, failed.", getContext());
+                        }
                     }
-
-                    //refresh ScrollView after DB update
-                    presetsAdapter.swapCursor(getAllPresets(), workoutIsRunning, lastWorkoutId);
+                    refresh(tableName);
                     descPopupWindow.dismiss();
                 }
             });
@@ -318,7 +360,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
 
             //Update History db table
             lastClickedEngageButton.setBackgroundResource(R.drawable.ic_play_4_negative);
-            addHistory(workoutDb, name, description, sppCSV, gearCSV, sppType);
+            addPreset(workoutDb, TABLE_NAME_HISTORY, name, description, sppCSV, gearCSV, sppType);
             historyAdapter.swapCursor(getAllHistory(), true, lastWorkoutId);
 
             // Start beeping?
@@ -326,6 +368,21 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         }
     }
 
+    private void refresh(String tableName) {
+        //refresh ScrollView after DB update
+        switch (tableName) {
+            case TABLE_NAME_PRESETS:
+                presetsAdapter.swapCursor(getAllPresets(), workoutIsRunning, lastWorkoutId);
+                break;
+            case TABLE_NAME_HISTORY:
+                historyAdapter.swapCursor(getAllHistory(), workoutIsRunning, lastWorkoutId);
+                break;
+            case TABLE_NAME_TRASH:
+                trashAdapter.swapCursor(getAllTrash(), workoutIsRunning, lastWorkoutId);
+                break;
+            default:
+        }
+    }
     private class SlidePagerAdapter extends PagerAdapter {
         private String pageTitle;
 
@@ -343,20 +400,20 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         @Override
         public CharSequence getPageTitle(int position) {
             switch (position) {
-                case 0: {
+                case SPEED_DIAL_POSITION: {
                     pageTitle = getString(R.string.speed_dial_title);
                     break;
                 }
-                case 1: {
+                case PRESETS_POSITION: {
                     pageTitle = getString(R.string.workouts_title);
                     break;
                 }
-                case 2: {
+                case HISTORY_POSITION: {
                     pageTitle = getString(R.string.history_title);
                     break;
                 }
                 default: {
-                    pageTitle = "Woot";
+                    pageTitle = "";
                     break;
                 }
             }
@@ -372,7 +429,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
 
 
             switch (position) {
-                case 0: {
+                case SPEED_DIAL_POSITION: {
                     view = requireActivity().getLayoutInflater().inflate(R.layout.fragment_dial, container, false);
                     dialGrid = (GridView) view.findViewById(R.id.dial_grid_frag);
                     dialGrid.setAdapter(dialAdapter);
@@ -402,7 +459,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                     });
                     break;
                 }
-                case 1: {
+                case PRESETS_POSITION: {
                     view = requireActivity().getLayoutInflater().inflate(R.layout.fragment_presets, container, false);
                     presetRV = (RecyclerView) view.findViewById(R.id.preset_rv);
                     LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
@@ -413,7 +470,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                     presetsAdapter.swapCursor(presetCursor, workoutIsRunning, lastWorkoutId);
                     break;
                 }
-                case 2: {
+                case HISTORY_POSITION: {
                     view = requireActivity().getLayoutInflater().inflate(R.layout.fragment_history, container, false);
                     historyRV = (RecyclerView) view.findViewById(R.id.history_rv);
                     LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
@@ -422,6 +479,17 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                     historyRV.setBackgroundColor(pref.getInt(THEME_COLOR, 0xfffafafa));
                     historyCursor = getAllHistory();
                     historyAdapter.swapCursor(historyCursor, workoutIsRunning, lastWorkoutId);
+                    break;
+                }
+                case TRASH_POSITION: {
+                    view = requireActivity().getLayoutInflater().inflate(R.layout.fragment_trash, container, false);
+                    trashRV = (RecyclerView) view.findViewById(R.id.trash_rv);
+                    LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+                    trashRV.setLayoutManager(layoutManager);
+                    trashRV.setAdapter(trashAdapter);
+                    trashRV.setBackgroundColor(pref.getInt(THEME_COLOR, 0xfffafafa));
+                    trashCursor = getAllTrash();
+                    trashAdapter.swapCursor(trashCursor, workoutIsRunning, lastWorkoutId);
                     break;
                 }
                 default: {
@@ -538,6 +606,18 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         );
     }
 
+    public static Cursor getAllTrash() {
+        return workoutDb.query(
+                WorkoutEntry1.TABLE_NAME_TRASH,
+                null,
+                null,
+                null,
+                null,
+                null,
+                WorkoutEntry1.COLUMN_TIMESTAMP + " DESC"
+        );
+    }
+
     private Cursor getAllRows(String tableName) {
         return workoutDb.query(
                 tableName,
@@ -550,9 +630,9 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         );
     }
 
-    private Cursor getPreset(long position) {
+    private Cursor getPreset(long position, String tab) {
         return workoutDb.query(
-                WorkoutEntry1.TABLE_NAME_PRESETS,
+                tab,
                 null,
                 WorkoutEntry1._ID + "=" + position,
                 null,
@@ -562,26 +642,15 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         );
     }
 
-    private long addPreset(SQLiteDatabase db, String name, String description,
-                           String spp, String gears, String sppType) {
+    private boolean addPreset(SQLiteDatabase db, String tab, String name, String description,
+                              String spp, String gears, String sppType) {
         ContentValues cv = new ContentValues();
         cv.put(WorkoutEntry1.COLUMN_NAME, name);
         cv.put(WorkoutEntry1.COLUMN_DESC, description);
         cv.put(WorkoutEntry1.COLUMN_SPP_CSV, spp);
         cv.put(WorkoutEntry1.COLUMN_GEARS_CSV, gears);
         cv.put(WorkoutEntry1.COLUMN_SPP_TYPE, sppType);
-        return addToDb(db, WorkoutEntry1.TABLE_NAME_PRESETS, cv);
-    }
-
-    private long addHistory(SQLiteDatabase db, String name, String description,
-                            String spp, String gears, String sppType) {
-        ContentValues cv = new ContentValues();
-        cv.put(WorkoutEntry1.COLUMN_NAME, name);
-        cv.put(WorkoutEntry1.COLUMN_DESC, description);
-        cv.put(WorkoutEntry1.COLUMN_SPP_CSV, spp);
-        cv.put(WorkoutEntry1.COLUMN_GEARS_CSV, gears);
-        cv.put(WorkoutEntry1.COLUMN_SPP_TYPE, sppType);
-        return addToDb(db, WorkoutEntry1.TABLE_NAME_HISTORY, cv);
+        return addToDb(db, tab, cv) != -1;
     }
 
     private long addToDb(SQLiteDatabase db, String table, android.content.ContentValues values) {

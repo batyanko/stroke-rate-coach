@@ -58,10 +58,11 @@
                 android:src="@drawable/ic_copy" />
 
             <TextView
+                android:id="@+id/copy_button_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="COPY"
+                android:text="@string/copy"
                 android:textSize="@dimen/text_size_medium" />
         </LinearLayout>
 
