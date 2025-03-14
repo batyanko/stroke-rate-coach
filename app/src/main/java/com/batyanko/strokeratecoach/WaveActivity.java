@@ -1239,54 +1239,60 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 
             pref.edit().putInt(WaveActivity.OPERATION_SETTING, WORKOUT_STOP).apply();
             PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-            //... or handle current version
-        } else {
-            // Get notification permission
-            if (pref.getInt(LATEST_VERSION_KEY, 0) < 120) {
 
-                final LayoutInflater inflater = (LayoutInflater) WaveActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                View whatsNewLayout = inflater.inflate(R.layout.whatsnew_layout, null);
+            bumpLatestVer();
+            
+            //... or handle current version:
+            // 1.20 Get notification permission
+        } else if (pref.getInt(LATEST_VERSION_KEY, 0) < 120) {
 
-                final PopupWindow whatsnewPopupWindow = new PopupWindow(whatsNewLayout, windowWidth, LinearLayout.LayoutParams.WRAP_CONTENT, true);
-                whatsnewPopupWindow.setBackgroundDrawable(
-                        new ColorDrawable(pref.getInt(THEME_COLOR, getResources().getColor(R.color.backgroundLight))));
+            final LayoutInflater inflater = (LayoutInflater) WaveActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View whatsNewLayout = inflater.inflate(R.layout.whatsnew_layout, null);
 
-                whatsnewPopupWindow.setElevation(100f);
+            final PopupWindow whatsnewPopupWindow = new PopupWindow(whatsNewLayout, windowWidth, LinearLayout.LayoutParams.WRAP_CONTENT, true);
+            whatsnewPopupWindow.setBackgroundDrawable(
+                    new ColorDrawable(pref.getInt(THEME_COLOR, getResources().getColor(R.color.backgroundLight))));
 
-                findViewById(R.id.activity_wave).post(new Runnable() {
-                    @Override
-                    public void run() {
-                        countdownView.setAlpha(1f);
-                        countdownView.setVisibility(View.VISIBLE);
-                        whatsnewPopupWindow.showAtLocation(menuTextView, Gravity.CENTER, 0, 100);
-                    }
-                });
+            whatsnewPopupWindow.setElevation(100f);
 
-                whatsNewLayout.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        whatsnewPopupWindow.dismiss();
-                    }
-                });
-
-                whatsnewPopupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
-                    @Override
-                    public void onDismiss() {
-                        notifPopup(inflater);
-                    }
-                });
-                PackageInfo pInfo;
-                try {
-                    pInfo = this.getPackageManager().getPackageInfo(this.getPackageName(), 0);
-                } catch (PackageManager.NameNotFoundException e) {
-                    e.printStackTrace();
-                    // Here be more robust handling ;)
-                    return;
+            findViewById(R.id.activity_wave).post(new Runnable() {
+                @Override
+                public void run() {
+                    countdownView.setAlpha(1f);
+                    countdownView.setVisibility(View.VISIBLE);
+                    whatsnewPopupWindow.showAtLocation(menuTextView, Gravity.CENTER, 0, 100);
                 }
-                int verCode = pInfo.versionCode;
-                pref.edit().putInt(LATEST_VERSION_KEY, verCode).apply();
-            }
+            });
+
+            whatsNewLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    whatsnewPopupWindow.dismiss();
+                }
+            });
+
+            whatsnewPopupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+                @Override
+                public void onDismiss() {
+                    notifPopup(inflater);
+                }
+            });
+            bumpLatestVer();
         }
+    }
+
+    private void bumpLatestVer() {
+        // Save latest version for comparison with next update
+        PackageInfo pInfo;
+        try {
+            pInfo = this.getPackageManager().getPackageInfo(this.getPackageName(), 0);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            // Here be more robust handling ;)
+            return;
+        }
+        int verCode = pInfo.versionCode;
+        pref.edit().putInt(LATEST_VERSION_KEY, verCode).apply();
     }
 
     public void LocPopup(LayoutInflater inflater) {
