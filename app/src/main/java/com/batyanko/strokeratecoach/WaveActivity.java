@@ -546,6 +546,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     @Override
     protected void onStart() {
         super.onStart();
+        Log.d("PROGRESS", "onStart()");
 //        WaveActivity act = WaveActivity.this;
         onProgressChange();
     }
@@ -701,7 +702,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
-        Log.d("PROGRESS", "Pref changed");
+//        Log.d("PROGRESS", "Pref changed");
         if (s.equals(SPM_SETTING)) {
             spm = sharedPreferences.getInt(SPM_SETTING, 22);
             spmTextView.setText(String.valueOf(spm));
@@ -711,18 +712,21 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
                 case WORKOUT_INTERVAL: {
                     workoutRunning = WORKOUT_INTERVAL;
                     flushGUI();
+                    Log.d("PROGRESS", "onSwitch Interval");
                     onProgressChange();
                     break;
                 }
                 case WORKOUT_LAST: {
                     workoutRunning = WORKOUT_LAST;
                     flushGUI();
+                    Log.d("PROGRESS", "onSwitch Last");
                     onProgressChange();
                     break;
                 }
                 case WORKOUT_SIMPLE: {
                     workoutRunning = WORKOUT_SIMPLE;
                     flushGUI();
+                    Log.d("PROGRESS", "onSwitch Simple");
                     onProgressChange();
                     break;
                 }

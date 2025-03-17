@@ -137,6 +137,6 @@ begrensninger under lisensen.</string>
     <string name="notification_desc1">Appen kan fungere i bakgrunnet, for å muliggjøre kombinering med andre sportapper.</string>
     <string name="whatsnew">NYE FUNKSJONER:\n\n- Rediger og backup av trening.\n- alternativ pipelyd.</string>
     <string name="copy">KOPIERE</string>
-    <string name="copy_to_presets">KOPIERE TIL TRENINGER</string>
+    <string name="copy_to_presets">RESTAURERE TIL TRENINGER</string>
 
 </resources>
