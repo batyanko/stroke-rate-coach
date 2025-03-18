@@ -65,9 +65,6 @@ import com.batyanko.strokeratecoach.sync.BeeperService;
 import com.batyanko.strokeratecoach.sync.BeeperServiceUtils;
 import com.batyanko.strokeratecoach.sync.BeeperTasks;
 
-/**
- * A simple {@link Fragment} subclass.
- */
 public class SlideFragment extends Fragment implements SvAdapter.ListItemClickListener {
 
     private static final int TAB_COUNT = 4;
@@ -169,12 +166,12 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
 
         // Get the ViewPager and set it's PagerAdapter so that it can display items
-        mViewPager = (ViewPager) view.findViewById(R.id.viewpager);
+        mViewPager = view.findViewById(R.id.viewpager);
         mViewPager.setAdapter(new SlidePagerAdapter());
 
         // Give the SlidingTabLayout the ViewPager, this must be done AFTER the ViewPager has had
         // it's PagerAdapter set.
-        mSlidingTabLayout = (SlidingTabLayout) view.findViewById(R.id.sliding_tabs);
+        mSlidingTabLayout = view.findViewById(R.id.sliding_tabs);
         mSlidingTabLayout.setViewPager(mViewPager);
 
         ViewGroup bigChild = (ViewGroup) mSlidingTabLayout.getChildAt(0);
@@ -248,9 +245,9 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                     @Override
                     public void onClick(View view) {
                         String wId = cursor.getString(cursor.getColumnIndex(WorkoutEntry1._ID));
-                        intent = new Intent(getActivity(), EntryFormActivity.class);
-                        intent.putExtra(EXTRA_WORKOUT_ID, wId);
-                        startActivity(intent);
+                        Intent entryIntent = new Intent(getActivity(), EntryFormActivity.class);
+                        entryIntent.putExtra(EXTRA_WORKOUT_ID, wId);
+                        startActivity(entryIntent);
                         descPopupWindow.dismiss();
                     }
                 });
@@ -274,7 +271,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                     );
                     if (added) {
                         presetsAdapter.swapCursor(getAllPresets(), workoutIsRunning, lastWorkoutId);
-                        if (tableName.equals(WorkoutEntry1.TABLE_NAME_TRASH)){
+                        if (tableName.equals(WorkoutEntry1.TABLE_NAME_TRASH)) {
                             removeWorkout(clickedItemId, WorkoutEntry1.TABLE_NAME_TRASH);
                             trashAdapter.swapCursor(getAllTrash(), workoutIsRunning, lastWorkoutId);
                             WaveUtilities.ShowShortToast("Restored to Workouts.", getContext());
@@ -381,6 +378,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
             default:
         }
     }
+
     private class SlidePagerAdapter extends PagerAdapter {
         private String pageTitle;
 
@@ -415,16 +413,13 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                     break;
                 }
             }
-
             return pageTitle;
         }
 
         @NonNull
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
-
             View view;
-
 
             switch (position) {
                 case SPEED_DIAL_POSITION: {
@@ -441,17 +436,6 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                                 setSpmFromDigital(position + 1, view);
                             } else if (position == 10) {
                                 setSpmFromDigital(0, view);
-                            } else if (position == 9) {
-//                                checkBeeper();
-//                                stopBeeper();
-                            } else if (position == 11) {
-//                                getActivity().setTheme(R.style.AppThemeLight);
-//                                final Context contextThemeWrapper = new ContextThemeWrapper(getActivity(), R.style.Theme_AppCompat_Light);
-//                                contextThemeWrapper.setTheme(R.style.AppThemeLight);
-
-//                                checkBeeper(intent);
-//                                Intent intent = new Intent(SlideFragment.this.getActivity(), SpeedActivity.class);
-//                                startActivity(intent);
                             }
                         }
                     });
@@ -459,7 +443,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                 }
                 case PRESETS_POSITION: {
                     view = requireActivity().getLayoutInflater().inflate(R.layout.fragment_presets, container, false);
-                    presetRV = (RecyclerView) view.findViewById(R.id.preset_rv);
+                    presetRV = view.findViewById(R.id.preset_rv);
                     LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
                     presetRV.setLayoutManager(layoutManager);
                     presetRV.setAdapter(presetsAdapter);
@@ -470,7 +454,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                 }
                 case HISTORY_POSITION: {
                     view = requireActivity().getLayoutInflater().inflate(R.layout.fragment_history, container, false);
-                    historyRV = (RecyclerView) view.findViewById(R.id.history_rv);
+                    historyRV = view.findViewById(R.id.history_rv);
                     LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
                     historyRV.setLayoutManager(layoutManager);
                     historyRV.setAdapter(historyAdapter);
@@ -481,7 +465,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                 }
                 case TRASH_POSITION: {
                     view = requireActivity().getLayoutInflater().inflate(R.layout.fragment_trash, container, false);
-                    trashRV = (RecyclerView) view.findViewById(R.id.trash_rv);
+                    trashRV = view.findViewById(R.id.trash_rv);
                     LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
                     trashRV.setLayoutManager(layoutManager);
                     trashRV.setAdapter(trashAdapter);
@@ -494,7 +478,6 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                     view = requireActivity().getLayoutInflater().inflate(R.layout.fragment_dial, container, false);
                 }
             }
-
             container.addView(view);
 
             return view;
@@ -531,12 +514,6 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                 firstDigit = digitalInput;
                 firstDigitView = view;
             }
-
-//            Log.d("GridHeight!!!: ", "" + dialGrid.getHeight());
-//            Log.d("WindowHeight!!!: ", "" + windowHeight);
-//
-//            ConstraintLayout constraintLayout = (ConstraintLayout) findViewById(R.id.activity_main);
-//            Log.d("Constrai PostCreate???:", "" + constraintLayout.getHeight());
         }
     }
 
@@ -547,17 +524,13 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         intent.putExtra(BeeperTasks.EXTRA_WORKOUT_GEARS, gearSettings);
         intent.putExtra(BeeperTasks.EXTRA_WORKOUT_SPP_TYPE, sppType);
 
-//        if (requestLocation()) {
-//            Log.d("HAS PERMISSON", "HAS LOCATION");
         startBeeper();
-//        }
         ;
     }
 
     public void startBeeper() {
         this.requireActivity().startService(intent);
         BeeperServiceUtils.doBindService(intent, requireActivity(), mConnection);
-        //        lastClickedEngageButton.setBackgroundResource(R.drawable.ic_menu_play_clip_negative);
     }
 
     //TODO extract static method and use in Notification stopper

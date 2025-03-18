@@ -73,15 +73,10 @@ public class BeeperServiceUtils {
     }
 
     public static void doBindService(Intent intent, Context context, ServiceConnection connection) {
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-//            context.startService(intent);
-//            return;
-//        }
-//        if (mIsBound) {
-//            doUnbindService(context, connection);
-//        }
-        context.bindService(intent, connection, Context.BIND_AUTO_CREATE);
-        mIsBound = true;
+        if (mIsBound) {
+            doUnbindService(context);
+        }
+        mIsBound = context.bindService(intent, connection, Context.BIND_AUTO_CREATE);
     }
 
     public static void doUnbindService(Context context) {
