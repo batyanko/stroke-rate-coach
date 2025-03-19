@@ -24,7 +24,6 @@ import static com.batyanko.strokeratecoach.data.WorkoutContract.WorkoutEntry1.CO
 import static com.batyanko.strokeratecoach.data.WorkoutContract.WorkoutEntry1.COLUMN_TIMESTAMP;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -53,20 +52,13 @@ import java.util.TimeZone;
 
 public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder> {
 
-    private String textHolder;
-
     private String tableName;
 
-
-    private int mNumItems;
     final private ListItemClickListener mOnClickListener;
-
-    private SharedPreferences sharedPreferences;
 
     //////////////////
     //Database stuff
     private Cursor gottenCursor;
-    private Cursor historyCursor;
     private Context mContext;
     private boolean workoutIsRunning;
     private int workoutId;
@@ -95,17 +87,6 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
         color = typedValue.data;
     }
 
-    /**
-     * DB adapter for the history list
-     */
-    public SvAdapter(Context context, Cursor gottenCursor, Cursor historyCursor, ListItemClickListener listener) {
-        mContext = context;
-        this.gottenCursor = gottenCursor;
-        this.historyCursor = historyCursor;
-        mOnClickListener = listener;
-    }
-
-
     @Override
     public ExerciseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
@@ -115,13 +96,11 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
         boolean shouldAttachToParentImmediately = false;
 
         View itemView = inflater.inflate(layoutIdForListItem, parent, shouldAttachToParentImmediately);
-//        itemView.setBackgroundColor(color);
         return new ExerciseViewHolder(itemView);
     }
 
     @Override
     public void onBindViewHolder(ExerciseViewHolder holder, int position) {
-        //More like holder.bind(DatabaseHelper.getExercise(exerciseID));
         holder.bind(position);
     }
 
@@ -145,13 +124,11 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
         public ExerciseViewHolder(View itemView) {
             super(itemView);
 
-            workoutTitle = (TextView) itemView.findViewById(R.id.workout_title);
-            workoutTime = (TextView) itemView.findViewById(R.id.workout_time);
-            workoutDate = (TextView) itemView.findViewById(R.id.workout_date);
-            workoutDesc = (TextView) itemView.findViewById(R.id.exercise_desc);
-//            delButton = (Button) itemView.findViewById(R.id.del_button);
-            engageButton = (ImageView) itemView.findViewById(R.id.engage_button);
-//            delButtonId = delButton.getId();
+            workoutTitle = itemView.findViewById(R.id.workout_title);
+            workoutTime = itemView.findViewById(R.id.workout_time);
+            workoutDate = itemView.findViewById(R.id.workout_date);
+            workoutDesc = itemView.findViewById(R.id.exercise_desc);
+            engageButton = itemView.findViewById(R.id.engage_button);
             engageButtonId = engageButton.getId();
         }
 
@@ -182,8 +159,6 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
         }
 
         private void bind(int position) {
-//            workoutDesc.setText(String.valueOf(position));
-
             ////////////////
             //SQLite stuff
             if (!gottenCursor.moveToPosition(position))
@@ -194,17 +169,12 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
                 engageButton.setBackgroundResource(R.drawable.ic_play_4_negative);
 
             } else {
-//                engageButton.setBackgroundResource(android.R.drawable.ic_media_play);
                 engageButton.setBackgroundResource(R.drawable.ic_play_4);
             }
-//            delButton.setBackgroundResource(R.drawable.dialog_ic_close_focused_holo_light);
-//            delButton.setBackgroundResource(R.drawable.ic_delete);
-//            delButton.setOnClickListener(this);
             workoutDesc.setOnClickListener(this);
             engageButton.setOnClickListener(this);
             itemView.setOnClickListener(this);
 
-            String scrollItemName;
             String sppType;
 
             String timestampFromSQLite = gottenCursor.getString(gottenCursor.getColumnIndex(COLUMN_TIMESTAMP));
@@ -244,29 +214,8 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
                         sppType = "";
                     }
                 }
-                String at = mContext.getString(R.string.gear_title_text) + " ";
-
-                //Show workout phase details
-                /*if (tableName.equals(WorkoutContract.WorkoutEntry1.TABLE_NAME_PRESETS)) {
-                    scrollItemName =
-                            sppType +
-                            "\n" +
-                            gottenCursor.getString(gottenCursor.getColumnIndex(COLUMN_SPP_CSV)) +
-                            " " +
-                            at +
-                            gottenCursor.getString(gottenCursor.getColumnIndex(COLUMN_GEARS_CSV));
-                } else {
-                    scrollItemName =
-                            sppType +
-                            "\n" +
-                            gottenCursor.getString(gottenCursor.getColumnIndex(COLUMN_SPP_CSV)) +
-                            " " +
-                            at +
-                            gottenCursor.getString(gottenCursor.getColumnIndex(COLUMN_GEARS_CSV));
-                }*/
 
             } else {
-//                scrollItemName = gottenCursor.getString(gottenCursor.getColumnIndex(COLUMN_NAME));
                 sppType = "";
             }
 

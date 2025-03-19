@@ -52,9 +52,6 @@ public class SpeedViewAdapter extends ArrayAdapter<String> implements SpinnerAda
         this.viewResource = resource;
 
         pref = PreferenceManager.getDefaultSharedPreferences(context);
-
-
-
     }
 
     @NonNull
@@ -79,13 +76,12 @@ public class SpeedViewAdapter extends ArrayAdapter<String> implements SpinnerAda
 
         text = contentString[position];
 
-//        parent.setBackgroundResource(R.color.colorAccent);
         TextView textView = view.findViewById(R.id.spinner_tv);
         textView.setText(text);
 
         textView.setBackgroundDrawable(new ColorDrawable(color));
         textView.setTextSize(parent.getResources().getDimension(R.dimen.speed_strip_text_size)
-        / parent.getResources().getDisplayMetrics().density);
+                / parent.getResources().getDisplayMetrics().density);
         return textView;
     }
 

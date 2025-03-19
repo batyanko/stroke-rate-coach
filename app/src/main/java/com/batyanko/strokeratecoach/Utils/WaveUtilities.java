@@ -6,7 +6,6 @@ import static com.batyanko.strokeratecoach.WaveActivity.NOTIFICATION_PERMISSION;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
@@ -42,7 +41,7 @@ public class WaveUtilities {
         }
     }
 
-    public static void ShowShortToast (String string, Context context) {
+    public static void ShowShortToast(String string, Context context) {
         if (mToast != null) {
             mToast.cancel();
         }
@@ -50,7 +49,7 @@ public class WaveUtilities {
         mToast.show();
     }
 
-    public static void ShowLongToast (String string, Context context) {
+    public static void ShowLongToast(String string, Context context) {
         if (mToast != null) {
             mToast.cancel();
         }

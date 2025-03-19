@@ -31,7 +31,6 @@ import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -48,9 +47,7 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
@@ -58,6 +55,7 @@ import android.widget.PopupWindow;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -78,15 +76,12 @@ import java.util.TimerTask;
 
 public class WaveActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener, PopupMenu.OnMenuItemClickListener {
 
-    public static final String TAG = "StrokeRateCoach";
-
     //Constants for OnSharedPreferenceChangeListener
     public static final String OPERATION_SETTING = "operation";
     public static final String SWITCH_SETTING = "switch";
     public static final String SPM_SETTING = "spm";
 
     //Workout types
-    public static final int WORKOUT_WAVE = 1;   //Deprecated
     public static final int WORKOUT_INTERVAL = 2;
     public static final int WORKOUT_SIMPLE = 3;
     public static final int WORKOUT_LAST = 9;
@@ -113,30 +108,23 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     public static final String WORKOUT_PROGRESS = "total-strokes-elapsed";
     public static final String CURRENT_COLOR = "current-phase";
     public static final String CURRENT_SPEED = "current-speed";
-    public static final String CURRENT_SPEED_TIMESTAMP = "current-speed-timestamp";
     public static final String SPEED_LIMIT = "speed-limit";
     public static final String SPEED_LIMIT_SWITCH = "speed-limit-switch";
     public static final String SPEED_UNIT = "speed-unit";
     public static final String SPEED_MS_SETTING = "m/s";
     public static final String SPEED_500M_SETTING = "/500m";
-    public static final String COUNTDOWN_RUNNING = "countdown-running";
     public static final String COUNTDOWN_DURATION = "countdown-duration";   //In ms
     public static final String COUNTDOWN_DURATION_LEFT = "countdown-duration-left";   //In ms
     public static final String BEEP = "beep";
     public static final String THEME_COLOR = "theme-color";
-    public static final String DAT_HASH = "dat-hash";
     public static final String WARN = "teh-warn";
     public static final String GPS_LOCKING = "gps-lock";
     public static final String LOCATION_ACCURACY = "loc-accuracy";
     public static final boolean THEME_LIGHT = false;
     public static final boolean THEME_DARK = true;
-    //R.string.theme_setting_key
     public static final String THEME = "theme";
-    //R.string.starting_loc_accuracy_setting_key
     public static final String LOCATION_ACCURACY_ACCEPTABLE = "starting-loc-accuracy";
-    public static final String CUSTOM_SOUND_PATH = "custom-sound-path";
     public static final String CUSTOM_SOUND = "custom-sound";
-    //R.string.speed_sample_count_setting_key
     public static final String SPEED_SAMPLE_COUNT = "speed-sample-count";
 
     /* Global spm setting to hold current spm */
@@ -157,8 +145,6 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     private TextView speedLimitView;
     private Spinner speedUnitSpinner;
     private TextView stopperButton;
-    private View speedUnitStack;
-    private View speedLimitStack;
 
     private static Animation beeperAnimation;
     public static Animation warningAnimation;
@@ -167,8 +153,6 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     private ImageView speedUnitLegend;
     private TextView speedSpeedLegend;
     private TextView speedLimitLegend;
-
-    private ImageView water;
 
     private SharedPreferences pref;
 
@@ -227,25 +211,8 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         countdownDigit = findViewById(R.id.countdown_digit);
         countdownDigit.setVisibility(View.INVISIBLE);
 
-//        countdownView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                countdownView.setVisibility(View.INVISIBLE);
-//                countdownDigit.setVisibility(View.INVISIBLE);
-//            }
-//        });
-//        countdownDigit.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                countdownView.setVisibility(View.INVISIBLE);
-//                countdownDigit.setVisibility(View.INVISIBLE);
-//            }
-//        });
-
-//        animateSplash(1500);
-
-        viewGroup = (ViewGroup) findViewById(R.id.activity_wave);
-        speedStrip = (ViewGroup) findViewById(R.id.speed_strip);
+        viewGroup = findViewById(R.id.activity_wave);
+        speedStrip = findViewById(R.id.speed_strip);
         final LayoutInflater inflater = (LayoutInflater) WaveActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         orientation = getResources().getConfiguration().orientation;
@@ -274,28 +241,25 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         this.getWindow().getDecorView().setBackgroundColor(
                 pref.getInt(THEME_COLOR, getResources().getColor(R.color.backgroundLight)));
 
-        progressFrameLayout = (FrameLayout) findViewById(R.id.progress_frame_layout);
-        waveProgress = (ProgressBar) findViewById(R.id.wave_progress_bar);
+        progressFrameLayout = findViewById(R.id.progress_frame_layout);
+        waveProgress = findViewById(R.id.wave_progress_bar);
         waveProgress.setVisibility(View.INVISIBLE);
 
-        spmTextView = (TextView) findViewById(R.id.spm_text_view);
+        spmTextView = findViewById(R.id.spm_text_view);
         spmTextView.setText(String.valueOf(spm));
-        progressTextView = (TextView) findViewById(R.id.progressTextView);
+        progressTextView = findViewById(R.id.progressTextView);
 
         legendStrip = findViewById(R.id.legend_strip);
 
-        stopperButton = (TextView) findViewById(R.id.stop_button);
-        stopperButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                slideFragment.stopBeeper();
-                flushGUI();
-            }
+        stopperButton = findViewById(R.id.stop_button);
+        stopperButton.setOnClickListener(view -> {
+            slideFragment.stopBeeper();
+            flushGUI();
         });
 
         String[] speeds = {SPEED_MS_SETTING, SPEED_500M_SETTING};
         String initSpeedUnit = pref.getString(SPEED_UNIT, SPEED_MS_SETTING);
-        speedUnitSpinner = (Spinner) findViewById(R.id.speed_unit);
+        speedUnitSpinner = findViewById(R.id.speed_unit);
         final SpeedViewAdapter myAdapter = new SpeedViewAdapter(this, R.layout.spinner_tv, speeds);
 
         AdapterView.OnItemSelectedListener spinnerListener = new AdapterView.OnItemSelectedListener() {
@@ -315,9 +279,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
-
             }
-
         };
         speedUnitSpinner.setAdapter(myAdapter);
         speedUnitSpinner.setOnItemSelectedListener(spinnerListener);
@@ -326,181 +288,107 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
                 (initSpeedUnit.equals(SPEED_MS_SETTING) ? 0 : 1)
         );
 
-        speedView = (TextView) findViewById(R.id.speed_view);
-        speedView.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-                speedUnitSpinner.performClick();
-            }
-        });
+        speedView = findViewById(R.id.speed_view);
+        speedView.setOnClickListener(view -> speedUnitSpinner.performClick());
         speedUnitLegend = findViewById(R.id.speed_unit_legend);
-        speedUnitLegend.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-                speedUnitSpinner.performClick();
-            }
-        });
+        speedUnitLegend.setOnClickListener(view -> speedUnitSpinner.performClick());
         speedSpeedLegend = findViewById(R.id.speed_speed_legend);
-        speedSpeedLegend.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-                speedUnitSpinner.performClick();
-            }
-        });
+        speedSpeedLegend.setOnClickListener(view -> speedUnitSpinner.performClick());
         speedLimitLegend = findViewById(R.id.speed_limit_legend);
-        speedLimitLegend.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-                speedLimitView.performClick();
-            }
-        });
+        speedLimitLegend.setOnClickListener(view -> speedLimitView.performClick());
 
 
         imm = (InputMethodManager)
                 getSystemService(Context.INPUT_METHOD_SERVICE);
 
-        speedLimitStack = findViewById(R.id.speed_limit_stack);
-        speedUnitStack = findViewById(R.id.speed_unit_stack);
-
-        speedLimitView = (TextView) findViewById(R.id.speed_limit_view);
+        speedLimitView = findViewById(R.id.speed_limit_view);
         updateSpeedUnit();
-        speedLimitView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                float density = WaveActivity.this.getResources().getDisplayMetrics().density;
-                speedLimitPopupLayout = inflater.inflate(R.layout.speed_limit_layout, null);
+        speedLimitView.setOnClickListener(view -> {
+            float density = WaveActivity.this.getResources().getDisplayMetrics().density;
+            speedLimitPopupLayout = inflater.inflate(R.layout.speed_limit_layout, null);
 
-                speedPopupWindow = new PopupWindow(speedLimitPopupLayout, windowWidth, LinearLayout.LayoutParams.WRAP_CONTENT, true);
-                speedPopupWindow.setBackgroundDrawable(
-                        new ColorDrawable(pref.getInt(THEME_COLOR, getResources().getColor(R.color.backgroundLight))));
+            speedPopupWindow = new PopupWindow(speedLimitPopupLayout, windowWidth, LinearLayout.LayoutParams.WRAP_CONTENT, true);
+            speedPopupWindow.setBackgroundDrawable(
+                    new ColorDrawable(pref.getInt(THEME_COLOR, getResources().getColor(R.color.backgroundLight))));
 
-                speedPopupWindow.setElevation(100f);
+            speedPopupWindow.setElevation(100f);
 
-                speedPopupWindow.showAsDropDown(speedLimitView);
-                speedPopupWindow.showAtLocation(speedLimitPopupLayout, Gravity.CENTER, 0, (int) density * 100);
+            speedPopupWindow.showAsDropDown(speedLimitView);
+            speedPopupWindow.showAtLocation(speedLimitPopupLayout, Gravity.CENTER, 0, (int) density * 100);
 
-                speedLimitTv500m = speedLimitPopupLayout.findViewById(R.id.speed_limit_tv_500m);
-                int speedLimit = pref.getInt(SPEED_LIMIT, 0);
-                speedLimitTv500m.setText(getSpeedPer500(((float) speedLimit) / 100));
+            speedLimitTv500m = speedLimitPopupLayout.findViewById(R.id.speed_limit_tv_500m);
+            int speedLimit = pref.getInt(SPEED_LIMIT, 0);
+            speedLimitTv500m.setText(getSpeedPer500(((float) speedLimit) / 100));
 
-                speedLimitSwitch =
-                        speedLimitPopupLayout.findViewById(R.id.speed_limit_switch);
-                speedLimitEditText = speedLimitPopupLayout.findViewById(R.id.speed_limit_edit_text);
-                speedLimitEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-                    @Override
-                    public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
-                        if (actionId == EditorInfo.IME_ACTION_DONE) {
-                            updateSpeedLimitPref();
-                            speedPopupWindow.dismiss();
-                            return true;
-                        }
-                        return false;
-                    }
-                });
-                speedLimitEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-                    @Override
-                    public void onFocusChange(View view, boolean b) {
-                        imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
-                        speedLimitEditText.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                imm.showSoftInput(speedLimitEditText, InputMethodManager.SHOW_IMPLICIT);
-                            }
-                        });
-                    }
-                });
+            speedLimitSwitch =
+                    speedLimitPopupLayout.findViewById(R.id.speed_limit_switch);
+            speedLimitEditText = speedLimitPopupLayout.findViewById(R.id.speed_limit_edit_text);
+            speedLimitEditText.setOnEditorActionListener((textView, actionId, keyEvent) -> {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    updateSpeedLimitPref();
+                    speedPopupWindow.dismiss();
+                    return true;
+                }
+                return false;
+            });
+            speedLimitEditText.setOnFocusChangeListener((view1, b) -> {
+                imm.showSoftInput(view1, InputMethodManager.SHOW_IMPLICIT);
+                speedLimitEditText.post(() -> imm.showSoftInput(speedLimitEditText, InputMethodManager.SHOW_IMPLICIT));
+            });
 
-                final Button setLimit = speedLimitPopupLayout.findViewById(R.id
-                        .speed_limit_setter_button);
-                final ImageView up = speedLimitPopupLayout.findViewById(R.id.increase_speed);
-                final ImageView down = speedLimitPopupLayout.findViewById(R.id.decrease_speed);
+            final Button setLimit = speedLimitPopupLayout.findViewById(R.id
+                    .speed_limit_setter_button);
+            final ImageView up = speedLimitPopupLayout.findViewById(R.id.increase_speed);
+            final ImageView down = speedLimitPopupLayout.findViewById(R.id.decrease_speed);
 
-                String speedLimitString = "" + pref.getInt(SPEED_LIMIT, 0);
-                speedLimitString = getSpeedString(speedLimitString);
-                speedLimitEditText.setText(speedLimitString);
-                speedLimitEditText.selectAll();
+            String speedLimitString = "" + pref.getInt(SPEED_LIMIT, 0);
+            speedLimitString = getSpeedString(speedLimitString);
+            speedLimitEditText.setText(speedLimitString);
+            speedLimitEditText.selectAll();
 
-                setLimit.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        updateSpeedLimitPref();
-                        speedPopupWindow.dismiss();
-                    }
-                });
+            setLimit.setOnClickListener(view2 -> {
+                updateSpeedLimitPref();
+                speedPopupWindow.dismiss();
+            });
 
-                speedLimitSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(CompoundButton compoundButton, boolean isOn) {
-                        pref.edit().putBoolean(SPEED_LIMIT_SWITCH, isOn).apply();
-                        updateSpeedSwitchGUI(isOn);
-                        if (isOn) {
-                            imm.showSoftInput(speedLimitEditText, InputMethodManager.SHOW_IMPLICIT);
-                        }
+            speedLimitSwitch.setOnCheckedChangeListener((compoundButton, isOn) -> {
+                pref.edit().putBoolean(SPEED_LIMIT_SWITCH, isOn).apply();
+                updateSpeedSwitchGUI(isOn);
+                if (isOn) {
+                    imm.showSoftInput(speedLimitEditText, InputMethodManager.SHOW_IMPLICIT);
+                }
 
-                    }
-                });
-                boolean switchOn = pref.getBoolean(SPEED_LIMIT_SWITCH, false);
-                speedLimitSwitch.setChecked(switchOn);
-                updateSpeedSwitchGUI(switchOn);
+            });
+            boolean switchOn = pref.getBoolean(SPEED_LIMIT_SWITCH, false);
+            speedLimitSwitch.setChecked(switchOn);
+            updateSpeedSwitchGUI(switchOn);
 
-                //                speedLimitEditText.requestFocus();
-                up.setOnTouchListener(new View.OnTouchListener() {
-                    @Override
-                    public boolean onTouch(View view, MotionEvent motionEvent) {
-                        if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                            upIsTouched = true;
-                            incrementSpeedTrigger();
-                        } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                            upIsTouched = false;
-                        }
-                        return true;
-                    }
-                });
-                down.setOnTouchListener(new View.OnTouchListener() {
-                    @Override
-                    public boolean onTouch(View view, MotionEvent motionEvent) {
-                        if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                            downIsTouched = true;
-                            incrementSpeedTrigger();
-                        } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                            downIsTouched = false;
-                        }
-                        return true;
-                    }
-                });
-
-
-//                saveAndExit.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View view) {
-//                        speedPopupWindow.dismiss();
-//                    }
-//                });
-            }
+            up.setOnTouchListener((view3, motionEvent) -> {
+                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                    upIsTouched = true;
+                    incrementSpeedTrigger();
+                } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                    upIsTouched = false;
+                }
+                return true;
+            });
+            down.setOnTouchListener((view4, motionEvent) -> {
+                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                    downIsTouched = true;
+                    incrementSpeedTrigger();
+                } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                    downIsTouched = false;
+                }
+                return true;
+            });
         });
 
         beeperAnimation = AnimationUtils.loadAnimation(WaveActivity.this, R.anim.on_click);
         warningAnimation = AnimationUtils.loadAnimation(WaveActivity.this, R.anim.on_warn);
 
-        /*createButton = (Button) findViewById(R.id.create_workout_button);
-        createButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(WaveActivity.this, EntryFormActivity.class);
-                startActivity(intent);
-            }
-        });
-        createButton.setVisibility(View.VISIBLE);
-        */
-
         int resource = getResources().getIdentifier("status_bar_height", "dimen", "android");
         if (resource > 0) {
             statusbarHeight = getResources().getDimensionPixelSize(resource);
-//            Log.d("Statusbar Height!!!: ", "" + statusbarHeight);
         }
 
         gpsSplashLayout = findViewById(R.id.gps_splash_layout);
@@ -510,44 +398,32 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         gpsLocatorImage.setVisibility(View.INVISIBLE);
         gpsSplashText.setVisibility(View.INVISIBLE);
 
-        gpsSplashRunnable = new Runnable() {
-            @Override
-            public void run() {
-                gpsLocatorImage.startAnimation(getGpsAnimationSet());
-            }
-        };
+        gpsSplashRunnable = () -> gpsLocatorImage.startAnimation(getGpsAnimationSet());
 
-        gpsSplashLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                BeeperTasks.completeLocking();
-            }
-        });
+        gpsSplashLayout.setOnClickListener(view -> BeeperTasks.completeLocking());
 
 
         menuTextView = findViewById(R.id.menu_image_view);
         popupMenu = new PopupMenu(WaveActivity.this, menuTextView);
         popupMenu.inflate(R.menu.menu_options);
         popupMenu.setOnMenuItemClickListener(WaveActivity.this);
-        menuTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                popupMenu.show();
-            }
-        });
+        menuTextView.setOnClickListener(view -> popupMenu.show());
 
         //Bind to service if already running (in case of screen rotation / onDestroy)
 
         updateSpeedLimitView(pref.getBoolean(SPEED_LIMIT_SWITCH, false));
         firstRunInit();
+
+        //Assuming no running workout at onCreate()
+        if (!BeeperServiceUtils.serviceIsRunning()) {
+            pref.edit().putInt(OPERATION_SETTING, WORKOUT_STOP).apply();
+        }
         flushGUI();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        Log.d("PROGRESS", "onStart()");
-//        WaveActivity act = WaveActivity.this;
         onProgressChange();
     }
 
@@ -556,11 +432,6 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         super.onResume();
 
         onThemeChange(pref);
-
-        // Short splash on return
-        if (!countdownBeingAnimated) {
-//            animateSplash(1000);
-        }
 
         if (pref.getInt(OPERATION_SETTING, WORKOUT_STOP) == WORKOUT_INTERVAL) {
             //Bind to service if a workout is running
@@ -599,8 +470,6 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         if (BeeperServiceUtils.serviceIsRunning()) {
             BeeperServiceUtils.doUnbindService(this);
         }
-//        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
-//        pref.unregisterOnSharedPreferenceChangeListener(this);
     }
 
     /**
@@ -615,22 +484,11 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
                     constraintSet.connect(R.id.spm_text_view, ConstraintSet.BOTTOM, R.id.guideline_hor50, ConstraintSet.BOTTOM);
                     constraintSet.applyTo((ConstraintLayout) viewGroup);
                 }
-
                 progressFrameLayout.setVisibility(View.GONE);
-//                waveProgress.setVisibility(View.GONE);
-//                progressTextView.setVisibility(View.GONE);
-//                createButton.setVisibility(View.VISIBLE);
                 speedStrip.setVisibility(View.GONE);
-//                speedUnitStack.setVisibility(View.GONE);
-//                speedView.setVisibility(View.GONE);
-//                speedLimitStack.setVisibility(View.GONE);
-//                stopperButton.setVisibility(View.INVISIBLE);
                 legendStrip.setVisibility(View.GONE);
                 countdownView.setVisibility(View.GONE);
                 menuTextView.setVisibility(View.VISIBLE);
-
-                //Setup spmTsxtView
-//                spmTextView.layout
                 break;
             }
             case WORKOUT_SIMPLE: {
@@ -638,23 +496,13 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
                     constraintSet.connect(R.id.legend_strip, ConstraintSet.TOP, R.id.activity_wave, ConstraintSet.TOP);
                     constraintSet.connect(R.id.speed_strip, ConstraintSet.TOP, R.id.legend_strip, ConstraintSet.BOTTOM);
                     constraintSet.connect(R.id.spm_text_view, ConstraintSet.TOP, R.id.speed_strip, ConstraintSet.BOTTOM);
-//                constraintSet.connect(R.id.spm_text_view, ConstraintSet.BOTTOM, R.id.guideline_hor50, ConstraintSet.BOTTOM);
                     constraintSet.applyTo((ConstraintLayout) viewGroup);
                     speedStrip.bringToFront();
                 }
                 pref.edit().putBoolean(GPS_LOCKING, false).apply();
                 progressFrameLayout.setVisibility(View.GONE);
-//                waveProgress.setVisibility(View.GONE);
-//                progressTextView.setVisibility(View.GONE);
-//                createButton.setVisibility(View.INVISIBLE);
                 speedStrip.setVisibility(View.VISIBLE);
-//                speedStrip.bringToFront();
-//                speedUnitStack.setVisibility(View.VISIBLE);
-//                speedView.setVisibility(View.VISIBLE);
-//                speedLimitStack.setVisibility(View.VISIBLE);
-//                stopperButton.setVisibility(View.VISIBLE);
                 legendStrip.setVisibility(View.VISIBLE);
-//                legendStrip.bringToFront();
                 countdownView.setVisibility(View.INVISIBLE);
                 menuTextView.setVisibility(View.INVISIBLE);
 
@@ -672,15 +520,8 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
                 progressFrameLayout.setVisibility(View.VISIBLE);
                 waveProgress.setVisibility(View.VISIBLE);
                 progressTextView.setVisibility(View.VISIBLE);
-//                createButton.setVisibility(View.INVISIBLE);
                 speedStrip.setVisibility(View.VISIBLE);
-//                speedStrip.bringToFront();
-//                speedUnitStack.setVisibility(View.VISIBLE);
-//                speedView.setVisibility(View.VISIBLE);
-//                speedLimitStack.setVisibility(View.VISIBLE);
-//                stopperButton.setVisibility(View.VISIBLE);
                 legendStrip.setVisibility(View.VISIBLE);
-//                legendStrip.bringToFront();
                 countdownView.setVisibility(View.INVISIBLE);
                 menuTextView.setVisibility(View.INVISIBLE);
 
@@ -688,8 +529,6 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         }
         updateGpsSplash();
         countdownDigit.setVisibility(View.INVISIBLE);
-//        spmTextView.setText("0");
-//        spmTextView.setBackgroundColor(Color.TRANSPARENT);
     }
 
     /**
@@ -702,7 +541,6 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
-//        Log.d("PROGRESS", "Pref changed");
         if (s.equals(SPM_SETTING)) {
             spm = sharedPreferences.getInt(SPM_SETTING, 22);
             spmTextView.setText(String.valueOf(spm));
@@ -743,34 +581,27 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
             updateSpeedUnit();
         } else if (s.equals(CURRENT_COLOR)) {
             //TODO show color somewhere on the UI
-//            spmTextView.setBackgroundColor(sharedPreferences.getInt(CURRENT_COLOR, Color.TRANSPARENT));
         } else if (s.equals(COUNTDOWN_DURATION_LEFT)) {
-//            createButton.setVisibility(View.INVISIBLE);
             int duration = sharedPreferences.getInt(COUNTDOWN_DURATION, 3000) / 1000;
             int durationLeft = sharedPreferences.getInt(COUNTDOWN_DURATION_LEFT, 0) / 1000;
             String countdownString = durationLeft + "";
             if (durationLeft == 0) {
                 countdownView.setVisibility(View.INVISIBLE);
                 countdownDigit.setVisibility(View.INVISIBLE);
-//                SlideFragment.lastClickedEngageButton.setBackgroundResource(R.drawable.ic_menu_play_clip_negative);
             } else {
                 countdownDigit.setText(countdownString);
                 countdownView.bringToFront();
-//                countdownView.requestLayout();
                 countdownView.setVisibility(View.VISIBLE);
                 countdownDigit.setVisibility(View.VISIBLE);
                 countdownDigit.bringToFront();
                 if (durationLeft == duration) {
                     AnimationSet animationSet = new AnimationSet(true);
-                    /*Animation animationOut = AnimationUtils.loadAnimation(WaveActivity.this, R.anim.alpha_fade);
-                    Animation animationIn = AnimationUtils.loadAnimation(WaveActivity.this, R.anim.alpha_fade_in);*/
-                    Animation animationIn = new ScaleAnimation(0, 1, 0, 1, 20, windowHeight * 3 / 4);
+                    Animation animationIn = new ScaleAnimation(0, 1, 0, 1, 20, (float) (windowHeight * 3) / 4);
                     Animation animationOut = new AlphaAnimation(1, 0);
                     animationOut.setDuration(duration * 1000 - 100);
                     animationOut.setStartOffset(100);
                     animationIn.setDuration(100);
                     animationSet.addAnimation(animationIn);
-//                    animationSet.addAnimation(animationOut);
                     countdownView.startAnimation(animationSet);
                     countdownDigit.startAnimation(animationSet);
                 }
@@ -867,7 +698,6 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         int workoutProgressPercent = (int) (((float) workoutProgress[0] / (float) workoutProgress[1]) * 100);
         waveProgress.setSecondaryProgress(workoutProgressPercent);
 
-//        spmTextView.setBackgroundColor(pref.getInt(CURRENT_COLOR, Color.TRANSPARENT));
     }
 
     private void onSpeedChange(SharedPreferences sharedPreferences) {
@@ -907,7 +737,6 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     }
 
     public void onSpmClicked(View view) {
-//        view.performClick();
         //Bounce
         spmTextView.startAnimation(AnimationUtils.loadAnimation(WaveActivity.this, R.anim.on_click));
 
@@ -1043,13 +872,10 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 
         countdownBeingAnimated = true;
         countdownView.animate().alpha(0f).setDuration(duration).withEndAction(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        countdownView.setAlpha(1f);
-                        countdownView.setVisibility(View.INVISIBLE);
-                        countdownBeingAnimated = false;
-                    }
+                () -> {
+                    countdownView.setAlpha(1f);
+                    countdownView.setVisibility(View.INVISIBLE);
+                    countdownBeingAnimated = false;
                 }
         );
     }
@@ -1087,7 +913,6 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         Animation animation3 = new TranslateAnimation(0f, -100f, 0f, 000f);
         Animation animation4 = new TranslateAnimation(0f, -100f, 0f, -300f);
         Animation animation5 = new TranslateAnimation(0f, 200f, -0f, -300f);
-//                Animation animation6 = new TranslateAnimation(200f, -400f, -300f, 000f);
         Animation animation6 = new TranslateAnimation(0, 0, 0f, 200);
         animation1.setDuration(1000);
         animation2.setDuration(1000);
@@ -1139,8 +964,6 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
             slideFragment.trashRV.setBackgroundColor(backgroundColor);
         }
         if (slideFragment.mSlidingTabLayout != null) {
-//                slideFragment.mSlidingTabLayout.setDividerColors(0xffffbb33, 0xffffbb33);
-//                slideFragment.mSlidingTabLayout.set
         }
     }
 
@@ -1180,7 +1003,6 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     @Override
     public void onBackPressed() {
         if (pref.getBoolean(GPS_LOCKING, true)) {
-//            pref.edit().putBoolean(GPS_LOCKING, false).apply();
             slideFragment.stopBeeper();
             flushGUI();
         } else {
@@ -1201,43 +1023,29 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 
             welcomePopupWindow.setElevation(100f);
 
-            findViewById(R.id.activity_wave).post(new Runnable() {
-                @Override
-                public void run() {
-                    countdownView.setAlpha(1f);
-                    countdownView.setVisibility(View.VISIBLE);
-                    welcomePopupWindow.showAtLocation(menuTextView, Gravity.CENTER, 0, 100);
-                }
+            findViewById(R.id.activity_wave).post(() -> {
+                countdownView.setAlpha(1f);
+                countdownView.setVisibility(View.VISIBLE);
+                welcomePopupWindow.showAtLocation(menuTextView, Gravity.CENTER, 0, 100);
             });
 
             Button agreeButton = welcomeLayout.findViewById(R.id.button_agree);
             Button disagreeButton = welcomeLayout.findViewById(R.id.button_disagree);
 
-            agreeButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    pref.edit().putBoolean(NOT_AGREED, false).apply();
-                    welcomePopupWindow.dismiss();
-//                    animateSplash(3000);
-//                    requestLocation();
-                }
+            agreeButton.setOnClickListener(view -> {
+                pref.edit().putBoolean(NOT_AGREED, false).apply();
+                welcomePopupWindow.dismiss();
             });
-            disagreeButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    pref.edit().putBoolean(NOT_AGREED, true).apply();
-                    welcomePopupWindow.dismiss();
-                }
+            disagreeButton.setOnClickListener(view -> {
+                pref.edit().putBoolean(NOT_AGREED, true).apply();
+                welcomePopupWindow.dismiss();
             });
 
-            welcomePopupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
-                @Override
-                public void onDismiss() {
-                    if (pref.getBoolean(NOT_AGREED, true)) {
-                        WaveActivity.this.finishAffinity();
-                    } else {
-                        LocPopup(inflater);
-                    }
+            welcomePopupWindow.setOnDismissListener(() -> {
+                if (pref.getBoolean(NOT_AGREED, true)) {
+                    WaveActivity.this.finishAffinity();
+                } else {
+                    LocPopup(inflater);
                 }
             });
 
@@ -1245,7 +1053,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
             PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
             bumpLatestVer();
-            
+
             //... or handle current version:
             // 1.20 Get notification permission
         } else if (pref.getInt(LATEST_VERSION_KEY, 0) < 120) {
@@ -1259,28 +1067,15 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 
             whatsnewPopupWindow.setElevation(100f);
 
-            findViewById(R.id.activity_wave).post(new Runnable() {
-                @Override
-                public void run() {
-                    countdownView.setAlpha(1f);
-                    countdownView.setVisibility(View.VISIBLE);
-                    whatsnewPopupWindow.showAtLocation(menuTextView, Gravity.CENTER, 0, 100);
-                }
+            findViewById(R.id.activity_wave).post(() -> {
+                countdownView.setAlpha(1f);
+                countdownView.setVisibility(View.VISIBLE);
+                whatsnewPopupWindow.showAtLocation(menuTextView, Gravity.CENTER, 0, 100);
             });
 
-            whatsNewLayout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    whatsnewPopupWindow.dismiss();
-                }
-            });
+            whatsNewLayout.setOnClickListener(view -> whatsnewPopupWindow.dismiss());
 
-            whatsnewPopupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
-                @Override
-                public void onDismiss() {
-                    notifPopup(inflater);
-                }
-            });
+            whatsnewPopupWindow.setOnDismissListener(() -> notifPopup(inflater));
             bumpLatestVer();
         }
     }
@@ -1308,39 +1103,25 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 
         locPopupWindow.setElevation(100f);
 
-        findViewById(R.id.activity_wave).post(new Runnable() {
-            @Override
-            public void run() {
-                countdownView.setAlpha(1f);
-                countdownView.setVisibility(View.VISIBLE);
-                locPopupWindow.showAtLocation(menuTextView, Gravity.CENTER, 0, 100);
-            }
+        findViewById(R.id.activity_wave).post(() -> {
+            countdownView.setAlpha(1f);
+            countdownView.setVisibility(View.VISIBLE);
+            locPopupWindow.showAtLocation(menuTextView, Gravity.CENTER, 0, 100);
         });
 
         Button agreeButton = locationLayout.findViewById(R.id.button_use_loc);
         Button disagreeButton = locationLayout.findViewById(R.id.button_no_loc);
 
-        agreeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                pref.edit().putBoolean(USE_LOC_KEY, true).apply();
-                locPopupWindow.dismiss();
-                WaveUtilities.requestLocation(WaveActivity.this);
-            }
+        agreeButton.setOnClickListener(view -> {
+            pref.edit().putBoolean(USE_LOC_KEY, true).apply();
+            locPopupWindow.dismiss();
+            WaveUtilities.requestLocation(WaveActivity.this);
         });
-        disagreeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                pref.edit().putBoolean(USE_LOC_KEY, false).apply();
-                locPopupWindow.dismiss();
-            }
+        disagreeButton.setOnClickListener(view -> {
+            pref.edit().putBoolean(USE_LOC_KEY, false).apply();
+            locPopupWindow.dismiss();
         });
-        locPopupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
-            @Override
-            public void onDismiss() {
-                notifPopup(inflater);
-            }
-        });
+        locPopupWindow.setOnDismissListener(() -> notifPopup(inflater));
     }
 
     private void notifPopup(LayoutInflater inflater) {
@@ -1352,46 +1133,30 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 
         notifPopupWindow.setElevation(100f);
 
-        findViewById(R.id.activity_wave).post(new Runnable() {
-            @Override
-            public void run() {
-                countdownView.setAlpha(1f);
-                countdownView.setVisibility(View.VISIBLE);
-                notifPopupWindow.showAtLocation(menuTextView, Gravity.CENTER, 0, 100);
-            }
+        findViewById(R.id.activity_wave).post(() -> {
+            countdownView.setAlpha(1f);
+            countdownView.setVisibility(View.VISIBLE);
+            notifPopupWindow.showAtLocation(menuTextView, Gravity.CENTER, 0, 100);
         });
 
         Button yesButton = notifLayout.findViewById(R.id.button_background_yes);
         Button noButton = notifLayout.findViewById(R.id.button_background_no);
 
-        yesButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                pref.edit().putBoolean(getString(R.string.notification_preference_key), true).apply();
-                notifPopupWindow.dismiss();
-                WaveUtilities.requestNotifications(WaveActivity.this);
-            }
+        yesButton.setOnClickListener(view -> {
+            pref.edit().putBoolean(getString(R.string.notification_preference_key), true).apply();
+            notifPopupWindow.dismiss();
+            WaveUtilities.requestNotifications(WaveActivity.this);
         });
-        noButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                pref.edit().putBoolean(getString(R.string.notification_preference_key), false).apply();
-                notifPopupWindow.dismiss();
-            }
+        noButton.setOnClickListener(view -> {
+            pref.edit().putBoolean(getString(R.string.notification_preference_key), false).apply();
+            notifPopupWindow.dismiss();
         });
 
-        notifPopupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
-            @Override
-            public void onDismiss() {
-                animateSplash(3000);
-            }
-        });
+        notifPopupWindow.setOnDismissListener(() -> animateSplash(3000));
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-//        Boolean bool = pref.getBoolean(WaveActivity.SWITCH_SETTING, true);
-//        pref.edit().putBoolean(WaveActivity.SWITCH_SETTING, !bool).apply();
         slideFragment.startBeeper();
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }

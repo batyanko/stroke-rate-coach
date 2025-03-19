@@ -1,13 +1,13 @@
 package com.batyanko.strokeratecoach.Fragments;
 
-
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
+
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 import com.batyanko.strokeratecoach.R;
 import com.batyanko.strokeratecoach.Utils.DialGridAdapter;

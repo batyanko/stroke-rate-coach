@@ -38,8 +38,7 @@ public abstract class NonStopIntentService extends Service {
 
         @Override
         public void handleMessage(Message msg) {
-            onHandleIntent((Intent)msg.obj);
-            // stopSelf(msg.arg1); <-- Removed
+            onHandleIntent((Intent) msg.obj);
         }
     }
 

@@ -53,7 +53,8 @@ public class NotificationUtils {
                 context.getSystemService(Context.NOTIFICATION_SERVICE);
         if (notificationManager == null) {
             return;
-        }notificationManager.cancelAll();
+        }
+        notificationManager.cancelAll();
     }
 
     public static void showWorkoutNotification(Context context) {
@@ -70,16 +71,14 @@ public class NotificationUtils {
                     NotificationManager.IMPORTANCE_LOW);
             notificationManager.createNotificationChannel(mChannel);
         }
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context,WORKOUT_NOTIFICATION_CHANNEL_ID)
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, WORKOUT_NOTIFICATION_CHANNEL_ID)
                 .setColor(ContextCompat.getColor(context, R.color.blueAppColor))
                 .setSmallIcon(R.drawable.ic_icon2_transparent)
                 .setLargeIcon(largeIcon(context))
                 .setContentTitle(context.getString(R.string.app_name))
                 .setContentText(context.getString(R.string.workout_in_progress))
-//                .setStyle(new NotificationCompat.BigTextStyle().bigText(context.getString(R.string.charging_reminder_notification_body)))
                 .setDefaults(Notification.DEFAULT_LIGHTS)
                 .setContentIntent(contentIntent(context))
-//                .addAction(stopWorkoutAction(context))
                 .setOngoing(true)
                 .setAutoCancel(false);
 
@@ -107,21 +106,7 @@ public class NotificationUtils {
                     PendingIntent.FLAG_UPDATE_CURRENT);
         }
     }
-
     //TODO add stop action
-/*    private static NotificationCompat.Action stopWorkoutAction(Context context) {
-        Intent incrementWaterCountIntent = new Intent(context, WaterReminderIntentService.class);
-        incrementWaterCountIntent.setAction(ReminderTasks.ACTION_INCREMENT_WATER_COUNT);
-        PendingIntent incrementWaterPendingIntent = PendingIntent.getService(
-                context,
-                ACTION_DRINK_PENDING_INTENT_ID,
-                incrementWaterCountIntent,
-                PendingIntent.FLAG_CANCEL_CURRENT);
-        NotificationCompat.Action drinkWaterAction = new NotificationCompat.Action(R.drawable.ic_local_drink_black_24px,
-                "I did it!",
-                incrementWaterPendingIntent);
-        return drinkWaterAction;
-    }*/
 
     private static Bitmap largeIcon(Context context) {
         Resources res = context.getResources();

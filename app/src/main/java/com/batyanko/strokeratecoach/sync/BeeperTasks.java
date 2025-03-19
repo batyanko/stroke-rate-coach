@@ -227,12 +227,7 @@ public class BeeperTasks {
                 player = new MediaPlayer();
                 player.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
                 player.prepare();
-                player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                    @Override
-                    public void onCompletion(MediaPlayer mp) {
-                        mp.seekTo(0);
-                    }
-                });
+                player.setOnCompletionListener(mp -> mp.seekTo(0));
                 player.setLooping(false);
             } catch (IOException e) {
                 workoutToneGen = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
@@ -347,8 +342,6 @@ public class BeeperTasks {
                                 switch (workoutRunning) {
                                     case WaveActivity.WORKOUT_INTERVAL: {
                                         phaseProgress++;
-//                                        pref.edit().putInt(WaveActivity.PHASE_PROGRESS, 1).apply();
-//                                        pref.edit().putInt(WaveActivity.WORKOUT_PROGRESS, ++workoutProgress).apply();
                                         autoProgress(beeperService);
                                         break;
                                     }
@@ -446,7 +439,6 @@ public class BeeperTasks {
             public void run() {
                 //TODO check SpeedLimit prefs to avoid zombie beepers?
                 pref.edit().putInt(WaveActivity.WARN, ++warns).apply();
-//                warningToneGen.startTone(ToneGenerator.TONE_CDMA_ABBR_REORDER, 100);
                 warningToneGen.startTone(ToneGenerator.TONE_CDMA_ANSWER, 50);
             }
         };

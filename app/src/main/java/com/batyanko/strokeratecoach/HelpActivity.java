@@ -11,12 +11,13 @@ import androidx.appcompat.app.AppCompatActivity;
 public class HelpActivity extends AppCompatActivity {
 
     private SharedPreferences pref;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_help);
 
-    pref = PreferenceManager.getDefaultSharedPreferences(this);
+        pref = PreferenceManager.getDefaultSharedPreferences(this);
         this.getWindow().getDecorView().setBackgroundColor(
                 pref.getInt(THEME_COLOR, getResources().getColor(R.color.backgroundLight)));
     }

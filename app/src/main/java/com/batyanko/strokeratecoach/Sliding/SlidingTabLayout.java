@@ -19,10 +19,6 @@ package com.batyanko.strokeratecoach.Sliding;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Build;
-
-import androidx.fragment.app.Fragment;
-import androidx.viewpager.widget.PagerAdapter;
-import androidx.viewpager.widget.ViewPager;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -30,6 +26,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.HorizontalScrollView;
 import android.widget.TextView;
+
+import androidx.fragment.app.Fragment;
+import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 
 /**
  * To be used with ViewPager to provide a tab indicator component which give constant feedback as to
@@ -105,7 +105,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
 
     /**
      * Set the custom {@link TabColorizer} to be used.
-     *
+     * <p>
      * If you only require simple custmisation then you can use
      * {@link #setSelectedIndicatorColors(int...)} and {@link #setDividerColors(int...)} to achieve
      * similar effects.
@@ -145,7 +145,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
      * Set the custom layout to be inflated for the tab views.
      *
      * @param layoutResId Layout id to be inflated
-     * @param textViewId id of the {@link TextView} in the inflated view
+     * @param textViewId  id of the {@link TextView} in the inflated view
      */
     public void setCustomTabView(int layoutResId, int textViewId) {
         mTabViewLayoutId = layoutResId;

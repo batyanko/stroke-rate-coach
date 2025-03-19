@@ -38,13 +38,15 @@ public class BeeperServiceUtils {
 
     public static BeeperService getBeeperService() {
         if (mBeeperService == null) {
-	        createServiceConnection();
+            createServiceConnection();
         }
         return mBeeperService;
     }
+
     public static ServiceConnection getServiceConnection() {
         return createServiceConnection();
     }
+
     public static boolean serviceIsRunning() {
         return mBeeperService != null;
     }
@@ -54,18 +56,11 @@ public class BeeperServiceUtils {
             @Override
             public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
                 mBeeperService = ((BeeperService.BeeperBinder) iBinder).getService();
-
-                //Check if Service is running and flush UI
-//            checkBeeper(intent);
-//            Boolean bool = pref.getBoolean(WaveActivity.SWITCH_SETTING, true);
-//            pref.edit().putBoolean(WaveActivity.SWITCH_SETTING, !bool).apply();
-//            Toast.makeText(getContext(), "Bound!", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onServiceDisconnected(ComponentName componentName) {
                 mBeeperService = null;
-//            Toast.makeText(getContext(), "Unbound", Toast.LENGTH_SHORT).show();
             }
         };
         serviceConnection = mConnection;

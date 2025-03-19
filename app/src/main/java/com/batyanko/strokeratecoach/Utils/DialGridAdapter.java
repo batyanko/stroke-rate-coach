@@ -84,18 +84,12 @@ public class DialGridAdapter extends BaseAdapter {
             LayoutInflater inflater =
                     (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             view = inflater.inflate(R.layout.digit_view_item, null);
-            TextView text = (TextView) view.findViewById(R.id.digit_item);
+            TextView text = view.findViewById(R.id.digit_item);
             text.setText(digitIds[position]);
             if (position == 11) {
                 text.setTextSize(20);
             }
 
-//            view.getLayoutParams().width = 30;
-//            view.getLayoutParams().height = 30;
-//            ViewGroup.LayoutParams lp = view.getLayoutParams();
-//            lp.width = 20; //WaveActivity.windowWidth / 3 - 5;
-//            lp.height = 30; //(WaveActivity.windowHeight - WaveActivity.statusbarHeight) / 10 - 1;
-//
             int cellWidthFraction;
             int cellHeightFraction;
             if (WaveActivity.orientation == ORIENTATION_VERTICAL) {
@@ -106,14 +100,11 @@ public class DialGridAdapter extends BaseAdapter {
                 cellHeightFraction = 5;
             }
             view.setLayoutParams(
-                        new android.widget.AbsListView.LayoutParams(WaveActivity.windowWidth / cellWidthFraction - 5,
-                                (WaveActivity.windowHeight - WaveActivity.statusbarHeight) / cellHeightFraction - 1
-                        )
-                );
+                    new android.widget.AbsListView.LayoutParams(WaveActivity.windowWidth / cellWidthFraction - 5,
+                            (WaveActivity.windowHeight - WaveActivity.statusbarHeight) / cellHeightFraction - 1
+                    )
+            );
 
-
-//            view.requestLayout();
-//            Log.d("Cell Height!!!: ", "" + MainActivity.windowHeight / 10);
         } else {
             view = convertView;
         }

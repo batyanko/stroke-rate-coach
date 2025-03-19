@@ -27,8 +27,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -217,12 +215,7 @@ public class EntryFormActivity extends AppCompatActivity {
         addPhaseButton.setLayoutParams(pHorizontal);
         addPhaseButton.setBackgroundResource(R.drawable.ic_rectangle);
         addPhaseButton.setTextColor(getResources().getColor(android.R.color.white));
-        addPhaseButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                addLine("", "");
-            }
-        });
+        addPhaseButton.setOnClickListener(view -> addLine("", ""));
         addPhaseButton.setText(R.string.button_add_phase_label);
 
         createWorkoutButton = new Button(this);
@@ -389,7 +382,6 @@ public class EntryFormActivity extends AppCompatActivity {
         cv.put(WorkoutContract.WorkoutEntry1.COLUMN_DESC, description);
         cv.put(WorkoutContract.WorkoutEntry1.COLUMN_SPP_CSV, spp);
         cv.put(WorkoutContract.WorkoutEntry1.COLUMN_GEARS_CSV, gears);
-//        cv.put(WorkoutEntry1.COLUMN_TIMESTAMP, time);
         cv.put(WorkoutContract.WorkoutEntry1.COLUMN_SPP_TYPE, sppType);
         return db.insert(WorkoutContract.WorkoutEntry1.TABLE_NAME_PRESETS, null, cv);
     }
@@ -418,19 +410,6 @@ public class EntryFormActivity extends AppCompatActivity {
                 WorkoutContract.WorkoutEntry1.COLUMN_TIMESTAMP);
     }
 
-    //    TODO delete
-    private Cursor getAllPresets(SQLiteDatabase db, String workoutId) {
-        return db.query(
-                WorkoutContract.WorkoutEntry1.TABLE_NAME_PRESETS,
-                null,
-                null,
-                null,
-                null,
-                null,
-                WorkoutContract.WorkoutEntry1.COLUMN_TIMESTAMP
-        );
-    }
-
     private String getSPPFromRadio() {
         if (radioStrokes.isChecked()) {
             return BeeperTasks.SPP_TYPE_STROKES;
@@ -439,24 +418,5 @@ public class EntryFormActivity extends AppCompatActivity {
         } else if (radioSeconds.isChecked()) {
             return BeeperTasks.SPP_TYPE_SECONDS;
         } else return "9";
-    }
-
-    //TODO Delete
-    public class CustomWatcher implements TextWatcher {
-
-        @Override
-        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-        }
-
-        @Override
-        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-        }
-
-        @Override
-        public void afterTextChanged(Editable editable) {
-
-        }
     }
 }

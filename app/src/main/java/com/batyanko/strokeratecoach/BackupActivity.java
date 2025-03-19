@@ -23,7 +23,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroupOverlay;
 import android.widget.Button;
@@ -71,26 +70,20 @@ public class BackupActivity extends AppCompatActivity {
         Button restoreBkpButton = findViewById(R.id.restore_backup);
 
         createBkpButton.setOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (workoutDb == null) {
-                            // TODO handle DB problems
-                        } else {
-                            createBkp(workoutDb);
-                        }
+                v -> {
+                    if (workoutDb == null) {
+                        // TODO handle DB problems
+                    } else {
+                        createBkp(workoutDb);
                     }
                 }
         );
         restoreBkpButton.setOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (workoutDb == null) {
-                            // TODO handle DB problems
-                        } else {
-                            restoreBkp(workoutDb);
-                        }
+                v -> {
+                    if (workoutDb == null) {
+                        // TODO handle DB problems
+                    } else {
+                        restoreBkp(workoutDb);
                     }
                 }
         );
@@ -225,7 +218,6 @@ public class BackupActivity extends AppCompatActivity {
         summaryTv.setText(summary);
         reportAddedTv.setText(added);
         reportFailedTv.setText(failed);
-//        int tvHeight = (int) ((float) windowHeight /3 * density + 0.5f);
         int tvHeight = this.getResources().getDisplayMetrics().heightPixels / 4;
         reportAddedTv.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, tvHeight));
         reportFailedTv.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, tvHeight));
@@ -244,14 +236,8 @@ public class BackupActivity extends AppCompatActivity {
         ViewGroupOverlay overlay = root.getOverlay();
         overlay.add(dim);
 
-        descPopupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
-            @Override
-            public void onDismiss() {
-                overlay.clear();
-            }
-        });
+        descPopupWindow.setOnDismissListener(() -> overlay.clear());
         descPopupWindow.showAtLocation(backupInfoLayout, Gravity.CENTER, 0, (int) density * 100);
-
     }
 
 }

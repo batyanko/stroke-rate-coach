@@ -6,13 +6,10 @@ package com.batyanko.strokeratecoach.Utils;
 
 public class TwoDigFloat {
 
-    private float aFloat;
+    private final float aFloat;
+
     public TwoDigFloat() {
         aFloat = 0f;
-    }
-
-    public void setValue(float value) {
-        aFloat = value;
     }
 
     public float getValue() {

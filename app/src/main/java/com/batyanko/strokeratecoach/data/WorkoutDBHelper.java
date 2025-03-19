@@ -17,6 +17,8 @@
 
 package com.batyanko.strokeratecoach.data;
 
+import static com.batyanko.strokeratecoach.data.WorkoutContract.WorkoutEntry1;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -24,8 +26,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.batyanko.strokeratecoach.R;
 import com.batyanko.strokeratecoach.sync.BeeperTasks;
-
-import static com.batyanko.strokeratecoach.data.WorkoutContract.*;
 
 /**
  * Created by batyanko on 8/23/17.
@@ -36,8 +36,7 @@ public class WorkoutDBHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "presets.db";
     private static final int DATABASE_VERSION = 2;
 
-    private Context mContext;
-
+    private final Context mContext;
 
 
     private final String SQL_CREATE_TRASH_TABLE = "CREATE TABLE " + WorkoutEntry1.TABLE_NAME_TRASH + " (" +

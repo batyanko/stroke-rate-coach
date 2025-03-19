@@ -29,14 +29,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SpeedActivity"
-            android:label="@string/speed_label"
-            android:parentActivityName=".WaveActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.batyanko.strokeratecoach.WaveActivity" />
-        </activity>
-        <activity
             android:name=".EntryFormActivity"
             android:label="@string/entry_form_label"
             android:parentActivityName=".WaveActivity"

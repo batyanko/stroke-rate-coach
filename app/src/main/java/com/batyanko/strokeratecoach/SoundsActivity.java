@@ -8,7 +8,6 @@ import android.media.MediaPlayer;
 import android.media.ToneGenerator;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -46,20 +45,12 @@ public class SoundsActivity extends AppCompatActivity {
         }
 
         Button confirm = findViewById(R.id.sound_confirm_button);
-        confirm.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                pref.edit().putString(getString(R.string.beep_sound_list_key), sndPref).apply();
-                startActivity(new Intent(SoundsActivity.this, WaveActivity.class));
-            }
+        confirm.setOnClickListener(v -> {
+            pref.edit().putString(getString(R.string.beep_sound_list_key), sndPref).apply();
+            startActivity(new Intent(SoundsActivity.this, WaveActivity.class));
         });
         Button cancel = findViewById(R.id.sound_cancel_button);
-        cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        cancel.setOnClickListener(v -> finish());
 
         RadioGroup sounds_rg = findViewById(R.id.sounds_rg);
 
@@ -98,34 +89,28 @@ public class SoundsActivity extends AppCompatActivity {
         rb.setText(snd);
         rb.setTextSize(getResources().getDimension(R.dimen.text_size_very_small));
 
-        rb.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sndPref = snd;
+        rb.setOnClickListener(v -> {
+            sndPref = snd;
 
-                if (snd.equals(getString(R.string.beep_sound_default))) {
-                    ToneGenerator workoutToneGen = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
-                    workoutToneGen.startTone(ToneGenerator.TONE_CDMA_EMERGENCY_RINGBACK, 150);
-                } else {
-                    AssetFileDescriptor afd;
-                    try {
-                        afd = getAssets().openFd(snd + ".wav");
-                        MediaPlayer player = new MediaPlayer();
-                        player.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
-                        player.prepare();
-                        player.start();
-                        player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                            @Override
-                            public void onCompletion(MediaPlayer mp) {
-                                mp.seekTo(0);
-                                mp.release();
-                            }
-                        });
-                        player.setLooping(false);
-                    } catch (IOException e) {
-                        pref.edit().putString(getString(R.string.beep_sound_list_key), getString(R.string.beep_sound_default)).apply();
-                        sndPref = getString(R.string.beep_sound_default);
-                    }
+            if (snd.equals(getString(R.string.beep_sound_default))) {
+                ToneGenerator workoutToneGen = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
+                workoutToneGen.startTone(ToneGenerator.TONE_CDMA_EMERGENCY_RINGBACK, 150);
+            } else {
+                AssetFileDescriptor afd;
+                try {
+                    afd = getAssets().openFd(snd + ".wav");
+                    MediaPlayer player = new MediaPlayer();
+                    player.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+                    player.prepare();
+                    player.start();
+                    player.setOnCompletionListener(mp -> {
+                        mp.seekTo(0);
+                        mp.release();
+                    });
+                    player.setLooping(false);
+                } catch (IOException e) {
+                    pref.edit().putString(getString(R.string.beep_sound_list_key), getString(R.string.beep_sound_default)).apply();
+                    sndPref = getString(R.string.beep_sound_default);
                 }
             }
         });
