@@ -18,10 +18,10 @@
 
         <!--Oar-->
         <group
-            android:scaleX="3.5"
-            android:scaleY="3.5"
-            android:translateX="-1750"
-            android:translateY="610">
+            android:scaleX="1.5"
+            android:scaleY="1.5"
+            android:translateX="-750"
+            android:translateY="370">
             <group
                 android:pivotX="5"
                 android:pivotY="52"

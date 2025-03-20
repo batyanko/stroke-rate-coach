@@ -14,13 +14,18 @@
      limitations under the License.
     -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="com.batyanko.strokeratecoach.Fragments.SlideFragment"
+    android:orientation="vertical">
+
+<LinearLayout
     android:orientation="vertical"
-    >
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
     <com.batyanko.strokeratecoach.Sliding.SlidingTabLayout
         android:id="@+id/sliding_tabs"
         android:layout_width="match_parent"
@@ -35,5 +40,20 @@
         android:background="@android:color/white"
         android:layout_weight="1"
         />
-
 </LinearLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/adder_fab"
+        app:fabSize="normal"
+        android:scaleType="center"
+        app:maxImageSize="64dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:src="@drawable/ic_add"
+        android:contentDescription="@string/create_workout_button_label"
+        android:layout_margin="32dp" />
+
+</RelativeLayout>

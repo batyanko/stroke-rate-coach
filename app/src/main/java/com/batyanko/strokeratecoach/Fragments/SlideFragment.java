@@ -17,6 +17,8 @@
 
 package com.batyanko.strokeratecoach.Fragments;
 
+import static android.view.View.INVISIBLE;
+import static android.view.View.VISIBLE;
 import static com.batyanko.strokeratecoach.WaveActivity.THEME_COLOR;
 import static com.batyanko.strokeratecoach.WaveActivity.windowWidth;
 import static com.batyanko.strokeratecoach.sync.BeeperTasks.EXTRA_WORKOUT_ID;
@@ -63,6 +65,7 @@ import com.batyanko.strokeratecoach.data.WorkoutDBHelper;
 import com.batyanko.strokeratecoach.sync.BeeperService;
 import com.batyanko.strokeratecoach.sync.BeeperServiceUtils;
 import com.batyanko.strokeratecoach.sync.BeeperTasks;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class SlideFragment extends Fragment implements SvAdapter.ListItemClickListener {
 
@@ -115,6 +118,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
     private View workoutDelButton;
     private PopupWindow descPopupWindow;
     private TextView descPopupTextView;
+    private FloatingActionButton adderFab;
     private final int SPEED_DIAL_POSITION = 0;
     private final int PRESETS_POSITION = 1;
     private final int HISTORY_POSITION = 2;
@@ -163,10 +167,35 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        adderFab = view.findViewById(R.id.adder_fab);
+        adderFab.setVisibility(INVISIBLE);
+        adderFab.setAlpha(0.5F);
+        adderFab.setOnClickListener(v -> {
+            Intent entryIntent = new Intent(getActivity(), EntryFormActivity.class);
+            startActivity(entryIntent);
+        });
 
         // Get the ViewPager and set it's PagerAdapter so that it can display items
         mViewPager = view.findViewById(R.id.viewpager);
         mViewPager.setAdapter(new SlidePagerAdapter());
+        mViewPager.addOnPageChangeListener((new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                if (position == PRESETS_POSITION) {
+                    adderFab.setVisibility(VISIBLE);
+                } else {
+                    adderFab.setVisibility(INVISIBLE);
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+            }
+        }));
 
         // Give the SlidingTabLayout the ViewPager, this must be done AFTER the ViewPager has had
         // it's PagerAdapter set.
@@ -176,6 +205,8 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         ViewGroup bigChild = (ViewGroup) mSlidingTabLayout.getChildAt(0);
         View tabTitle = bigChild.getChildAt(TRASH_POSITION);
         tabTitle.setBackground(ResourcesCompat.getDrawable(view.getResources(), R.drawable.ic_delete, view.getContext().getTheme()));
+
+
     }
 
 
@@ -316,7 +347,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
             lastClickedEngageButton = view;
             final String name = cursor.getString(cursor.getColumnIndex(WorkoutEntry1.COLUMN_NAME));
             final String description = cursor.getString(cursor.getColumnIndex(WorkoutEntry1.COLUMN_DESC));
-            final String ts = cursor.getString(cursor.getColumnIndex(WorkoutEntry1.COLUMN_DESC));
+            final String ts = cursor.getString(cursor.getColumnIndex(WorkoutEntry1.COLUMN_TIMESTAMP));
             final String sppType =
                     cursor.getString(cursor.getColumnIndex(WorkoutEntry1.COLUMN_SPP_TYPE));
             lastWorkoutId = cursor.getInt(cursor.getColumnIndex(WorkoutEntry1._ID));

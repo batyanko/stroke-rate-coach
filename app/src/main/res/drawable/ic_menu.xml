@@ -14,7 +14,7 @@
     <group
         android:scaleY=".2"
         android:scaleX=".2"
-        android:translateX="35"
+        android:translateX="75"
         android:translateY="5"
         >
         <path
@@ -28,7 +28,7 @@
     <group
         android:scaleY=".2"
         android:scaleX=".2"
-        android:translateX="35"
+        android:translateX="75"
         android:translateY="40"
         >
         <path
@@ -42,7 +42,7 @@
     <group
         android:scaleY=".2"
         android:scaleX=".2"
-        android:translateX="35"
+        android:translateX="75"
         android:translateY="75"
         >
         <path

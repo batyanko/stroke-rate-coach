@@ -208,6 +208,10 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 
         countdownView = findViewById(R.id.countdown_image_view);
         countdownView.setVisibility(View.INVISIBLE);
+
+        // Avoid transparent click through countdownView
+        countdownView.setOnClickListener(v -> Toast.makeText(this, "Almost there...", Toast.LENGTH_SHORT).show());
+
         countdownDigit = findViewById(R.id.countdown_digit);
         countdownDigit.setVisibility(View.INVISIBLE);
 
