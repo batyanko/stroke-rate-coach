@@ -132,7 +132,9 @@
     <string name="work_in_background_yes_text">Включи</string>
     <string name="notification_pref_summary">Работа на заден с план, с цел комбинация с други спортни приложения. (Операционната система все пак е възможно да го спре, за да освободи памет).</string>
     <string name="notification_desc1">Приложението може да работи на заден план, така че да го ползвате заедно с други спортни приложения.</string>
-    <string name="whatsnew">Нови функции:/n/n- Копиране и промяна и резервно копие на тренировки.\n- Избор на звук за бипкане.</string>
+    <string name="whatsnew_title">УРА! НОВИ НЕЩА\n\n</string>
+    <string name="whatsnew_120">120:\n\n- Копиране и промяна и резервно копие на тренировки.\n- Избор на звук за бипкане.\n\n</string>
+    <string name="whatsnew_121">121:\n\n- Кошче за изтрити тренировки\n\n- Отстранени бъгове, промени по интерфейса\n\n</string>
     <string name="copy">КОПИРАЙ</string>
     <string name="copy_to_presets">ВЪЗСТАНОВИ В ТРЕНИРОВКИ</string>
 

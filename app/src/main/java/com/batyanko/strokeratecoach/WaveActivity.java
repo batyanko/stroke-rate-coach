@@ -213,7 +213,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         countdownView.setVisibility(View.INVISIBLE);
 
         // Avoid transparent click through countdownView
-        countdownView.setOnClickListener(v -> Toast.makeText(this, "Almost there...", Toast.LENGTH_SHORT).show());
+        countdownView.setOnClickListener(v -> countdownView.setVisibility(View.INVISIBLE));
 
         countdownDigit = findViewById(R.id.countdown_digit);
         countdownDigit.setVisibility(View.INVISIBLE);
@@ -1063,27 +1063,43 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 
             //... or handle current version:
             // 1.20 Get notification permission
-        } else if (pref.getInt(LATEST_VERSION_KEY, 0) < 120) {
+        } else {
+            String whatsNew = "";
+            if (pref.getInt(LATEST_VERSION_KEY, 0) < 121) {
+                whatsNew += this.getResources().getString(R.string.whatsnew_121);
+            }
+            if (pref.getInt(LATEST_VERSION_KEY, 0) < 120) {
+                whatsNew += this.getResources().getString(R.string.whatsnew_120);
+            }
+            if (!whatsNew.isEmpty()){
+                whatsNew = this.getResources().getString(R.string.whatsnew_title) + whatsNew;
 
-            final LayoutInflater inflater = (LayoutInflater) WaveActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View whatsNewLayout = inflater.inflate(R.layout.whatsnew_layout, null);
+                final LayoutInflater inflater = (LayoutInflater) WaveActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                View whatsNewLayout = inflater.inflate(R.layout.whatsnew_layout, null);
+                TextView whatsNewTv = whatsNewLayout.findViewById(R.id.whatsnew_textview);
+                whatsNewTv.setText(whatsNew);
 
-            final PopupWindow whatsnewPopupWindow = new PopupWindow(whatsNewLayout, windowWidth, LinearLayout.LayoutParams.WRAP_CONTENT, true);
-            whatsnewPopupWindow.setBackgroundDrawable(
-                    new ColorDrawable(pref.getInt(THEME_COLOR, getResources().getColor(R.color.backgroundLight))));
+                final PopupWindow whatsnewPopupWindow = new PopupWindow(whatsNewLayout, windowWidth, LinearLayout.LayoutParams.WRAP_CONTENT, true);
+                whatsnewPopupWindow.setBackgroundDrawable(
+                        new ColorDrawable(pref.getInt(THEME_COLOR, getResources().getColor(R.color.backgroundLight))));
 
-            whatsnewPopupWindow.setElevation(100f);
+                whatsnewPopupWindow.setElevation(100f);
 
-            findViewById(R.id.activity_wave).post(() -> {
-                countdownView.setAlpha(1f);
-                countdownView.setVisibility(View.VISIBLE);
-                whatsnewPopupWindow.showAtLocation(menuTextView, Gravity.CENTER, 0, 100);
-            });
+                findViewById(R.id.activity_wave).post(() -> {
+                    countdownView.setAlpha(1f);
+                    countdownView.setVisibility(View.VISIBLE);
+                    whatsnewPopupWindow.showAtLocation(menuTextView, Gravity.CENTER, 0, 100);
+                });
 
-            whatsNewLayout.setOnClickListener(view -> whatsnewPopupWindow.dismiss());
+                whatsNewLayout.setOnClickListener(view -> whatsnewPopupWindow.dismiss());
 
-            whatsnewPopupWindow.setOnDismissListener(() -> notifPopup(inflater));
-            bumpLatestVer();
+                if (pref.getInt(LATEST_VERSION_KEY, 0) < 120) {
+                    whatsnewPopupWindow.setOnDismissListener(() -> notifPopup(inflater));
+                } else {
+                    whatsnewPopupWindow.setOnDismissListener(() -> animateSplash(3000));
+                }
+                bumpLatestVer();
+            }
         }
     }
 

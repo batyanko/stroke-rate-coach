@@ -7,9 +7,9 @@
     <TextView
      android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/whatsnew_textview"
         android:gravity="start"
         android:padding="15dp"
-        android:text="@string/whatsnew"
         android:textSize="@dimen/text_size_medium" />
 
 

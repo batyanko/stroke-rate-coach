@@ -141,7 +141,9 @@ Einschränkungen unter der Lizenz.</string>
     <string name="work_in_background_yes_text">Einschalten</string>
     <string name="notification_pref_summary">Im Hintergrund laufen, um sich mit anderen Sportanwendungen kombinieren zu lassen. (Android mag sie allerdings weiterhin stoppen).</string>
     <string name="notification_desc1">Die Anwendung kann im Hintergrund laufen, um mit anderen Sportanwendungen kombinieren.</string>
-    <string name="whatsnew">NEUE FUNKTIONALITÄTEN:\n\n - Bearbeitung und Sicherheitskopien für Übungen.\n- Alternative Klingeltöne.</string>
+    <string name="whatsnew_title">HURRAH! NEUES ZEUG\n\n</string>
+    <string name="whatsnew_120">120:\n\n- Bearbeitung und Sicherheitskopien für Übungen.\n- Alternative Klingeltöne.\n\n</string>
+    <string name="whatsnew_121">121:\n\n- Papierkorb\n\n- Bug fixes, Verbesserungen der Benutzeroberfläche\n\n</string>
     <string name="copy">KOPIEREN</string>
     <string name="copy_to_presets">WIEDERHERSTELLEN NACH TRAININGS</string>
 

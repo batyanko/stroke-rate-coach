@@ -162,7 +162,9 @@ limitations under the License.</string>
     <string name="restore_failed_text">Failed:</string>
     <string name="restore_summary_text">"Summary: "</string>
     <string name="notification_preference_title">Work in background</string>
-    <string name="whatsnew">NEW FEATURES\n\nHooray! Now available:\n\n- Workout edit, copy and backup.\n- Alternative beep sounds (try if default beep doesn\'t work).</string>
+    <string name="whatsnew_title">HOORAY! NEW THINGS\n\n</string>
+    <string name="whatsnew_120">120:\n\n- Workout edit, copy and backup.\n- Alternative beep sounds (try if default beep doesn\'t work).\n\n</string>
+    <string name="whatsnew_121">121:\n\n- Recycle bin added\n\n- Bug fixes, some interface improvements\n\n</string>
     <string name="copy">COPY</string>
     <string name="copy_to_presets">RESTORE TO PRESETS</string>
 
