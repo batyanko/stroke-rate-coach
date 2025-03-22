@@ -19,8 +19,14 @@ package com.batyanko.strokeratecoach.Fragments;
 
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
+import static com.batyanko.strokeratecoach.WaveActivity.LAST_HISTORY_SETTING;
+import static com.batyanko.strokeratecoach.WaveActivity.LAST_PRESET_SETTING;
+import static com.batyanko.strokeratecoach.WaveActivity.LAST_TRASH_SETTING;
 import static com.batyanko.strokeratecoach.WaveActivity.THEME_COLOR;
 import static com.batyanko.strokeratecoach.WaveActivity.windowWidth;
+import static com.batyanko.strokeratecoach.data.WorkoutContract.WorkoutEntry1.TABLE_NAME_HISTORY;
+import static com.batyanko.strokeratecoach.data.WorkoutContract.WorkoutEntry1.TABLE_NAME_PRESETS;
+import static com.batyanko.strokeratecoach.data.WorkoutContract.WorkoutEntry1.TABLE_NAME_TRASH;
 import static com.batyanko.strokeratecoach.sync.BeeperTasks.EXTRA_WORKOUT_ID;
 
 import android.content.ContentValues;
@@ -169,7 +175,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         adderFab = view.findViewById(R.id.adder_fab);
         adderFab.setVisibility(INVISIBLE);
-        adderFab.setAlpha(0.5F);
+        adderFab.setAlpha(0.8F);
         adderFab.setOnClickListener(v -> {
             Intent entryIntent = new Intent(getActivity(), EntryFormActivity.class);
             startActivity(entryIntent);
@@ -204,9 +210,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
 
         ViewGroup bigChild = (ViewGroup) mSlidingTabLayout.getChildAt(0);
         View tabTitle = bigChild.getChildAt(TRASH_POSITION);
-        tabTitle.setBackground(ResourcesCompat.getDrawable(view.getResources(), R.drawable.ic_delete, view.getContext().getTheme()));
-
-
+        tabTitle.setBackground(ResourcesCompat.getDrawable(view.getResources(), R.drawable.ic_del_empty, view.getContext().getTheme()));
     }
 
 
@@ -284,7 +288,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                 boolean added = addPreset(workoutDb, WorkoutEntry1.TABLE_NAME_PRESETS,
                         bkpCursor.getString(bkpCursor.getColumnIndex(WorkoutEntry1.COLUMN_NAME)),
                         bkpCursor.getString(bkpCursor.getColumnIndex(WorkoutEntry1.COLUMN_DESC)),
-                        bkpCursor.getString(bkpCursor.getColumnIndex(WorkoutEntry1.COLUMN_TIMESTAMP)),
+                        "",
                         bkpCursor.getString(bkpCursor.getColumnIndex(WorkoutEntry1.COLUMN_SPP_CSV)),
                         bkpCursor.getString(bkpCursor.getColumnIndex(WorkoutEntry1.COLUMN_GEARS_CSV)),
                         bkpCursor.getString(bkpCursor.getColumnIndex(WorkoutEntry1.COLUMN_SPP_TYPE))
@@ -313,7 +317,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                     success = addPreset(workoutDb, WorkoutEntry1.TABLE_NAME_TRASH,
                             bkpCursor.getString(bkpCursor.getColumnIndex(WorkoutEntry1.COLUMN_NAME)),
                             bkpCursor.getString(bkpCursor.getColumnIndex(WorkoutEntry1.COLUMN_DESC)),
-                            bkpCursor.getString(bkpCursor.getColumnIndex(WorkoutEntry1.COLUMN_TIMESTAMP)),
+                            "",
                             bkpCursor.getString(bkpCursor.getColumnIndex(WorkoutEntry1.COLUMN_SPP_CSV)),
                             bkpCursor.getString(bkpCursor.getColumnIndex(WorkoutEntry1.COLUMN_GEARS_CSV)),
                             bkpCursor.getString(bkpCursor.getColumnIndex(WorkoutEntry1.COLUMN_SPP_TYPE))
@@ -370,9 +374,24 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
             }
 
             //Update History db table
-            lastClickedEngageButton.setBackgroundResource(R.drawable.ic_play_4_negative);
-            addPreset(workoutDb, WorkoutEntry1.TABLE_NAME_HISTORY, name, description, ts, sppCSV, gearCSV, sppType);
-            historyAdapter.swapCursor(getAllHistory(), true, lastWorkoutId);
+            addPreset(workoutDb, WorkoutEntry1.TABLE_NAME_HISTORY, name, description, "", sppCSV, gearCSV, sppType);
+
+            //Highlight last clicked start icon
+            switch (tableName) {
+                case TABLE_NAME_PRESETS:
+                    pref.edit().putInt(LAST_PRESET_SETTING, lastWorkoutId).apply();
+                    break;
+                case TABLE_NAME_HISTORY:
+                    pref.edit().putInt(LAST_HISTORY_SETTING, lastWorkoutId).apply();
+                    break;
+                case TABLE_NAME_TRASH:
+                    pref.edit().putInt(LAST_TRASH_SETTING, lastWorkoutId).apply();
+                    break;
+            }
+            if (!tableName.equals(TABLE_NAME_HISTORY)) {
+                historyAdapter.swapCursor(getAllHistory(), true, lastWorkoutId);
+            }
+            refresh(tableName);
 
             // Start beeping?
             initIntent(sppInts, gearInts, sppType);
@@ -573,7 +592,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                 null,
                 null,
                 null,
-                WorkoutEntry1.COLUMN_TIMESTAMP
+                WorkoutEntry1.COLUMN_TIMESTAMP + " DESC"
         );
     }
 
@@ -618,10 +637,12 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         ContentValues cv = new ContentValues();
         cv.put(WorkoutEntry1.COLUMN_NAME, name);
         cv.put(WorkoutEntry1.COLUMN_DESC, description);
-        cv.put(WorkoutEntry1.COLUMN_TIMESTAMP, ts);
         cv.put(WorkoutEntry1.COLUMN_SPP_CSV, spp);
         cv.put(WorkoutEntry1.COLUMN_GEARS_CSV, gears);
         cv.put(WorkoutEntry1.COLUMN_SPP_TYPE, sppType);
+        if (!ts.isEmpty()) {
+            cv.put(WorkoutEntry1.COLUMN_TIMESTAMP, ts);
+        }
         return addToDb(db, tab, cv) != -1;
     }
 

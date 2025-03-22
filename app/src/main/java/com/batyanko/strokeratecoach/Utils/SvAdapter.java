@@ -19,12 +19,21 @@ Modifications copyright (C) 2017 Yanko Georgiev
 
 package com.batyanko.strokeratecoach.Utils;
 
+import static com.batyanko.strokeratecoach.WaveActivity.LAST_HISTORY_SETTING;
+import static com.batyanko.strokeratecoach.WaveActivity.LAST_PRESET_SETTING;
+import static com.batyanko.strokeratecoach.WaveActivity.LAST_TRASH_SETTING;
 import static com.batyanko.strokeratecoach.data.WorkoutContract.WorkoutEntry1.COLUMN_NAME;
 import static com.batyanko.strokeratecoach.data.WorkoutContract.WorkoutEntry1.COLUMN_SPP_TYPE;
 import static com.batyanko.strokeratecoach.data.WorkoutContract.WorkoutEntry1.COLUMN_TIMESTAMP;
+import static com.batyanko.strokeratecoach.data.WorkoutContract.WorkoutEntry1.TABLE_NAME_HISTORY;
+import static com.batyanko.strokeratecoach.data.WorkoutContract.WorkoutEntry1.TABLE_NAME_PRESETS;
+import static com.batyanko.strokeratecoach.data.WorkoutContract.WorkoutEntry1.TABLE_NAME_TRASH;
+import static com.batyanko.strokeratecoach.data.WorkoutContract.WorkoutEntry1._ID;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.preference.PreferenceManager;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,6 +42,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.ColorInt;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.batyanko.strokeratecoach.R;
@@ -58,6 +68,7 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
 
     //////////////////
     //Database stuff
+    private SharedPreferences pref;
     private Cursor gottenCursor;
     private Context mContext;
     private boolean workoutIsRunning;
@@ -80,6 +91,8 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
         this.tableName = tableName;
         mOnClickListener = listener;
         workoutIsRunning = false;
+
+        pref = PreferenceManager.getDefaultSharedPreferences(context);
 
         //Get style background color
         typedValue = new TypedValue();
@@ -115,9 +128,8 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
         private TextView workoutTime;
         private TextView workoutDate;
         private TextView workoutDesc;
-        //        private Button delButton;
         private ImageView engageButton;
-        //        private final int delButtonId;
+        private String tsTitle;
         private final int engageButtonId;
 
 
@@ -175,6 +187,21 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
             engageButton.setOnClickListener(this);
             itemView.setOnClickListener(this);
 
+            switch (tableName) {
+                case TABLE_NAME_PRESETS:
+                    tsTitle = "";
+                    colorizeLast(LAST_PRESET_SETTING);
+                    break;
+                case TABLE_NAME_HISTORY:
+                    tsTitle = mContext.getString(R.string.played);
+                    colorizeLast(LAST_HISTORY_SETTING);
+                    break;
+                case TABLE_NAME_TRASH:
+                    tsTitle = mContext.getString(R.string.deleted);
+                    colorizeLast(LAST_TRASH_SETTING);
+                    break;
+            }
+
             String sppType;
 
             String timestampFromSQLite = gottenCursor.getString(gottenCursor.getColumnIndex(COLUMN_TIMESTAMP));
@@ -183,7 +210,7 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
             Locale locale = Locale.getDefault();
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss", locale);
             SimpleDateFormat sdfDateTime = new SimpleDateFormat("yyyy-MM-dd',' kk:mm:ss", locale);
-            SimpleDateFormat sdfDate = new SimpleDateFormat("dd MMM yyyy", locale);
+            SimpleDateFormat sdfDate = new SimpleDateFormat("dd MMM yy", locale);
             SimpleDateFormat sdfTime = new SimpleDateFormat("kk:mm:ss", locale);
             ParsePosition pp = new ParsePosition(0);
             Date dt = sdf.parse(timestampFromSQLite, pp);
@@ -222,10 +249,22 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
 
             workoutDesc.setText(sppType);
             workoutTitle.setText(gottenCursor.getString(gottenCursor.getColumnIndex(COLUMN_NAME)));
-            workoutTime.setText(localTime);
+            tsTitle = tsTitle + " " + localTime;
+            workoutTime.setText(tsTitle);
             workoutDate.setText(localDate);
 
             this.itemView.setTag(gottenCursor.getLong(gottenCursor.getColumnIndex(WorkoutContract.WorkoutEntry1._ID)));
+        }
+
+        private void colorizeLast(String lastPrefTableKey) {
+            int lastId = pref.getInt(lastPrefTableKey, 0);
+            if (lastId != 0) {
+                if (lastId == gottenCursor.getInt(gottenCursor.getColumnIndex(_ID))) {
+                    engageButton.setImageDrawable(ResourcesCompat.getDrawable(itemView.getResources(), R.drawable.ic_play_4_negative, null));
+                } else {
+                    engageButton.setImageDrawable(ResourcesCompat.getDrawable(itemView.getResources(), R.drawable.ic_play_4, null));
+                }
+            }
         }
 
         ///////////////////

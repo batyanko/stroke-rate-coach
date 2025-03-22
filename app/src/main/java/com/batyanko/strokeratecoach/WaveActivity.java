@@ -127,6 +127,9 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     public static final String CUSTOM_SOUND = "custom-sound";
     public static final String SPEED_SAMPLE_COUNT = "speed-sample-count";
 
+    public static final String LAST_PRESET_SETTING = "last-preset-item";
+    public static final String LAST_HISTORY_SETTING = "last-history-item";
+    public static final String LAST_TRASH_SETTING = "last-trash-item";
     /* Global spm setting to hold current spm */
     public static int spm;
 

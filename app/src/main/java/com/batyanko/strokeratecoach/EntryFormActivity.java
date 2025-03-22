@@ -298,7 +298,7 @@ public class EntryFormActivity extends AppCompatActivity {
                     join(",", gearsResized),
                     sppType);
             Toast.makeText(EntryFormActivity.this,
-                    emptyPhasesPresent + getString(R.string.preset_added_notification),
+                    emptyPhasesPresent + getString(R.string.preset_added),
                     Toast.LENGTH_LONG).show();
             finish();
         }
@@ -366,10 +366,15 @@ public class EntryFormActivity extends AppCompatActivity {
                     join(",", sppResized),
                     join(",", gearsResized),
                     sppType);
-            Toast.makeText(EntryFormActivity.this,
-                    emptyPhasesPresent + getString(R.string.preset_added_notification),
-                    Toast.LENGTH_LONG).show();
-
+            if (i > 0) {
+                Toast.makeText(EntryFormActivity.this,
+                        emptyPhasesPresent + getString(R.string.preset_added),
+                        Toast.LENGTH_LONG).show();
+                updateTimestamp(mDb, workoutId);
+            } else {
+                Toast.makeText(EntryFormActivity.this, getString(R.string.preset_add_failed),
+                        Toast.LENGTH_LONG).show();
+            }
             finish();
         }
     };
@@ -398,6 +403,13 @@ public class EntryFormActivity extends AppCompatActivity {
                 cv,
                 WorkoutContract.WorkoutEntry1._ID + " = " + workoutId + ";",
                 null);
+    }
+
+    private void updateTimestamp(SQLiteDatabase db, String wId) {
+        String updd = "UPDATE " + WorkoutContract.WorkoutEntry1.TABLE_NAME_PRESETS +
+                " SET " + WorkoutContract.WorkoutEntry1.COLUMN_TIMESTAMP + " = CURRENT_TIMESTAMP" +
+                " WHERE " + WorkoutContract.WorkoutEntry1._ID + " = " + wId + ";";
+        db.execSQL(updd);
     }
 
     private Cursor getPreset(SQLiteDatabase db, String workoutId) {

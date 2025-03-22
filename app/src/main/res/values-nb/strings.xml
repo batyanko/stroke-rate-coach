@@ -31,6 +31,7 @@
     <string name="speed_dial_title">Hurtigvalg</string>
     <string name="workouts_title">Trening</string>
     <string name="history_title">Logg</string>
+    <string name="trash_title">Papirkurven</string>
     <string name="minimum_speed_warning">Hastighetsalarm</string>
     <string name="speed_unit_mps">m/s</string>
     <string name="speed_unit_500m">/500m</string>
@@ -42,7 +43,8 @@
     <string name="tpp_title_text">Tid</string>
     <string name="dpp_title_text">Avstand</string>
     <string name="min_speed_label">Min Hastighet</string>
-    <string name="preset_added_notification">Trening ble sikert.</string>
+    <string name="preset_added">Trening ble sikert.</string>
+    <string name="preset_add_failed">Feil.</string>
     <string name="gps_lock_text">Mottar en nøyaktig GPS-fix…</string>
 
     <string name="settings_title">Instillinger</string>
@@ -139,4 +141,7 @@ begrensninger under lisensen.</string>
     <string name="copy">KOPIERE</string>
     <string name="copy_to_presets">RESTAURERE TIL TRENINGER</string>
 
+    <string name="created">skapt</string>
+    <string name="played">avspilt</string>
+    <string name="deleted">slettet</string>
 </resources>

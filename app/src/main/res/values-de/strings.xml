@@ -32,6 +32,7 @@
     <string name="speed_dial_title">Kurzwahl</string>
     <string name="workouts_title">Trainings</string>
     <string name="history_title">Verlauf</string>
+    <string name="trash_title">Papierkorb</string>
     <string name="minimum_speed_warning">Geschwindigkeitsalarm</string>
     <string name="speed_unit_mps">m/s</string>
     <string name="speed_unit_500m">/500m</string>
@@ -43,7 +44,8 @@
     <string name="tpp_title_text">Dauer</string>
     <string name="dpp_title_text">Entfernung</string>
     <string name="min_speed_label">Min Geschw.</string>
-    <string name="preset_added_notification">Übung gespeichert.</string>
+    <string name="preset_added">Übung gespeichert.</string>
+    <string name="preset_add_failed">Gescheitert.</string>
     <string name="gps_lock_text">Eine genauer GPS-Fix wird empfangen…</string>
     <string name="settings_title">Einstellungen</string>
     <string name="help_title">Hilfe</string>
@@ -142,4 +144,8 @@ Einschränkungen unter der Lizenz.</string>
     <string name="whatsnew">NEUE FUNKTIONALITÄTEN:\n\n - Bearbeitung und Sicherheitskopien für Übungen.\n- Alternative Klingeltöne.</string>
     <string name="copy">KOPIEREN</string>
     <string name="copy_to_presets">WIEDERHERSTELLEN NACH TRAININGS</string>
+
+    <string name="created">erstellt</string>
+    <string name="played">abgespielt</string>
+    <string name="deleted">gelöscht</string>
 </resources>
