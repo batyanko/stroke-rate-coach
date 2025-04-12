@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
      Copyright (C) 2017 Yanko Georgiev
 
      Licensed under the Apache License, Version 2.0 (the "License");
@@ -49,6 +48,7 @@
     <string name="gps_lock_text">Eine genauer GPS-Fix wird empfangen…</string>
     <string name="settings_title">Einstellungen</string>
     <string name="help_title">Hilfe</string>
+    <string name="countdown_setting_title">Countdown-Timer (Sekunden)</string>
     <string name="starting_loc_accuracy_setting_title">GPS-Anfanggenauigkeit (metres)</string>
     <string name="starting_loc_accuracy_setting_desc">Zulässige Standardabweichung am Anfang einer Übung (nur distanzbasierte Übungen).
         \nNiedriger = genauer messen
@@ -150,4 +150,9 @@ Einschränkungen unter der Lizenz.</string>
     <string name="created">erstellt</string>
     <string name="played">abgespielt</string>
     <string name="deleted">gelöscht</string>
+
+    <string name="clear_history_title">Verlauf löschen?</string>
+    <string name="move_to_bin">Nach Papierkorb senden</string>
+    <string name="clear_button">Löschen!</string>
+    <string name="clear_bin_title">Papierkorb leeren?</string>
 </resources>

@@ -139,10 +139,10 @@ public class BeeperTasks {
     //TODO make static?
     private long phaseStartTime;
     private int timeTimerPhaseProgress;
-    private int countdownCyclesTotal;
-    private int countdownCyclesElapsed;
+    public static int countdownCyclesTotal;
+    public static int countdownCyclesElapsed;
     private int countdownCycleDuration;
-    private int countdownDuration;
+    private int countdownDurationMs;
     private String sndPref;
     private static int oldWorkoutProgress;
 
@@ -260,11 +260,20 @@ public class BeeperTasks {
         //Remove sensitive data?
         currentLocation = null;
         startingPhaseLocation = null;
-        acceptableAccuracy = Float.valueOf(pref.getString(WaveActivity.LOCATION_ACCURACY_ACCEPTABLE, acceptableAccuracy + ""));
+
+        try {
+            acceptableAccuracy = Float.parseFloat(pref.getString(WaveActivity.LOCATION_ACCURACY_ACCEPTABLE, acceptableAccuracy + ""));
+        } catch (NumberFormatException e) {
+            // Already at default
+        }
         if (acceptableAccuracy <= .0001f) {
             acceptableAccuracy = .0001f;
         }
-        speedSampleCount = Integer.valueOf(pref.getString(WaveActivity.SPEED_SAMPLE_COUNT, speedSampleCount + ""));
+        try {
+            speedSampleCount = Integer.parseInt(pref.getString(WaveActivity.SPEED_SAMPLE_COUNT, speedSampleCount + ""));
+        } catch (NumberFormatException e) {
+            // Already at default
+        }
         if (speedSampleCount < 3) {
             speedSampleCount = 3;
         }
@@ -277,10 +286,13 @@ public class BeeperTasks {
         cancelTimer(speedLimitTimer, speedLimitTimerTask);
 
         countdownCyclesElapsed = 0;
-        //TODO add setting for countdown cycle length / frequency?
-        countdownDuration = pref.getInt(WaveActivity.COUNTDOWN_DURATION, 3000);
+        try {
+            countdownDurationMs = Integer.parseInt(pref.getString(WaveActivity.COUNTDOWN_DURATION, "3")) * 1000;
+        } catch (NumberFormatException e) {
+            countdownDurationMs = 3000;
+        }
         countdownCycleDuration = 100;
-        countdownCyclesTotal = countdownDuration / countdownCycleDuration;
+        countdownCyclesTotal = countdownDurationMs / countdownCycleDuration;
 
         //Init speed unit setting if necessary
         String speedUnit = pref.getString(WaveActivity.SPEED_UNIT, "");
@@ -458,7 +470,7 @@ public class BeeperTasks {
 
                 if (countdownCyclesElapsed % 10 == 0) {
                     pref.edit().putInt(WaveActivity.COUNTDOWN_DURATION_LEFT,
-                                    countdownDuration - countdownCyclesElapsed * 100)
+                                    countdownDurationMs - countdownCyclesElapsed * 100)
                             .apply();
                 }
                 if (++countdownCyclesElapsed >= countdownCyclesTotal) {

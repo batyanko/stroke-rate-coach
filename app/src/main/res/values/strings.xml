@@ -68,6 +68,8 @@
     <string name="beep_sound_list_key" translatable="false">beep-sound</string>
     <string name="use_location_key" translatable="false">use-location</string>
     <string name="notification_preference_key" translatable="false">use-in-background</string>
+    <string name="countdown_setting_key" translatable="false">countdown-duration</string>
+    <string name="countdown_setting_title">Countdown duration (seconds)</string>
     <string name="starting_loc_accuracy_setting_key" translatable="false">starting-loc-accuracy</string>
     <string name="starting_loc_accuracy_setting_title">Starting GPS accuracy (metres)</string>
     <string name="starting_loc_accuracy_setting_desc">Acceptable GPS standard deviation for starting workout (only for distance workouts). \nLower = better accuracy\nHigher = faster start</string>
@@ -168,7 +170,12 @@ limitations under the License.</string>
     <string name="copy">COPY</string>
     <string name="copy_to_presets">RESTORE TO PRESETS</string>
 
-        <string name="created">created</string>
-        <string name="played">played</string>
-        <string name="deleted">deleted</string>
+    <string name="created">created</string>
+    <string name="played">played</string>
+    <string name="deleted">deleted</string>
+
+    <string name="clear_history_title">Clear History?</string>
+    <string name="move_to_bin">Send to bin</string>
+    <string name="clear_button">Purge!</string>
+    <string name="clear_bin_title">Clear bin?</string>
 </resources>

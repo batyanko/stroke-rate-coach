@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
      Copyright (C) 2017 Yanko Georgiev
 
      Licensed under the Apache License, Version 2.0 (the "License");
@@ -48,6 +47,7 @@
     <string name="gps_lock_text">Получаване на точен GPS сигнал…</string>
     <string name="settings_title">Настройки</string>
     <string name="help_title">Помощ</string>
+    <string name="countdown_setting_title">Таймер за обратно броене при старт (секунди)</string>
     <string name="starting_loc_accuracy_setting_title">GPS точност при старт (м)</string>
     <string name="starting_loc_accuracy_setting_desc">Допустимо GPS стандартно отклонение при започване на тренировка (само за тренировки, измервани в метри). \nНиска стойност = висока точност\nВисока стойност = по-бърз старт</string>
     <string name="dark_theme_setting_title">Тъмен фон</string>
@@ -141,4 +141,9 @@
     <string name="created">създадена</string>
     <string name="played">проиграна</string>
     <string name="deleted">изтрита</string>
+
+    <string name="clear_history_title">Изтрий историята?</string>
+    <string name="move_to_bin">Прати в кошчето</string>
+    <string name="clear_button">Изтрий!</string>
+    <string name="clear_bin_title">Изпразни кошчето?</string>
 </resources>

@@ -56,4 +56,32 @@
         android:contentDescription="@string/create_workout_button_label"
         android:layout_margin="32dp" />
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/clear_history_fab"
+        app:fabSize="normal"
+        android:scaleType="center"
+        app:maxImageSize="64dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:src="@drawable/ic_clear"
+        android:contentDescription="@string/clear_history_title"
+        android:layout_margin="32dp" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/clear_trash_fab"
+        app:fabSize="normal"
+        android:scaleType="center"
+        app:maxImageSize="64dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:src="@drawable/ic_clear"
+        android:contentDescription="@string/clear_bin_title"
+        android:layout_margin="32dp" />
+
 </RelativeLayout>

@@ -38,6 +38,27 @@ public class WorkoutDBHelper extends SQLiteOpenHelper {
 
     private final Context mContext;
 
+    public static final String SQL_NON_UNIQUES = WorkoutEntry1.COLUMN_NAME + ", " +
+            WorkoutEntry1.COLUMN_DESC + ", " +
+            WorkoutEntry1.COLUMN_TIMESTAMP + ", " +
+            WorkoutEntry1.COLUMN_SPP_TYPE + ", " +
+            WorkoutEntry1.COLUMN_SPP_CSV + ", " +
+            WorkoutEntry1.COLUMN_GEARS_CSV;
+    public static final String SQL_MOVE_HISTORY_TO_TRASH = "INSERT INTO " +
+            WorkoutEntry1.TABLE_NAME_TRASH +
+            "(" + SQL_NON_UNIQUES + ")" +
+            " SELECT " + SQL_NON_UNIQUES +
+            " FROM " +
+            WorkoutEntry1.TABLE_NAME_HISTORY +
+            "; ";
+
+    public static final String SQL_CLEAR_HISTORY = "DELETE FROM " +
+            WorkoutEntry1.TABLE_NAME_HISTORY +
+            "; ";
+
+    public static final String SQL_CLEAR_TRASH = "DELETE FROM " +
+            WorkoutEntry1.TABLE_NAME_TRASH +
+            "; ";
 
     private final String SQL_CREATE_TRASH_TABLE = "CREATE TABLE " + WorkoutEntry1.TABLE_NAME_TRASH + " (" +
             WorkoutEntry1._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
@@ -48,7 +69,6 @@ public class WorkoutDBHelper extends SQLiteOpenHelper {
             WorkoutEntry1.COLUMN_SPP_CSV + " TEXT NOT NULL, " +
             WorkoutEntry1.COLUMN_GEARS_CSV + " TEXT NOT NULL" +
             "); ";
-
 
     public WorkoutDBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);

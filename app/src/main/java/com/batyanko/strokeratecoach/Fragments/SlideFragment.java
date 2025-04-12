@@ -29,6 +29,7 @@ import static com.batyanko.strokeratecoach.data.WorkoutContract.WorkoutEntry1.TA
 import static com.batyanko.strokeratecoach.data.WorkoutContract.WorkoutEntry1.TABLE_NAME_TRASH;
 import static com.batyanko.strokeratecoach.sync.BeeperTasks.EXTRA_WORKOUT_ID;
 
+import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -125,6 +126,8 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
     private PopupWindow descPopupWindow;
     private TextView descPopupTextView;
     private FloatingActionButton adderFab;
+    private FloatingActionButton clearHistoryFab;
+    private FloatingActionButton clearTrashFab;
     private final int SPEED_DIAL_POSITION = 0;
     private final int PRESETS_POSITION = 1;
     private final int HISTORY_POSITION = 2;
@@ -174,11 +177,57 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         adderFab = view.findViewById(R.id.adder_fab);
+        clearHistoryFab = view.findViewById(R.id.clear_history_fab);
+        clearTrashFab = view.findViewById(R.id.clear_trash_fab);
         adderFab.setVisibility(INVISIBLE);
+        clearHistoryFab.setVisibility(INVISIBLE);
+        clearTrashFab.setVisibility(INVISIBLE);
         adderFab.setAlpha(0.8F);
+        clearHistoryFab.setAlpha(0.8F);
+        clearTrashFab.setAlpha(0.8F);
         adderFab.setOnClickListener(v -> {
             Intent entryIntent = new Intent(getActivity(), EntryFormActivity.class);
             startActivity(entryIntent);
+        });
+        clearHistoryFab.setOnClickListener(v -> {
+            AlertDialog alertDialog = new AlertDialog.Builder(this.getActivity()).create();
+            alertDialog.setTitle(getString(R.string.clear_history_title));
+            alertDialog.setMessage("  ");
+            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.clear_button),
+                    (dialog, which) -> {
+                        workoutDb.execSQL(WorkoutDBHelper.SQL_CLEAR_HISTORY);
+                        historyAdapter.swapCursor(getAllHistory(), workoutIsRunning, lastWorkoutId);
+                        dialog.dismiss();
+                    });
+            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, getString(R.string.move_to_bin),
+                    (dialog, which) -> {
+                        workoutDb.execSQL(WorkoutDBHelper.SQL_MOVE_HISTORY_TO_TRASH);
+                        workoutDb.execSQL(WorkoutDBHelper.SQL_CLEAR_HISTORY);
+                        historyAdapter.swapCursor(getAllHistory(), workoutIsRunning, lastWorkoutId);
+                        trashAdapter.swapCursor(getAllTrash(), workoutIsRunning, lastWorkoutId);
+                        dialog.dismiss();
+                    });
+            alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.cancel),
+                    (dialog, which) -> {
+                        dialog.dismiss();
+                    });
+            alertDialog.show();
+        });
+        clearTrashFab.setOnClickListener(v -> {
+            AlertDialog alertDialog = new AlertDialog.Builder(this.getActivity()).create();
+            alertDialog.setTitle(getString(R.string.clear_bin_title));
+            alertDialog.setMessage("  ");
+            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.clear_button),
+                    (dialog, which) -> {
+                        workoutDb.execSQL(WorkoutDBHelper.SQL_CLEAR_TRASH);
+                        trashAdapter.swapCursor(getAllTrash(), workoutIsRunning, lastWorkoutId);
+                        dialog.dismiss();
+                    });
+            alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.cancel),
+                    (dialog, which) -> {
+                        dialog.dismiss();
+                    });
+            alertDialog.show();
         });
 
         // Get the ViewPager and set it's PagerAdapter so that it can display items
@@ -193,8 +242,20 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
             public void onPageSelected(int position) {
                 if (position == PRESETS_POSITION) {
                     adderFab.setVisibility(VISIBLE);
+                    clearHistoryFab.setVisibility(INVISIBLE);
+                    clearTrashFab.setVisibility(INVISIBLE);
+                } else if (position == HISTORY_POSITION) {
+                    adderFab.setVisibility(INVISIBLE);
+                    clearHistoryFab.setVisibility(VISIBLE);
+                    clearTrashFab.setVisibility(INVISIBLE);
+                } else if (position == TRASH_POSITION) {
+                    adderFab.setVisibility(INVISIBLE);
+                    clearHistoryFab.setVisibility(INVISIBLE);
+                    clearTrashFab.setVisibility(VISIBLE);
                 } else {
                     adderFab.setVisibility(INVISIBLE);
+                    clearHistoryFab.setVisibility(INVISIBLE);
+                    clearTrashFab.setVisibility(INVISIBLE);
                 }
             }
 

@@ -113,7 +113,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     public static final String SPEED_UNIT = "speed-unit";
     public static final String SPEED_MS_SETTING = "m/s";
     public static final String SPEED_500M_SETTING = "/500m";
-    public static final String COUNTDOWN_DURATION = "countdown-duration";   //In ms
+    public static final String COUNTDOWN_DURATION = "countdown-duration";   //In sec
     public static final String COUNTDOWN_DURATION_LEFT = "countdown-duration-left";   //In ms
     public static final String BEEP = "beep";
     public static final String THEME_COLOR = "theme-color";
@@ -213,7 +213,11 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         countdownView.setVisibility(View.INVISIBLE);
 
         // Avoid transparent click through countdownView
-        countdownView.setOnClickListener(v -> countdownView.setVisibility(View.INVISIBLE));
+        countdownView.setOnClickListener(v -> {
+            BeeperTasks.countdownCyclesElapsed = BeeperTasks.countdownCyclesTotal;
+//            countdownView.setVisibility(View.INVISIBLE);
+//            countdownDigit.setVisibility(View.INVISIBLE);
+        });
 
         countdownDigit = findViewById(R.id.countdown_digit);
         countdownDigit.setVisibility(View.INVISIBLE);
@@ -589,7 +593,12 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         } else if (s.equals(CURRENT_COLOR)) {
             //TODO show color somewhere on the UI
         } else if (s.equals(COUNTDOWN_DURATION_LEFT)) {
-            int duration = sharedPreferences.getInt(COUNTDOWN_DURATION, 3000) / 1000;
+            int duration;
+            try{
+                duration = Integer.parseInt(sharedPreferences.getString(COUNTDOWN_DURATION, "3"));
+            } catch (NumberFormatException e) {
+                duration = 3;
+            }
             int durationLeft = sharedPreferences.getInt(COUNTDOWN_DURATION_LEFT, 0) / 1000;
             String countdownString = durationLeft + "";
             if (durationLeft == 0) {

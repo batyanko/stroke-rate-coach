@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
      Copyright (C) 2017 Yanko Georgiev
 
      Licensed under the Apache License, Version 2.0 (the "License");
@@ -49,6 +48,7 @@
 
     <string name="settings_title">Instillinger</string>
     <string name="help_title">Hjelp</string>
+    <string name="countdown_setting_title">Nedtellingstidtaker (Sekunder)</string>
     <string name="starting_loc_accuracy_setting_title">Treningsstart GPS-nøyaktighet (meter)</string>
     <string name="starting_loc_accuracy_setting_desc">Godtakbar GPS standardavvik for å starte treningen (bare for avstandsbasert trening).
         \nNedre = bedre nøyaktighet
@@ -146,4 +146,9 @@ begrensninger under lisensen.</string>
     <string name="created">skapt</string>
     <string name="played">avspilt</string>
     <string name="deleted">slettet</string>
+
+    <string name="clear_history_title">Tømme loggen?</string>
+    <string name="move_to_bin">Sende til papirkurven</string>
+    <string name="clear_button">Tømme!</string>
+    <string name="clear_bin_title">Tømme papirkurv?</string>
 </resources>
