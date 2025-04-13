@@ -141,7 +141,7 @@ begrensninger under lisensen.</string>
     <string name="whatsnew_120">120:\n\n- Rediger og backup av trening.\n- alternativ pipelyd.\n\n</string>
     <string name="whatsnew_121">121:\n\n- Papirkurv\n\n- Bug fixes, noen UI-forbedringer\n\n</string>
     <string name="copy">KOPIERE</string>
-    <string name="copy_to_presets">RESTAURERE TIL TRENINGER</string>
+    <string name="copy_to_presets">KOPIERE TIL TRENINGER</string>
 
     <string name="created">skapt</string>
     <string name="played">avspilt</string>

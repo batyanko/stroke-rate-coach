@@ -136,7 +136,7 @@
     <string name="whatsnew_120">120:\n\n- Копиране и промяна и резервно копие на тренировки.\n- Избор на звук за бипкане.\n\n</string>
     <string name="whatsnew_121">121:\n\n- Кошче за изтрити тренировки\n\n- Отстранени бъгове, промени по интерфейса\n\n</string>
     <string name="copy">КОПИРАЙ</string>
-    <string name="copy_to_presets">ВЪЗСТАНОВИ В ТРЕНИРОВКИ</string>
+    <string name="copy_to_presets">КОПИРАЙ В ТРЕНИРОВКИ</string>
 
     <string name="created">създадена</string>
     <string name="played">проиграна</string>
