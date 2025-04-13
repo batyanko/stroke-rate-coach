@@ -8,11 +8,11 @@
 
         <path
             android:pathData="M46 15.0278C41.4143 17.3149 38.2957 22.3231 34.9144 26C31.1249 30.1206 17.7136 40.7533 18.8819 46.8519C19.7692 51.4829 28.7138 50 32 50L66 50C69.7555 50 76.4306 51.2463 79.6636 48.9722C84.2245 45.7641 77.4732 39.5419 75.2855 37.0895C69.3918 30.4825 56.5567 9.76271 46 15.0278z"
-            android:fillColor="#ffffbb33"/>
+            android:fillColor="@color/colorAccent"/>
 
         <path
             android:pathData="M 23 46 L77 46 L50 17z"
-            android:fillColor="#ff33b5e5"
+            android:fillColor="@color/blueAppColor"
             />
     </group>
 

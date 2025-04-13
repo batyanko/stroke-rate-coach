@@ -6,13 +6,13 @@
 
     <group>
         <path
-            android:fillColor="#ff33b5e5"
+            android:fillColor="@color/blueAppColor"
             android:pathData="M 0 500 L 1000 500 L 1000 501 L 0 501z" />
         <path
-            android:fillColor="#ff33b5e5"
+            android:fillColor="@color/blueAppColor"
             android:pathData="M 500 0 L 500 1000 L 501 1000 L 501 0z" />
         <path
-            android:strokeColor="#ff33b5e5"
+            android:strokeColor="@color/blueAppColor"
             android:strokeWidth="1"
             android:pathData="M 501 450 a 50 50 0 1 0 0.001 0z" />
         </group>

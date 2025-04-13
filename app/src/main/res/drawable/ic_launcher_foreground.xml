@@ -11,7 +11,7 @@
             <path
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fillColor="#ff0099cc"
+                android:fillColor="@color/blueAppColor"
                 android:pathData="M -500 -500 L 1500 -500 L 1500 1500 L-500 1500z" />
             <!--Pivot Point-->
             <!--    <path
@@ -33,7 +33,7 @@
                     android:scaleY="1">
                     <group android:translateX="50">
                         <path
-                            android:fillColor="#ffffbb33"
+                            android:fillColor="@color/colorAccent"
                             android:pathData="M512 14.4244C479.675 18.6669 447.968 22.4026 416 29.4244C399.036 33.1506 381.528 40.8621 364.424 42.9776C329.493 47.2982 291.091 42.8743 256 42.0147C209.344 40.8717 162.59 43.0795 116 41.0394C89.1114 39.8619 61.9169 41 35 41C27.3307 41 10.2214 37.7383 3.6034 41.6034C0.583506 43.3671 1.59519 53.8484 2.14815 56.8519C3.41188 63.7159 24.6922 61 30 61L122 61L284 61C309.847 61 338.438 57.5232 364 61.2099C376.802 63.0563 387.351 74.8887 394.11 85C396.706 88.8824 399.027 97.342 403.39 99.3966C411.42 103.177 425.295 101 434 101C458.111 101 482.007 101.132 506 98.8302C511.878 98.2663 532.472 97.751 535.686 92.2724C538.115 88.1322 533.847 77.5026 533.081 73C530.753 59.3096 528.123 45.6176 525.4 32C524.504 27.52 524.518 19.2442 521.683 15.6034C519.664 13.011 514.766 14.0614 512 14.4244z" />
                     </group>
                 </group>
@@ -70,7 +70,7 @@
                         android:translateX="435"
                         android:translateY="75">
                         <path
-                            android:fillColor="#ffffbb33"
+                            android:fillColor="@color/colorAccent"
                             android:pathData="M19.0278 29.0278C17.0131 31.0424 18 36.4215 18 39L18 66L18 142C18 153.699 16.0308 167.356 18.1481 178.852C18.9236 183.062 30.3198 183.625 32.9722 180.972C34.9869 178.958 34 173.579 34 171L34 144L34 68C34 56.3011 35.9693 42.6437 33.8519 31.1481C33.0764 26.938 21.6802 26.3754 19.0278 29.0278z" />
                     </group>
                 </group>
@@ -84,7 +84,7 @@
                         android:translateX="435"
                         android:translateY="100">
                         <path
-                            android:fillColor="#ffffbb33"
+                            android:fillColor="@color/colorAccent"
                             android:pathData="M19.0278 29.0278C17.0131 31.0424 18 36.4215 18 39L18 66L18 142C18 153.699 16.0308 167.356 18.1481 178.852C18.9236 183.062 30.3198 183.625 32.9722 180.972C34.9869 178.958 34 173.579 34 171L34 144L34 68C34 56.3011 35.9693 42.6437 33.8519 31.1481C33.0764 26.938 21.6802 26.3754 19.0278 29.0278z" />
                     </group>
                 </group>
@@ -98,7 +98,7 @@
                         android:translateX="435"
                         android:translateY="100">
                         <path
-                            android:fillColor="#ffffbb33"
+                            android:fillColor="@color/colorAccent"
                             android:pathData="M19.0278 29.0278C17.0131 31.0424 18 36.4215 18 39L18 66L18 142C18 153.699 16.0308 167.356 18.1481 178.852C18.9236 183.062 30.3198 183.625 32.9722 180.972C34.9869 178.958 34 173.579 34 171L34 144L34 68C34 56.3011 35.9693 42.6437 33.8519 31.1481C33.0764 26.938 21.6802 26.3754 19.0278 29.0278z" />
                     </group>
                 </group>
@@ -112,7 +112,7 @@
                         android:translateX="435"
                         android:translateY="100">
                         <path
-                            android:fillColor="#ffffbb33"
+                            android:fillColor="@color/colorAccent"
                             android:pathData="M19.0278 29.0278C17.0131 31.0424 18 36.4215 18 39L18 66L18 142C18 153.699 16.0308 167.356 18.1481 178.852C18.9236 183.062 30.3198 183.625 32.9722 180.972C34.9869 178.958 34 173.579 34 171L34 144L34 68C34 56.3011 35.9693 42.6437 33.8519 31.1481C33.0764 26.938 21.6802 26.3754 19.0278 29.0278z" />
                     </group>
                 </group>
@@ -127,7 +127,7 @@
                         android:translateX="435"
                         android:translateY="100">
                         <path
-                            android:fillColor="#ffffbb33"
+                            android:fillColor="@color/colorAccent"
                             android:pathData="M19.0278 29.0278C17.0131 31.0424 18 36.4215 18 39L18 66L18 142C18 153.699 16.0308 167.356 18.1481 178.852C18.9236 183.062 30.3198 183.625 32.9722 180.972C34.9869 178.958 34 173.579 34 171L34 144L34 68C34 56.3011 35.9693 42.6437 33.8519 31.1481C33.0764 26.938 21.6802 26.3754 19.0278 29.0278z" />
                     </group>
                 </group>
@@ -141,7 +141,7 @@
                         android:translateX="435"
                         android:translateY="100">
                         <path
-                            android:fillColor="#ffffbb33"
+                            android:fillColor="@color/colorAccent"
                             android:pathData="M19.0278 29.0278C17.0131 31.0424 18 36.4215 18 39L18 66L18 142C18 153.699 16.0308 167.356 18.1481 178.852C18.9236 183.062 30.3198 183.625 32.9722 180.972C34.9869 178.958 34 173.579 34 171L34 144L34 68C34 56.3011 35.9693 42.6437 33.8519 31.1481C33.0764 26.938 21.6802 26.3754 19.0278 29.0278z" />
                     </group>
                 </group>
@@ -156,7 +156,7 @@
                         android:translateX="435"
                         android:translateY="100">
                         <path
-                            android:fillColor="#ffffbb33"
+                            android:fillColor="@color/colorAccent"
                             android:pathData="M19.0278 29.0278C17.0131 31.0424 18 36.4215 18 39L18 66L18 142C18 153.699 16.0308 167.356 18.1481 178.852C18.9236 183.062 30.3198 183.625 32.9722 180.972C34.9869 178.958 34 173.579 34 171L34 144L34 68C34 56.3011 35.9693 42.6437 33.8519 31.1481C33.0764 26.938 21.6802 26.3754 19.0278 29.0278z" />
                     </group>
                 </group>
@@ -175,7 +175,7 @@
             <!--
                     <path
                         android:pathData="M 470 992 L 480 1000 L 520 1000 L 530 992 L 658 750 C 550 650 450 650 342 750z"
-                        android:fillColor="#ffffbb33"
+                        android:fillColor="@color/colorAccent"
                         />
             -->
 
@@ -184,7 +184,7 @@
                 >
                 <path
                     android:pathData="M1135 290 C 800 0 200 0 -135 290"
-                    android:strokeColor="#ffffbb33"
+                    android:strokeColor="@color/colorAccent"
                     android:strokeWidth="40" />
             </group>
 

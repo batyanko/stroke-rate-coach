@@ -18,7 +18,7 @@
         android:translateY="5"
         >
         <path
-            android:fillColor="#ff33b5e5"
+            android:fillColor="@color/blueAppColor"
             android:pathData="M 50,50
     m -48,0
     a 1,1 0 1,0 96,0
@@ -32,7 +32,7 @@
         android:translateY="40"
         >
         <path
-            android:fillColor="#ff33b5e5"
+            android:fillColor="@color/blueAppColor"
             android:pathData="M 50,50
     m -48,0
     a 1,1 0 1,0 96,0
@@ -46,7 +46,7 @@
         android:translateY="75"
         >
         <path
-            android:fillColor="#ff33b5e5"
+            android:fillColor="@color/blueAppColor"
             android:pathData="M 50,50
     m -48,0
     a 1,1 0 1,0 96,0

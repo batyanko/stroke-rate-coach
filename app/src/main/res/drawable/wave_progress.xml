@@ -37,8 +37,8 @@
                 <gradient
                     android:startColor="#00ffd300"
                     android:centerColor="#00ffb600"
-                    android:centerY="0.85"
-                    android:endColor="#ffcb00"
+                    android:centerY="0.5"
+                    android:endColor="@color/colorAccent"
                     android:angle="270"
                     />
             </shape>
@@ -50,8 +50,8 @@
             <shape>
                 <corners android:radius="5dip" />
                 <gradient
-                    android:startColor="#33b5e5"
-                    android:centerColor="#0099cc"
+                    android:startColor="@color/blueAppColorLight"
+                    android:centerColor="@color/blueAppColor"
                     android:centerY="0.50"
                     android:endColor="#0033b5e5"
                     android:angle="270"

@@ -6,175 +6,175 @@
     <group 
         >
         <path
-            android:fillColor="#ffffbb33"
+            android:fillColor="@color/colorAccent"
             android:pathData="M 0 0 L 5 0 L 0 20 L -5 20z" />
     </group>
     <group android:translateX="5"
 
         >
         <path
-            android:fillColor="#ff33b5e5"
+            android:fillColor="@color/blueAppColor"
             android:pathData="M 0 0 L 5 0 L 0 20 L -5 20z" />
     </group>
     <group android:translateX="10"
 
         >
         <path
-            android:fillColor="#ffffbb33"
+            android:fillColor="@color/colorAccent"
             android:pathData="M 0 0 L 5 0 L 0 20 L -5 20z" />
     </group>
     <group android:translateX="15"
 
         >
         <path
-            android:fillColor="#ff33b5e5"
+            android:fillColor="@color/blueAppColor"
             android:pathData="M 0 0 L 5 0 L 0 20 L -5 20z" />
     </group>
     <group android:translateX="20"
 
         >
         <path
-            android:fillColor="#ffffbb33"
+            android:fillColor="@color/colorAccent"
             android:pathData="M 0 0 L 5 0 L 0 20 L -5 20z" />
     </group>
     <group android:translateX="25"
 
         >
         <path
-            android:fillColor="#ff33b5e5"
+            android:fillColor="@color/blueAppColor"
             android:pathData="M 0 0 L 5 0 L 0 20 L -5 20z" />
     </group>
     <group android:translateX="30"
 
         >
         <path
-            android:fillColor="#ffffbb33"
+            android:fillColor="@color/colorAccent"
             android:pathData="M 0 0 L 5 0 L 0 20 L -5 20z" />
     </group>
     <group android:translateX="35"
 
         >
         <path
-            android:fillColor="#ff33b5e5"
+            android:fillColor="@color/blueAppColor"
             android:pathData="M 0 0 L 5 0 L 0 20 L -5 20z" />
     </group>
     <group android:translateX="40"
 
         >
         <path
-            android:fillColor="#ffffbb33"
+            android:fillColor="@color/colorAccent"
             android:pathData="M 0 0 L 5 0 L 0 20 L -5 20z" />
     </group>
     <group android:translateX="45"
 
         >
         <path
-            android:fillColor="#ff33b5e5"
+            android:fillColor="@color/blueAppColor"
             android:pathData="M 0 0 L 5 0 L 0 20 L -5 20z" />
     </group>
     <group android:translateX="50"
 
         >
         <path
-            android:fillColor="#ffffbb33"
+            android:fillColor="@color/colorAccent"
             android:pathData="M 0 0 L 5 0 L 0 20 L -5 20z" />
     </group>
     <group android:translateX="55"
 
         >
         <path
-            android:fillColor="#ff33b5e5"
+            android:fillColor="@color/blueAppColor"
             android:pathData="M 0 0 L 5 0 L 0 20 L -5 20z" />
     </group>
     <group android:translateX="60"
 
         >
         <path
-            android:fillColor="#ffffbb33"
+            android:fillColor="@color/colorAccent"
             android:pathData="M 0 0 L 5 0 L 0 20 L -5 20z" />
     </group>
     <group android:translateX="65"
 
         >
         <path
-            android:fillColor="#ff33b5e5"
+            android:fillColor="@color/blueAppColor"
             android:pathData="M 0 0 L 5 0 L 0 20 L -5 20z" />
     </group>
     <group android:translateX="70"
 
         >
         <path
-            android:fillColor="#ffffbb33"
+            android:fillColor="@color/colorAccent"
             android:pathData="M 0 0 L 5 0 L 0 20 L -5 20z" />
     </group>
     <group android:translateX="75"
 
         >
         <path
-            android:fillColor="#ff33b5e5"
+            android:fillColor="@color/blueAppColor"
             android:pathData="M 0 0 L 5 0 L 0 20 L -5 20z" />
     </group>
     <group android:translateX="80"
 
         >
         <path
-            android:fillColor="#ffffbb33"
+            android:fillColor="@color/colorAccent"
             android:pathData="M 0 0 L 5 0 L 0 20 L -5 20z" />
     </group>
     <group android:translateX="85"
 
         >
         <path
-            android:fillColor="#ff33b5e5"
+            android:fillColor="@color/blueAppColor"
             android:pathData="M 0 0 L 5 0 L 0 20 L -5 20z" />
     </group>
     <group android:translateX="90"
 
         >
         <path
-            android:fillColor="#ffffbb33"
+            android:fillColor="@color/colorAccent"
             android:pathData="M 0 0 L 5 0 L 0 20 L -5 20z" />
     </group>
     <group android:translateX="95"
 
         >
         <path
-            android:fillColor="#ff33b5e5"
+            android:fillColor="@color/blueAppColor"
             android:pathData="M 0 0 L 5 0 L 0 20 L -5 20z" />
     </group>
     <group android:translateX="100"
 
         >
         <path
-            android:fillColor="#ffffbb33"
+            android:fillColor="@color/colorAccent"
             android:pathData="M 0 0 L 5 0 L 0 20 L -5 20z" />
     </group>
     <group android:translateX="105"
 
         >
         <path
-            android:fillColor="#ff33b5e5"
+            android:fillColor="@color/blueAppColor"
             android:pathData="M 0 0 L 5 0 L 0 20 L -5 20z" />
     </group>
     <group android:translateX="110"
 
         >
         <path
-            android:fillColor="#ffffbb33"
+            android:fillColor="@color/colorAccent"
             android:pathData="M 0 0 L 5 0 L 0 20 L -5 20z" />
     </group>
     <group android:translateX="115"
 
         >
         <path
-            android:fillColor="#ff33b5e5"
+            android:fillColor="@color/blueAppColor"
             android:pathData="M 0 0 L 5 0 L 0 20 L -5 20z" />
     </group>
     <group android:translateX="120"
 
         >
         <path
-            android:fillColor="#ffffbb33"
+            android:fillColor="@color/colorAccent"
             android:pathData="M 0 0 L 5 0 L 0 20 L -5 20z" />
     </group>
 

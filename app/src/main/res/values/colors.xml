@@ -14,6 +14,6 @@
     <color name="colorTransparent">#00ffffff</color>
 
     <color name="blueAppColor">@android:color/holo_blue_dark</color>
-    <color name="blueAppColorLight">#bb33b5e5</color>
+    <color name="blueAppColorLight">@android:color/holo_blue_light</color>
 
 </resources>

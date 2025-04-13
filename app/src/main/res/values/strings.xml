@@ -176,6 +176,6 @@ limitations under the License.</string>
 
     <string name="clear_history_title">Clear History?</string>
     <string name="move_to_bin">Send to bin</string>
-    <string name="clear_button">Purge!</string>
+    <string name="clear_button">Clear!</string>
     <string name="clear_bin_title">Clear bin?</string>
 </resources>

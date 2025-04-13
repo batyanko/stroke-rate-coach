@@ -9,29 +9,29 @@
             android:fillColor="#ffffff"
             android:pathData="M -1 -1 L 1001 -1 L 1001 1001 L -1 1001z" />
         <path
-            android:fillColor="#ff33b5e5"
+            android:fillColor="@color/blueAppColor"
             android:pathData="M 0 200 L 1000 200 L 1000 201 L 0 201z" />
 <!--        TODO color constant-->
         <path
-            android:fillColor="#ff33b5e5"
+            android:fillColor="@color/blueAppColor"
             android:pathData="M 0 400 L 1000 400 L 1000 401 L 0 401z" />
         <path
-            android:fillColor="#ff33b5e5"
+            android:fillColor="@color/blueAppColor"
             android:pathData="M 0 600 L 1000 600 L 1000 601 L 0 601z" />
         <path
-            android:fillColor="#ff33b5e5"
+            android:fillColor="@color/blueAppColor"
             android:pathData="M 0 800 L 1000 800 L 1000 801 L 0 801z" />
         <path
-            android:fillColor="#ff33b5e5"
+            android:fillColor="@color/blueAppColor"
             android:pathData="M 200 0 L 200 1000 L 201 1000 L 201 0z" />
         <path
-            android:fillColor="#ff33b5e5"
+            android:fillColor="@color/blueAppColor"
             android:pathData="M 400 0 L 400 1000 L 401 1000 L 401 0z" />
         <path
-            android:fillColor="#ff33b5e5"
+            android:fillColor="@color/blueAppColor"
             android:pathData="M 600 0 L 600 1000 L 601 1000 L 601 0z" />
         <path
-            android:fillColor="#ff33b5e5"
+            android:fillColor="@color/blueAppColor"
             android:pathData="M 800 0 L 800 1000 L 801 1000 L 801 0z" />
     </group>
 </vector>
