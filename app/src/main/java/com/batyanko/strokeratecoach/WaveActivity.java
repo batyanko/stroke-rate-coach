@@ -55,7 +55,6 @@ import android.widget.PopupWindow;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -594,7 +593,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
             //TODO show color somewhere on the UI
         } else if (s.equals(COUNTDOWN_DURATION_LEFT)) {
             int duration;
-            try{
+            try {
                 duration = Integer.parseInt(sharedPreferences.getString(COUNTDOWN_DURATION, "3"));
             } catch (NumberFormatException e) {
                 duration = 3;
@@ -894,6 +893,13 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
                     countdownBeingAnimated = false;
                 }
         );
+
+        countdownView.setOnClickListener(v -> {
+            countdownView.clearAnimation();
+            countdownView.setAlpha(1f);
+            countdownView.setVisibility(View.INVISIBLE);
+            countdownBeingAnimated = false;
+        });
     }
 
     private void updateGpsSplash() {
@@ -1080,7 +1086,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
             if (pref.getInt(LATEST_VERSION_KEY, 0) < 120) {
                 whatsNew += this.getResources().getString(R.string.whatsnew_120);
             }
-            if (!whatsNew.isEmpty()){
+            if (!whatsNew.isEmpty()) {
                 whatsNew = this.getResources().getString(R.string.whatsnew_title) + whatsNew;
 
                 final LayoutInflater inflater = (LayoutInflater) WaveActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
