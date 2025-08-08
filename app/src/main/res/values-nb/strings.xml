@@ -151,4 +151,12 @@ begrensninger under lisensen.</string>
     <string name="move_to_bin">Sende til papirkurven</string>
     <string name="clear_button">Tømme!</string>
     <string name="clear_bin_title">Tømme papirkurv?</string>
+    <string name="spp_type_error">" (Treningstype kan bli bare 0(slagtall), 1 (meter) eller 2 (sekunder))\n"</string>
+    <string name="spp_gears_error">" (Tempodata kan bare inneholde 0–9 og ',')\n"</string>
+    <string name="spp_length_error">" (aselengdedata kan bare inneholde 0–9 og ',')"</string>
+    <string name="bkp_malformed_error">\nSørg for at sikkerhetskopieringsdataene for disse treningsøktene ikke er feil, og prøv på nytt.</string>
+    <string name="bkp_nobkp_error">Ingen treningsbackup for treningsøkter funnet på utklippstavlen.
+Sørg for å kopiere en tidligere opprettet treningsbackup først.
+\nEn treningsbackup er i tekstform: du trenger merke den og velge «Kopier» (for eksempel i e-posten eller tekstredigeringsprogrammet der du har lagret den).
+Deretter «limer» StrokeRateCoach den inn automatisk når du trykker på «GJENOPPRETT».</string>
 </resources>

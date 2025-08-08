@@ -178,4 +178,12 @@ limitations under the License.</string>
     <string name="move_to_bin">Send to bin</string>
     <string name="clear_button">Clear!</string>
     <string name="clear_bin_title">Clear bin?</string>
+    <string name="spp_type_error">" (Workout type may only be 0 (strokes), 1 (meters) or 2 (seconds))\n"</string>
+    <string name="spp_gears_error">" (Gears/Tempo setting may only include 0–9 and ',')\n"</string>
+    <string name="spp_length_error">" (Phase length setting  may only include 0–9 and ',')"</string>
+    <string name="bkp_malformed_error">\nMake sure that the backup data for these workouts is not malformed, and try again.</string>
+    <string name="bkp_nobkp_error">No workout presets found in clipboard.
+        Make sure to first copy a previously created backup.
+        \nA backup is in the form of text: you need to select it and choose \"Copy\" (for example in your e-mail or text editor where you have stored it).
+        Then StrokeRateCoach \"pastes\" it automatically when you press \"RESTORE\".</string>
 </resources>

@@ -155,4 +155,12 @@ Einschränkungen unter der Lizenz.</string>
     <string name="move_to_bin">Nach Papierkorb senden</string>
     <string name="clear_button">Löschen!</string>
     <string name="clear_bin_title">Papierkorb leeren?</string>
+    <string name="spp_type_error">" (Übungstyp kann nur 0 (Schlagzahl), 1 (Meter) oder 2 (Sekunden) sein)\n"</string>
+    <string name="spp_gears_error">" (Tempoeinstellungdata darf nur 0–9 und ',' enthalten)\n"</string>
+    <string name="spp_length_error">" (Phasenlängedata darf nur 0–9 und ',' enthalten\n)"</string>
+    <string name="bkp_malformed_error">\nStellen Sie sicher, dass die Sicherungsdaten für diese Trainingseinheiten nicht fehlerhaft sind, und versuchen Sie es erneut.</string>
+    <string name="bkp_nobkp_error">Keine Trainingsvorgaben in der Zwischenablage gefunden.
+Kopieren Sie zunächst eine zuvor erstellte Sicherungskopie.
+\nEine Sicherungskopie liegt in Textform vor: Markieren Sie sie und wählen Sie \„Kopieren\“ (z. B. in Ihrer E-Mail oder im Texteditor, in dem Sie sie gespeichert haben).
+StrokeRateCoach \"fügt\" sie dann automatisch ein, wenn Sie auf \„WIEDERHERSTELLEN\“ klicken.</string>
 </resources>

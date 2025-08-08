@@ -62,8 +62,8 @@ public class WorkoutDBHelper extends SQLiteOpenHelper {
 
     private final String SQL_CREATE_TRASH_TABLE = "CREATE TABLE " + WorkoutEntry1.TABLE_NAME_TRASH + " (" +
             WorkoutEntry1._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-            WorkoutEntry1.COLUMN_NAME + " TEXT DEFAULT 'Untitled', " +
-            WorkoutEntry1.COLUMN_DESC + " TEXT DEFAULT 'No description', " +
+            WorkoutEntry1.COLUMN_NAME + " TEXT DEFAULT 'NO TITLE', " +
+            WorkoutEntry1.COLUMN_DESC + " TEXT DEFAULT 'NO DESC', " +
             WorkoutEntry1.COLUMN_TIMESTAMP + " INTEGER DEFAULT CURRENT_TIMESTAMP, " +
             WorkoutEntry1.COLUMN_SPP_TYPE + " INTEGER DEFAULT 0, " +
             WorkoutEntry1.COLUMN_SPP_CSV + " TEXT NOT NULL, " +

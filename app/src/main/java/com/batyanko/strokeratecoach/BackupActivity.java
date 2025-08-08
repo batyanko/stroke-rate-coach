@@ -20,7 +20,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -126,10 +125,30 @@ public class BackupActivity extends AppCompatActivity {
     }
 
     private void restoreBkp(SQLiteDatabase workoutDb) {
-        ClipboardManager clipboard = (ClipboardManager)
+        ClipboardManager clipboardMan = (ClipboardManager)
                 getSystemService(CLIPBOARD_SERVICE);
-        String gottenDump = clipboard.getPrimaryClip().getItemAt(0).getText().toString();
+        ClipData primaryClip = clipboardMan.getPrimaryClip();
+        if (primaryClip == null) {
+            displayReport(getString(R.string.bkp_nobkp_error), "-", "-");
+            return;
+        }
+
+        String gottenDump = primaryClip.getItemAt(0).getText().toString();
+
         String[] presets = gottenDump.split(this.getString(R.string.preset_delimiter));
+        int plausibleWorkouts = 0;
+        for (String string : presets) {
+            if ((string.contains(BKP_ID_TYPE)
+                    || string.contains(BKP_ID_GEARS)
+                    || string.contains(BKP_ID_SPP))) {
+                plausibleWorkouts++;
+            }
+        }
+        if (plausibleWorkouts == 0) {
+            displayReport(getString(R.string.bkp_nobkp_error), "-", "-");
+            return;
+        }
+
         StringBuilder presetsAdded = new StringBuilder();
         StringBuilder presetsBotched = new StringBuilder();
         int cntAdded = 0;
@@ -146,16 +165,12 @@ public class BackupActivity extends AppCompatActivity {
             ContentValues cv = new ContentValues();
 
             String name = String.valueOf(i);
-            Log.d("Next preset:", preset);
 
             for (String s : details) {
                 String detail = s.trim();
-                if (detail.length() <= 6) {
+                if (detail.length() <= 5) {
                     continue; // positions reserved for workout detail ID
                 }
-                Log.d("presetDetail:", detail);
-                Log.d("dbDetail:", detail);
-                //TODO Validity checks
                 if (detail.startsWith(BKP_ID_NAME)) {
                     name = detail.substring(BKP_ID_NAME.length());
                     cv.put(COLUMN_NAME, name);
@@ -165,7 +180,7 @@ public class BackupActivity extends AppCompatActivity {
                     String type = detail.substring(BKP_ID_TYPE.length());
                     if (!Arrays.asList(SPP_TYPE_STROKES, SPP_TYPE_METERS, SPP_TYPE_SECONDS).contains(type)) {
                         presetsBotched.append("- ").append(name)
-                                .append(" (Workout type may only be 0 (strokes), 1 (meters) or 2 (seconds))\n");
+                                .append(getString(R.string.spp_type_error));
                         cntFailed++;
                         continue presetsLoop;
                     }
@@ -174,7 +189,7 @@ public class BackupActivity extends AppCompatActivity {
                     String gears = detail.substring(BKP_ID_GEARS.length());
                     if (!gears.matches(SPP_VALID)) {
                         presetsBotched.append("- ").append(name)
-                                .append(" (Gears/Tempo setting may only include 0-9 and ',')\n");
+                                .append(getString(R.string.spp_gears_error));
                         cntFailed++;
                         continue presetsLoop;
                     }
@@ -183,7 +198,7 @@ public class BackupActivity extends AppCompatActivity {
                     String spp = detail.substring(BKP_ID_SPP.length());
                     if (!spp.matches(SPP_VALID)) {
                         presetsBotched.append("- ").append(name)
-                                .append(" (Phase length setting setting may only include 0-9 and ',')\n");
+                                .append(getString(R.string.spp_length_error));
                         cntFailed++;
                         continue presetsLoop;
                     }
@@ -201,7 +216,7 @@ public class BackupActivity extends AppCompatActivity {
         }
         String summary = cntAdded + " restored, " + cntFailed + " failed.";
         if (cntFailed > 0) {
-            summary = summary + "\nMake sure that the backup data for these workouts is not malformed, and try again.";
+            summary = summary + getString(R.string.bkp_malformed_error);
         }
 
         displayReport(summary, presetsAdded.toString(), presetsBotched.toString());
@@ -237,6 +252,7 @@ public class BackupActivity extends AppCompatActivity {
         overlay.add(dim);
 
         descPopupWindow.setOnDismissListener(() -> overlay.clear());
+        backupInfoLayout.setOnClickListener(v -> descPopupWindow.dismiss());
         descPopupWindow.showAtLocation(backupInfoLayout, Gravity.CENTER, 0, (int) density * 100);
     }
 

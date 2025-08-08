@@ -146,4 +146,12 @@
     <string name="move_to_bin">Прати в кошчето</string>
     <string name="clear_button">Изтрий!</string>
     <string name="clear_bin_title">Изпразни кошчето?</string>
+    <string name="spp_type_error">" (Тип тренировка може да бъде само 0 (загребоци), 1 (метри) или 2 (секунди))\n"</string>
+    <string name="spp_gears_error">" (Записът за скорости/темпо за всеки интервал може да съдържа само 0–9 и ',')\n"</string>
+    <string name="spp_length_error">" (Phase length setting setting may only include 0–9 and ',')"</string>
+    <string name="bkp_malformed_error">\nУверете се, че резервните данни за тези тренировки не са деформирани и опитайте отново.</string>
+    <string name="bkp_nobkp_error">Няма намерени предварително зададени настройки за тренировки в клипборда.
+Уверете се, че първо сте копирали предварително създадено резервно копие.
+\nРезервното копие е под формата на текст: трябва да го изберете и да изберете \„Копирай\“ (например в имейла или текстовия редактор, където сте го съхранили).
+След това StrokeRateCoach го \„поставя\“ автоматично, когато натиснете \„ВЪЗСТАНОВИ\“.</string>
 </resources>
