@@ -56,11 +56,15 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.batyanko.strokeratecoach.Fragments.SlideFragment;
@@ -201,8 +205,23 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_wave);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_wave);
+        Insets systemBars;
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.activity_wave), (v, insets) -> {
+            Insets lamSystemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            DisplayMetrics displayMetrics = new DisplayMetrics();
+            this.getWindowManager()
+                    .getDefaultDisplay()
+                    .getMetrics(displayMetrics);
+            v.setPadding(0, lamSystemBars.top, 0, lamSystemBars.bottom);
+//            v.setPadding(displayMetrics.widthPixels/40, lamSystemBars.top, displayMetrics.widthPixels/40, lamSystemBars.bottom);
+            countdownView = findViewById(R.id.countdown_image_view);
+            countdownView.setPadding(-32, -lamSystemBars.top, -64, -lamSystemBars.bottom);
+            return insets;
+        });
 
         //Initialize spm at last setting, or default at 0
         pref = PreferenceManager.getDefaultSharedPreferences(this);
@@ -214,8 +233,6 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         // Avoid transparent click through countdownView
         countdownView.setOnClickListener(v -> {
             BeeperTasks.countdownCyclesElapsed = BeeperTasks.countdownCyclesTotal;
-//            countdownView.setVisibility(View.INVISIBLE);
-//            countdownDigit.setVisibility(View.INVISIBLE);
         });
 
         countdownDigit = findViewById(R.id.countdown_digit);

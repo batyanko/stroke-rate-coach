@@ -9,7 +9,11 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.batyanko.strokeratecoach.Fragments.SettingsFragment;
 import com.batyanko.strokeratecoach.Utils.WaveUtilities;
@@ -21,6 +25,13 @@ public class SettingsActivity extends AppCompatActivity implements SharedPrefere
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        EdgeToEdge.enable(this);
+        ViewCompat.setOnApplyWindowInsetsListener(this.getWindow().getDecorView(), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(32, systemBars.top, 32, systemBars.bottom);
+            return insets;
+        });
 
         pref = PreferenceManager.getDefaultSharedPreferences(this);
         pref.registerOnSharedPreferenceChangeListener(this);

@@ -81,12 +81,15 @@
 
     </LinearLayout>
 
+<!--    The following is a dummy, the only purpose is to suggest workout settings functionality.-->
+<!--    Workout settings are accessibleby tapping anywhere on the workout. -->
     <ImageView
         android:id="@+id/preset_menu"
         android:layout_width="35dp"
         android:layout_height="35dp"
         android:contentDescription="@string/menu_image"
         android:src="@drawable/ic_menu"
+
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

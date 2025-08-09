@@ -119,7 +119,7 @@
     <string name="use_location_text_description">Нужно за измерване на скоростта и тренировки, базирани на разстояние.</string>
     <string name="engage_workout">Старт тренировка</string>
     <string name="restore_result_text">Резултат:</string>
-    <string name="restore_added_text">Добавени:</string>
+    <string name="restore_added_text">Възстановени:</string>
     <string name="restore_failed_text">Неуспешни:</string>
     <string name="restore_summary_text">Резултат:</string>
     <string name="create_backup">СЪЗДАЙ (КОПИРАЙ)</string>

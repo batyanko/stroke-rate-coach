@@ -160,7 +160,7 @@ limitations under the License.</string>
     <string name="backup_comment" translatable="false">-------\n#Copy this whole text to backup/restore StrokeRateCoach workouts\n#Workouts are described by several lines. Workouts starting with # are ignored.\n#Format:\n#1. Title\n#2. Description\n#3. Type: 0 - strokes, 1 - meters, 2 - seconds.\n#4. Strokes per minute for each phase\n#5. Duration of each phase (in strokes, metres or seconds).\n-------\n\n</string>
     <string name="preset_delimiter" translatable="false">-------</string>
     <string name="restore_result_text">Restore Result:</string>
-    <string name="restore_added_text">Added:</string>
+    <string name="restore_added_text">Restored:</string>
     <string name="restore_failed_text">Failed:</string>
     <string name="restore_summary_text">"Summary: "</string>
     <string name="notification_preference_title">Work in background</string>

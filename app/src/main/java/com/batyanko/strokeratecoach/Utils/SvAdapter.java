@@ -109,6 +109,7 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
         boolean shouldAttachToParentImmediately = false;
 
         View itemView = inflater.inflate(layoutIdForListItem, parent, shouldAttachToParentImmediately);
+        itemView.setPadding(16,0,32,0);
         return new ExerciseViewHolder(itemView);
     }
 

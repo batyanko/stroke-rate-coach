@@ -9,9 +9,8 @@ android {
         applicationId "com.batyanko.strokeratecoach"
         minSdkVersion 21
         targetSdkVersion 36
-        versionCode 122
-        versionName "1.22"
-        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+        versionCode 123
+        versionName "1.23"
     }
     buildTypes {
         release {

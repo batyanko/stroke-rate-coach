@@ -133,7 +133,7 @@ Einschränkungen unter der Lizenz.</string>
     <string name="edit_workout">Bearbeiten</string>
     <string name="delete_workout">Löschen</string>
     <string name="restore_result_text">Ergebnis:</string>
-    <string name="restore_added_text">Hinzugefügt:</string>
+    <string name="restore_added_text">Wiederhergestellt:</string>
     <string name="restore_backup">WIEDERHERSTELLEN (EINFÜGEN) ins StrokeRateCoach</string>
     <string name="restore_failed_text">Gescheitert:</string>
     <string name="restore_summary_text">Zusammenfassung:</string>
