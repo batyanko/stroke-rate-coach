@@ -76,7 +76,9 @@ import com.batyanko.strokeratecoach.sync.BeeperTasks;
 import com.batyanko.strokeratecoach.workout.CompiledPhase;
 import com.batyanko.strokeratecoach.workout.CompiledWorkout;
 import com.batyanko.strokeratecoach.workout.LegacyWorkoutParser;
+import com.batyanko.strokeratecoach.workout.WorkoutDefinition;
 import com.batyanko.strokeratecoach.workout.WorkoutCompiler;
+import com.batyanko.strokeratecoach.workout.WorkoutSummaryFormatter;
 import com.batyanko.strokeratecoach.workout.WorkoutValidationException;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -108,6 +110,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
 
     private static SQLiteDatabase workoutDb;
     private WorkoutRecordMapper recordMapper;
+    private final WorkoutSummaryFormatter summaryFormatter = new WorkoutSummaryFormatter();
 
     ViewGroup viewGroup;
     private BeeperService mBeeperService;
@@ -311,14 +314,19 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
 
         if (itemFunction == WaveActivity.WORKOUT_ITEM_FUNCTION) { // Tap anywhere on workout
 
-            message = cursor.getString(cursor.getColumnIndex(WorkoutEntry1.COLUMN_NAME)) +
-                    " : " +
-                    "\n" +
-                    cursor.getString(cursor.getColumnIndex(WorkoutEntry1.COLUMN_SPP_CSV)) +
-                    " at " +
-                    cursor.getString(cursor.getColumnIndex(WorkoutEntry1.COLUMN_GEARS_CSV)) +
-                    "\n" +
-                    cursor.getString(cursor.getColumnIndex(WorkoutEntry1.COLUMN_DESC));
+            final WorkoutDefinition definition;
+            try {
+                definition = recordMapper.readDefinition(cursor);
+            } catch (WorkoutValidationException exception) {
+                showInvalidWorkout(exception);
+                return;
+            }
+            String description = cursor.getString(cursor.getColumnIndexOrThrow(
+                    WorkoutEntry1.COLUMN_DESC));
+            message = getString(R.string.workout_summary_popup_format,
+                    cursor.getString(cursor.getColumnIndexOrThrow(WorkoutEntry1.COLUMN_NAME)),
+                    summaryFormatter.format(definition),
+                    description == null ? "" : description);
 
             LayoutInflater inflater = (LayoutInflater) requireActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             float density = requireActivity().getResources().getDisplayMetrics().density;

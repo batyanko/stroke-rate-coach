@@ -34,6 +34,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,7 +49,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.batyanko.strokeratecoach.R;
 import com.batyanko.strokeratecoach.WaveActivity;
 import com.batyanko.strokeratecoach.data.WorkoutContract;
+import com.batyanko.strokeratecoach.data.WorkoutRecordMapper;
 import com.batyanko.strokeratecoach.sync.BeeperTasks;
+import com.batyanko.strokeratecoach.workout.LegacyWorkoutParser;
+import com.batyanko.strokeratecoach.workout.WorkoutCompiler;
+import com.batyanko.strokeratecoach.workout.WorkoutDefinition;
+import com.batyanko.strokeratecoach.workout.WorkoutJsonCodec;
+import com.batyanko.strokeratecoach.workout.WorkoutSummaryFormatter;
+import com.batyanko.strokeratecoach.workout.WorkoutValidationException;
 
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
@@ -73,6 +81,8 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
     private Context mContext;
     private boolean workoutIsRunning;
     private int workoutId;
+    private final WorkoutRecordMapper recordMapper;
+    private final WorkoutSummaryFormatter summaryFormatter;
 
     TypedValue typedValue;
     @ColorInt
@@ -93,6 +103,9 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
         workoutIsRunning = false;
 
         pref = PreferenceManager.getDefaultSharedPreferences(context);
+        recordMapper = new WorkoutRecordMapper(
+                new WorkoutJsonCodec(), new LegacyWorkoutParser(), new WorkoutCompiler());
+        summaryFormatter = new WorkoutSummaryFormatter();
 
         //Get style background color
         typedValue = new TypedValue();
@@ -248,7 +261,18 @@ public class SvAdapter extends RecyclerView.Adapter<SvAdapter.ExerciseViewHolder
             }
 
 
-            workoutDesc.setText(sppType);
+            String description = sppType;
+            try {
+                WorkoutDefinition definition = recordMapper.readDefinition(gottenCursor);
+                if (summaryFormatter.containsRepeats(definition)) {
+                    description += " \u00b7 " + mContext.getString(R.string.repeat_indicator);
+                }
+            } catch (WorkoutValidationException exception) {
+                int id = gottenCursor.getInt(gottenCursor.getColumnIndexOrThrow(_ID));
+                Log.e("SvAdapter", "Could not inspect workout tree for record " + id,
+                        exception);
+            }
+            workoutDesc.setText(description);
             workoutTitle.setText(gottenCursor.getString(gottenCursor.getColumnIndex(COLUMN_NAME)));
             tsTitle = tsTitle + " " + localTime;
             workoutTime.setText(tsTitle);

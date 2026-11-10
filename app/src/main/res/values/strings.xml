@@ -69,6 +69,8 @@
     <string name="editor_delete_repeat_title">Delete repeat</string>
     <string name="editor_delete_repeat_confirmation">Delete %1$s and all of its contents?</string>
     <string name="editor_state_restore_failed">Could not restore the workout editor state.</string>
+    <string name="repeat_indicator">repeats</string>
+    <string name="workout_summary_popup_format">%1$s\n%2$s\n\n%3$s</string>
 
     <string name="path_circle" translatable="false">
     M 50,50
@@ -127,9 +129,10 @@
     <string name="help_how_to_speed4">\'Min Speed\' shows the current speed warning threshold. If on, it will sound a warning as long as your current speed is below that level. Tap to enable and set minimum speed threshold.</string>
     <string name="help_how_to_create1">- Creating a new workout</string>
     <string name="help_how_to_create2">Tap the menu button (\'⋮\') while the beeper is stopped, then tap \'Create workout\'.
-        Choose \'strokes\', \'metres\' or \'seconds\' for workout unit, enter a workout name and then enter data for all workout legs/phases:
-        \nThe first (left hand) field of each phase for phase duration.
-        \nThe second (right hand) for SPM rate of that phase.</string>
+        Choose \'strokes\', \'metres\' or \'seconds\' for workout unit and enter a workout name.
+        \nAdd a phase for one duration and SPM pair.
+        \nAdd a repeat block to group phases, then tap \'Open\' on that repeat to edit its contents.
+        \nRepeat blocks can be nested up to four levels.</string>
     <string name="help_how_to_create3">Example: to create a 2000m workout comprising 4 legs of 500m each at 22/24/26/28 SPM, create 4 phases and put \'500\' in the left hand field for each phase.
         Then, in the right hand field, put 22 for the first phase, then 24 for the second, 26 for the third and 28 for the fourth phase.</string>
     <string name="help_about1">About</string>
