@@ -34,5 +34,6 @@ public class WorkoutContract {
         public static final String COLUMN_SPP_TYPE = "spp_type";
         public static final String COLUMN_SPP_CSV = "spp";
         public static final String COLUMN_GEARS_CSV = "gears";
+        public static final String COLUMN_SERIALIZED_TREE = "serialized_tree";
     }
 }
