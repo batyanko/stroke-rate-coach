@@ -19,7 +19,9 @@ public final class WorkoutValidationException extends RuntimeException {
         WORKOUT_LENGTH_OVERFLOW,
         INVALID_UNIT_TYPE,
         INVALID_LEGACY_CSV,
-        TREE_CSV_MISMATCH
+        TREE_CSV_MISMATCH,
+        INVALID_BACKUP_TREE,
+        INVALID_BACKUP_RECORD
     }
 
     private final Code code;
