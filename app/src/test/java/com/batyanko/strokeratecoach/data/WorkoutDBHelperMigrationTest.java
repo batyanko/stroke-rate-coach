@@ -267,6 +267,42 @@ public class WorkoutDBHelperMigrationTest {
         assertEquals("22,24", legacyCopy.getAsString(COLUMN_GEARS_CSV));
     }
 
+    @Test
+    public void nestedDefinitionSurvivesCreateCopyHistoryTrashAndRestore() {
+        SQLiteDatabase database = openFreshDatabase();
+        WorkoutDefinition definition = new WorkoutDefinition(WorkoutUnit.SECONDS,
+                Collections.singletonList(new RepeatNode(2, "Cycle",
+                        Arrays.<WorkoutNode>asList(
+                                new PhaseNode(60, 22),
+                                new RepeatNode(3, "Rep",
+                                        Collections.singletonList(new PhaseNode(10, 28)))))));
+        WorkoutRecordMapper mapper = newMapper();
+        ContentValues createdPreset = new ContentValues();
+        createdPreset.put(COLUMN_NAME, "Nested workflow");
+        createdPreset.put(COLUMN_DESC, "Nested description");
+        mapper.putDefinition(createdPreset, definition);
+        long presetId = database.insertOrThrow(TABLE_NAME_PRESETS, null, createdPreset);
+        String originalTree = createdPreset.getAsString(COLUMN_SERIALIZED_TREE);
+
+        ContentValues historyValues = copyRecord(database, mapper, TABLE_NAME_PRESETS, presetId);
+        long historyId = database.insertOrThrow(TABLE_NAME_HISTORY, null, historyValues);
+        assertDefinitionInTable(database, mapper, TABLE_NAME_HISTORY, historyId);
+
+        database.execSQL(WorkoutDBHelper.SQL_MOVE_HISTORY_TO_TRASH);
+        database.execSQL(WorkoutDBHelper.SQL_CLEAR_HISTORY);
+        assertEquals(0, countRows(database, TABLE_NAME_HISTORY));
+        long trashId = recordIdByName(database, TABLE_NAME_TRASH, "Nested workflow");
+        assertEquals(originalTree,
+                serializedTree(database, TABLE_NAME_TRASH, trashId));
+        assertDefinitionInTable(database, mapper, TABLE_NAME_TRASH, trashId);
+
+        ContentValues restoredPreset = copyRecord(database, mapper, TABLE_NAME_TRASH, trashId);
+        long restoredId = database.insertOrThrow(TABLE_NAME_PRESETS, null, restoredPreset);
+        assertEquals(originalTree,
+                serializedTree(database, TABLE_NAME_PRESETS, restoredId));
+        assertDefinitionInTable(database, mapper, TABLE_NAME_PRESETS, restoredId);
+    }
+
     private SQLiteDatabase openFreshDatabase() {
         helper = new WorkoutDBHelper(context);
         return helper.getWritableDatabase();
@@ -365,6 +401,44 @@ public class WorkoutDBHelperMigrationTest {
                 COLUMN_NAME + " = ?", new String[]{name}, null, null, null)) {
             assertTrue(cursor.moveToFirst());
             return cursor.getString(0);
+        }
+    }
+
+    private long recordIdByName(SQLiteDatabase database, String table, String name) {
+        try (Cursor cursor = database.query(table, new String[]{_ID},
+                COLUMN_NAME + " = ?", new String[]{name}, null, null, null)) {
+            assertTrue(cursor.moveToFirst());
+            return cursor.getLong(0);
+        }
+    }
+
+    private ContentValues copyRecord(SQLiteDatabase database, WorkoutRecordMapper mapper,
+                                     String table, long id) {
+        try (Cursor cursor = database.query(table, null,
+                _ID + " = ?", new String[]{Long.toString(id)}, null, null, null)) {
+            assertTrue(cursor.moveToFirst());
+            ContentValues values = new ContentValues();
+            values.put(COLUMN_NAME, cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME)));
+            values.put(COLUMN_DESC, cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DESC)));
+            values.put(COLUMN_TIMESTAMP,
+                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TIMESTAMP)));
+            mapper.copyDefinition(cursor, values);
+            return values;
+        }
+    }
+
+    private void assertDefinitionInTable(SQLiteDatabase database, WorkoutRecordMapper mapper,
+                                         String table, long id) {
+        try (Cursor cursor = database.query(table, null,
+                _ID + " = ?", new String[]{Long.toString(id)}, null, null, null)) {
+            assertTrue(cursor.moveToFirst());
+            WorkoutDefinition actual = mapper.readDefinition(cursor);
+            assertEquals(WorkoutUnit.SECONDS, actual.getUnit());
+            CompiledWorkout compiled = new WorkoutCompiler().compile(actual);
+            assertEquals(8, compiled.getTotalPhases());
+            assertEquals(180, compiled.getTotalLength());
+            assertEquals("Cycle 2/2 · Rep 3/3",
+                    compiled.getPhases().get(7).getBreadcrumb());
         }
     }
 
