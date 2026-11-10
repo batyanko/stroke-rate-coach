@@ -1,7 +1,9 @@
 package com.batyanko.strokeratecoach.sync;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -42,5 +44,17 @@ public class BeeperTasksPayloadTest {
                 new String[]{"", ""}, BeeperTasks.SPP_TYPE_STROKES));
         assertNotNull(BeeperTasks.validateStartPayload(
                 null, new int[]{22}, null, "unknown"));
+    }
+
+    @Test
+    public void comparesLongTimePhasesWithoutMillisecondIntegerOverflow() {
+        int phaseLengthSeconds = Integer.MAX_VALUE;
+        long targetMillis = ((long) phaseLengthSeconds) * 1000L;
+
+        assertNull(BeeperTasks.validateStartPayload(
+                new int[]{phaseLengthSeconds}, new int[]{22}, new String[]{""},
+                BeeperTasks.SPP_TYPE_SECONDS));
+        assertFalse(BeeperTasks.isTimePhaseComplete(targetMillis - 1, phaseLengthSeconds));
+        assertTrue(BeeperTasks.isTimePhaseComplete(targetMillis, phaseLengthSeconds));
     }
 }

@@ -17,7 +17,6 @@
 package com.batyanko.strokeratecoach.sync;
 
 import static android.widget.Toast.LENGTH_LONG;
-import static com.batyanko.strokeratecoach.WaveActivity.CUSTOM_SOUND;
 import static com.batyanko.strokeratecoach.WaveActivity.USE_LOC_KEY;
 
 import android.content.Context;
@@ -31,6 +30,7 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.ToneGenerator;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
@@ -82,35 +82,26 @@ public class BeeperTasks {
     private static ToneGenerator countdownToneGen;
     private static ToneGenerator warningToneGen;
 
-    private static Timer workoutTimer;
-    private static TimerTask workoutTimerTask;
+    private Timer workoutTimer;
+    private TimerTask workoutTimerTask;
 
-    private static Timer timeTimer;
-    private static TimerTask timeTimerTask;
+    private Timer timeTimer;
+    private TimerTask timeTimerTask;
 
-    private static Timer countdownTimer;
-    private static TimerTask countdownTimerTask;
+    private Timer countdownTimer;
+    private TimerTask countdownTimerTask;
 
-    private static TimerTask speedLimitTimerTask;
+    private TimerTask speedLimitTimerTask;
 
-    private static Timer speedLimitTimer;
+    private Timer speedLimitTimer;
     //autoWave values
-    private static int workoutRunning;     //0=off, 1=wave(depreciated), 2=interval, 3=simple 9=lastPhase
+    private int workoutRunning;     //0=off, 1=wave(depreciated), 2=interval, 3=simple 9=lastPhase
     private static int countdownRunning;    //0=off, 1=on
-    private static int phaseTrigger;
-    private static int phase;    //phase = 0 = wave not running
-    private static int phasesTotal;
-    private static int color;
-    private static int phaseProgress;
-    private static int workoutProgress;
-    private static int workoutLength;       //Length (in strokes, meters or seconds)
+    private int phaseTrigger;
+    private int phaseProgress;
+    private int color;
 
     private String mSppType;
-
-    private static int[] sppSettings;
-
-    private static int[] gearSettings;
-    private static String[] phaseBreadcrumbs;
 
     private static SharedPreferences pref;
 
@@ -136,21 +127,47 @@ public class BeeperTasks {
 
     private static boolean locationPoolIsFull;
 
-    private static int prevPhasesDistance;
+    private int prevPhasesDistance;
 
     //TODO make static?
-    private long phaseStartTime;
+    private long phaseStartElapsedRealtime;
     private int timeTimerPhaseProgress;
     public static int countdownCyclesTotal;
     public static int countdownCyclesElapsed;
     private int countdownCycleDuration;
     private int countdownDurationMs;
     private String sndPref;
-    private static int oldWorkoutProgress;
+    private int oldWorkoutProgress;
 
-    private static int beeps;
+    private final Object runLock = new Object();
+    private long runGeneration;
+    private RunState activeRun;
+
+    private int beeps;
     private static int warns;
     private static boolean warningIsRunning = false;
+
+    private static final class RunState {
+        private final long generation;
+        private final int[] phaseLengths;
+        private final int[] targetSpms;
+        private final String[] breadcrumbs;
+        private final int totalPhases;
+        private final int totalLength;
+        private int currentPhaseIndex;
+        private int currentWorkoutProgress;
+        private String currentBreadcrumb = "";
+
+        private RunState(long generation, int[] phaseLengths, int[] targetSpms,
+                         String[] breadcrumbs, int totalLength) {
+            this.generation = generation;
+            this.phaseLengths = phaseLengths == null ? null : phaseLengths.clone();
+            this.targetSpms = targetSpms.clone();
+            this.breadcrumbs = breadcrumbs == null ? null : breadcrumbs.clone();
+            this.totalPhases = phaseLengths == null ? 0 : phaseLengths.length;
+            this.totalLength = totalLength;
+        }
+    }
 
     void executeTask(BeeperService beeperService, String action,
                      int[] phaseLengths, int[] targetSpms,
@@ -165,47 +182,25 @@ public class BeeperTasks {
                 return;
             }
 
-            NotificationUtils.showWorkoutNotification(beeperService);
-            mSppType = sppType;
-            initBeeper(beeperService);
-            initLocation(beeperService);
-
-            if (Objects.equals(mSppType, SPP_TYPE_METERS)) {
-                boolean enabled = pref.getBoolean(USE_LOC_KEY, false);
-                if (!enabled) {
-                    endWorkout(beeperService);
-                    flushUI();
-                    Toast.makeText(beeperService.getBaseContext(), "Distance based workout.\nPlease enable location in settings.", LENGTH_LONG).show();
+            long generation;
+            int totalLength = 0;
+            if (phaseLengths != null) {
+                for (int length : phaseLengths) {
+                    totalLength += length;
+                }
+            }
+            synchronized (runLock) {
+                invalidateRunLocked(beeperService);
+                generation = ++runGeneration;
+                activeRun = new RunState(
+                        generation, phaseLengths, targetSpms, breadcrumbs, totalLength);
+            }
+            synchronized (runLock) {
+                if (!isCurrentRun(generation)) {
                     return;
                 }
-                pref.edit().putBoolean(WaveActivity.GPS_LOCKING, true).apply();
+                startRun(beeperService, phaseLengths, targetSpms, sppType, generation);
             }
-            if (Objects.equals(mSppType, SPP_TYPE_SECONDS)) {
-                startTimeTimerTask(beeperService);
-            }
-
-            if (phaseLengths == null) {
-                workoutRunning = WaveActivity.WORKOUT_SIMPLE;
-                flushUI();
-                sppSettings = null;
-                gearSettings = targetSpms;
-                phaseBreadcrumbs = null;
-                spm = targetSpms[0];
-                startTheTempo(beeperService);
-                return;
-            }
-
-            workoutRunning = WaveActivity.WORKOUT_INTERVAL;
-            pref.edit().putInt(WaveActivity.OPERATION_SETTING, workoutRunning).apply();
-            sppSettings = phaseLengths;
-            gearSettings = targetSpms;
-            phaseBreadcrumbs = breadcrumbs;
-            workoutLength = 0;
-            for (int length : phaseLengths) {
-                workoutLength += length;
-            }
-            pref.edit().putInt(WaveActivity.WORKOUT_LENGTH, workoutLength).apply();
-            startCountdown(beeperService);
         } else if (action.equals(ACTION_STOP_BEEP)) {
             endWorkout(beeperService);
         } else if (action.equals(ACTION_CHECK_SERVICE)) {
@@ -222,6 +217,38 @@ public class BeeperTasks {
             cancelTimer(speedLimitTimer, speedLimitTimerTask);
             warningIsRunning = false;
         }
+    }
+
+    private void startRun(BeeperService beeperService, int[] phaseLengths,
+                          int[] targetSpms, String sppType, long generation) {
+        releaseAudioResources();
+        NotificationUtils.showWorkoutNotification(beeperService);
+        mSppType = sppType;
+        initBeeper(beeperService);
+        if (Objects.equals(mSppType, SPP_TYPE_METERS)) {
+            boolean enabled = pref.getBoolean(USE_LOC_KEY, false);
+            if (!enabled) {
+                endWorkout(beeperService);
+                Toast.makeText(beeperService.getBaseContext(),
+                        "Distance based workout.\nPlease enable location in settings.",
+                        LENGTH_LONG).show();
+                return;
+            }
+            pref.edit().putBoolean(WaveActivity.GPS_LOCKING, true).apply();
+        }
+        initLocation(beeperService, generation);
+        if (phaseLengths == null) {
+            workoutRunning = WaveActivity.WORKOUT_SIMPLE;
+            flushUI();
+            spm = targetSpms[0];
+            startTheTempo(beeperService, generation);
+            return;
+        }
+
+        workoutRunning = WaveActivity.WORKOUT_INTERVAL;
+        pref.edit().putInt(WaveActivity.OPERATION_SETTING, workoutRunning).apply();
+        pref.edit().putInt(WaveActivity.WORKOUT_LENGTH, activeRun.totalLength).apply();
+        startCountdown(beeperService, generation);
     }
 
     static String validateStartPayload(int[] phaseLengths, int[] targetSpms,
@@ -293,11 +320,11 @@ public class BeeperTasks {
         workoutRunning = WaveActivity.WORKOUT_STOP;
         countdownRunning = 0;
         phaseProgress = 0;
-        workoutProgress = 0;
+        if (activeRun != null) {
+            activeRun.currentWorkoutProgress = 0;
+        }
         oldWorkoutProgress = 0;
         phaseTrigger = 0;
-        phase = 0;
-        phasesTotal = 0;
         color = 0;
         beeps = 0;
         warns = 0;
@@ -332,6 +359,9 @@ public class BeeperTasks {
         cancelTimer(timeTimer, timeTimerTask);
         cancelTimer(countdownTimer, countdownTimerTask);
         cancelTimer(speedLimitTimer, speedLimitTimerTask);
+        speedLimitTimer = null;
+        speedLimitTimerTask = null;
+        warningIsRunning = false;
 
         countdownCyclesElapsed = 0;
         try {
@@ -347,7 +377,15 @@ public class BeeperTasks {
         if (!speedUnit.equals(WaveActivity.SPEED_500M_SETTING) && !speedUnit.equals(WaveActivity.SPEED_MS_SETTING)) {
             pref.edit().putString(WaveActivity.SPEED_UNIT, WaveActivity.SPEED_MS_SETTING).apply();
         }
-        pref.edit().putInt(WaveActivity.WORKOUT_PROGRESS, workoutProgress).apply();
+        pref.edit().putInt(WaveActivity.WORKOUT_PROGRESS,
+                activeRun == null ? 0 : activeRun.currentWorkoutProgress).apply();
+        pref.edit().putInt(WaveActivity.PHASE_INDEX, 0)
+                .putInt(WaveActivity.PHASES_TOTAL, 0)
+                .putString(WaveActivity.PHASE_BREADCRUMB, "")
+                .putInt(WaveActivity.PHASE_PROGRESS, 0)
+                .putInt(WaveActivity.PHASE_LENGTH, 0)
+                .putInt(WaveActivity.WORKOUT_LENGTH, 0)
+                .apply();
         pref.edit().putBoolean(WaveActivity.GPS_LOCKING, false).apply();
         flushUI();
 
@@ -355,7 +393,7 @@ public class BeeperTasks {
         locationAccuracy = 500;     //Init to extremely inaccurate value, i.e. no accuracy
         pref.edit().putFloat(WaveActivity.LOCATION_ACCURACY, locationAccuracy).apply();
 
-        phaseStartTime = System.currentTimeMillis();
+        phaseStartElapsedRealtime = SystemClock.elapsedRealtime();
         flushUI();
     }
 
@@ -367,139 +405,176 @@ public class BeeperTasks {
         pref.edit().putBoolean(WaveActivity.SWITCH_SETTING, !bool).apply();
     }
 
-    private void startTheTempo(final BeeperService beeperService) {
-        pref.edit().putInt(WaveActivity.SPM_SETTING, spm).apply();
-        phaseProgress = 0;
+    private void startTheTempo(final BeeperService beeperService, final long generation) {
+        synchronized (runLock) {
+            if (!isCurrentRun(generation)) {
+                return;
+            }
+            pref.edit().putInt(WaveActivity.SPM_SETTING, spm).apply();
+            phaseProgress = 0;
+            pref.edit().putInt(WaveActivity.PHASE_PROGRESS, 0).apply();
 
-        strokeDuration = SpmUtilities.spmToMilis(spm);
+            strokeDuration = SpmUtilities.spmToMilis(spm);
 
-        cancelTimer(workoutTimer, workoutTimerTask);
-        if (mSppType.equals(SPP_TYPE_SECONDS)) {
-            timeTimerPhaseProgress = 0;
-            cancelTimer(timeTimer, timeTimerTask);
-            startTimeTimerTask(beeperService);
-            timeTimer = new Timer();
-            timeTimer.scheduleAtFixedRate(timeTimerTask, 1, 1000);
-        }
+            cancelTimer(workoutTimer, workoutTimerTask);
+            if (mSppType.equals(SPP_TYPE_SECONDS)) {
+                timeTimerPhaseProgress = 0;
+                cancelTimer(timeTimer, timeTimerTask);
+                startTimeTimerTask(beeperService, generation);
+                timeTimer = new Timer();
+                timeTimer.scheduleAtFixedRate(timeTimerTask, 1, 1000);
+            }
 
-        //TODO create Task just once?
-        workoutTimerTask = new TimerTask() {
-            @Override
-            public void run() {
+            workoutTimerTask = new TimerTask() {
+                @Override
+                public void run() {
+                    synchronized (runLock) {
+                        if (!isCurrentRun(generation)) {
+                            return;
+                        }
 
-                //Abort if OPERATION set to WORKOUT_STOP. Avoid zombie service in the background?
-                if (pref.getInt(WaveActivity.OPERATION_SETTING, WaveActivity.WORKOUT_STOP)
-                        == WaveActivity.WORKOUT_STOP) {
-                    endWorkout(beeperService);
-                } else if (workoutRunning == WaveActivity.WORKOUT_INTERVAL
-                        || workoutRunning == WaveActivity.WORKOUT_LAST) {
+                        if (pref.getInt(WaveActivity.OPERATION_SETTING,
+                                WaveActivity.WORKOUT_STOP) == WaveActivity.WORKOUT_STOP) {
+                            endWorkout(beeperService);
+                            return;
+                        }
+                        if (workoutRunning != WaveActivity.WORKOUT_INTERVAL
+                                && workoutRunning != WaveActivity.WORKOUT_LAST
+                                && workoutRunning != WaveActivity.WORKOUT_SIMPLE) {
+                            return;
+                        }
 
-                    switch (mSppType) {
-                        //Handle stroke-based workouts
-                        case SPP_TYPE_STROKES: {
-                            if (phaseProgress >= phaseTrigger) {
-                                phaseProgress = 0;
-                                switch (workoutRunning) {
-                                    case WaveActivity.WORKOUT_INTERVAL: {
+                        if (workoutRunning != WaveActivity.WORKOUT_SIMPLE) {
+                            switch (mSppType) {
+                                case SPP_TYPE_STROKES: {
+                                    if (phaseProgress >= phaseTrigger) {
+                                        phaseProgress = 0;
+                                        if (workoutRunning != WaveActivity.WORKOUT_INTERVAL) {
+                                            endWorkout(beeperService);
+                                            return;
+                                        }
+                                        autoProgress(beeperService, generation);
+                                        return;
+                                    } else {
                                         phaseProgress++;
-                                        autoProgress(beeperService);
-                                        break;
+                                        activeRun.currentWorkoutProgress++;
+                                        pref.edit().putInt(WaveActivity.WORKOUT_PROGRESS,
+                                                        activeRun.currentWorkoutProgress)
+                                                .putInt(WaveActivity.PHASE_PROGRESS, phaseProgress)
+                                                .apply();
                                     }
-                                    default:
-                                        endWorkout(beeperService);
-                                        return;
+                                    break;
                                 }
-                            } else {
-                                phaseProgress++;
-                                workoutProgress++;
-                                pref.edit().putInt(WaveActivity.WORKOUT_PROGRESS, workoutProgress).apply();
-                                pref.edit().putInt(WaveActivity.PHASE_PROGRESS, phaseProgress).apply();
-                            }
-                            break;
-                        }
-                        //Handle distance-based workouts
-                        case SPP_TYPE_METERS: {
-                            if (phaseProgress >= phaseTrigger) {
-                                //TODO avoid extra beep after workout end?
-                                cancel();
-                                startingPhaseLocation = currentLocation;
-                                prevPhasesDistance += phaseTrigger;
-                                workoutProgress = prevPhasesDistance;
-                                pref.edit().putInt(WaveActivity.WORKOUT_PROGRESS, workoutProgress).apply();
-                                phaseProgress = 0;
-                                switch (workoutRunning) {
-                                    case WaveActivity.WORKOUT_INTERVAL:
-                                        autoProgress(beeperService);
-                                        break;
-                                    default:
-                                        endWorkout(beeperService);
+                                case SPP_TYPE_METERS: {
+                                    if (phaseProgress >= phaseTrigger) {
+                                        cancel();
+                                        startingPhaseLocation = currentLocation;
+                                        prevPhasesDistance += phaseTrigger;
+                                        activeRun.currentWorkoutProgress = prevPhasesDistance;
+                                        pref.edit().putInt(WaveActivity.WORKOUT_PROGRESS,
+                                                        activeRun.currentWorkoutProgress)
+                                                .apply();
+                                        phaseProgress = 0;
+                                        if (workoutRunning != WaveActivity.WORKOUT_INTERVAL) {
+                                            endWorkout(beeperService);
+                                            return;
+                                        }
+                                        autoProgress(beeperService, generation);
                                         return;
+                                    } else {
+                                        activeRun.currentWorkoutProgress =
+                                                prevPhasesDistance + phaseProgress;
+                                        pref.edit().putInt(WaveActivity.WORKOUT_PROGRESS,
+                                                        activeRun.currentWorkoutProgress)
+                                                .putInt(WaveActivity.PHASE_PROGRESS, phaseProgress)
+                                                .apply();
+                                    }
+                                    break;
                                 }
-                            } else {
-                                workoutProgress = prevPhasesDistance + phaseProgress;
-                                pref.edit().putInt(WaveActivity.WORKOUT_PROGRESS, workoutProgress).apply();
-                                pref.edit().putInt(WaveActivity.PHASE_PROGRESS, phaseProgress).apply();
                             }
-                            break;
                         }
+                        if (!isCurrentRun(generation)) {
+                            return;
+                        }
+                        if (sndPref.equals(beeperService.getString(R.string.beep_sound_default))) {
+                            workoutToneGen.startTone(
+                                    ToneGenerator.TONE_CDMA_EMERGENCY_RINGBACK, 150);
+                        } else {
+                            player.seekTo(0);
+                            player.start();
+                        }
+                        pref.edit().putInt(WaveActivity.BEEP, ++beeps).apply();
                     }
                 }
-                if (sndPref.equals(beeperService.getString(R.string.beep_sound_default))) {
-                    workoutToneGen.startTone(ToneGenerator.TONE_CDMA_EMERGENCY_RINGBACK, 150);
-                } else {
-                    player.seekTo(0);
-                    player.start();
-                }
-                // Register OnErrorListener
-                pref.edit().putInt(WaveActivity.BEEP, ++beeps).apply();
-            }
-        };
+            };
 
-        workoutTimer = new Timer();
-        workoutTimer.scheduleAtFixedRate(workoutTimerTask, 1, strokeDuration);
+            workoutTimer = new Timer();
+            workoutTimer.scheduleAtFixedRate(workoutTimerTask, 1, strokeDuration);
+        }
     }
 
-    //TimerTask for time-based workouts
-    private void startTimeTimerTask(final BeeperService beeperService) {
+    private void startTimeTimerTask(final BeeperService beeperService, final long generation) {
         timeTimerTask = new TimerTask() {
             @Override
             public void run() {
-                if (phase != 0 && timeTimerPhaseProgress == 0) {
-                    workoutProgress--;
-                }
-
-                long currentTime = System.currentTimeMillis();
-                phaseProgress = (int) (currentTime - phaseStartTime);
-                if (phaseProgress >= phaseTrigger * 1000) {
-                    //adjust for incomplete seconds in a phase
-                    workoutProgress = oldWorkoutProgress + phaseTrigger;
-                    oldWorkoutProgress = workoutProgress;
-                    pref.edit().putInt(WaveActivity.WORKOUT_PROGRESS, workoutProgress).apply();
-                    cancel();
-                    phaseStartTime = currentTime;
-                    phaseProgress = 0;
-
-                    if (workoutRunning == WaveActivity.WORKOUT_INTERVAL) {
-                        autoProgress(beeperService);
-                    } else {
-                        endWorkout(beeperService);
+                synchronized (runLock) {
+                    if (!isCurrentRun(generation)) {
+                        return;
                     }
-                    return;
-                }
+                    long elapsedMillis = SystemClock.elapsedRealtime()
+                            - phaseStartElapsedRealtime;
+                    if (isTimePhaseComplete(elapsedMillis, phaseTrigger)) {
+                        activeRun.currentWorkoutProgress = oldWorkoutProgress + phaseTrigger;
+                        oldWorkoutProgress = activeRun.currentWorkoutProgress;
+                        pref.edit().putInt(WaveActivity.WORKOUT_PROGRESS,
+                                activeRun.currentWorkoutProgress).apply();
+                        cancel();
+                        phaseProgress = 0;
 
-                pref.edit().putInt(WaveActivity.WORKOUT_PROGRESS, ++workoutProgress).apply();
-                pref.edit().putInt(WaveActivity.PHASE_PROGRESS, timeTimerPhaseProgress++).apply();
+                        if (workoutRunning == WaveActivity.WORKOUT_INTERVAL) {
+                            autoProgress(beeperService, generation);
+                        } else {
+                            endWorkout(beeperService);
+                        }
+                        return;
+                    }
+
+                    int elapsedSeconds = (int) (elapsedMillis / 1000L);
+                    phaseProgress = elapsedSeconds;
+                    activeRun.currentWorkoutProgress = oldWorkoutProgress + elapsedSeconds;
+                    pref.edit().putInt(WaveActivity.WORKOUT_PROGRESS,
+                                    activeRun.currentWorkoutProgress)
+                            .putInt(WaveActivity.PHASE_PROGRESS, elapsedSeconds)
+                            .apply();
+                    timeTimerPhaseProgress = elapsedSeconds;
+                }
             }
         };
     }
 
+    static boolean isTimePhaseComplete(long elapsedMillis, int phaseLengthSeconds) {
+        long targetMillis = ((long) phaseLengthSeconds) * 1000L;
+        return elapsedMillis >= targetMillis;
+    }
+
     private void startSpeedLimit(final BeeperService beeperService) {
+        long generation;
+        synchronized (runLock) {
+            if (activeRun == null) {
+                return;
+            }
+            generation = activeRun.generation;
+        }
         speedLimitTimerTask = new TimerTask() {
             @Override
             public void run() {
-                //TODO check SpeedLimit prefs to avoid zombie beepers?
-                pref.edit().putInt(WaveActivity.WARN, ++warns).apply();
-                warningToneGen.startTone(ToneGenerator.TONE_CDMA_ANSWER, 50);
+                synchronized (runLock) {
+                    if (!isCurrentRun(generation)) {
+                        return;
+                    }
+                    pref.edit().putInt(WaveActivity.WARN, ++warns).apply();
+                    warningToneGen.startTone(ToneGenerator.TONE_CDMA_ANSWER, 50);
+                }
             }
         };
         speedLimitTimer = new Timer();
@@ -507,30 +582,34 @@ public class BeeperTasks {
     }
 
     //TODO cancel countdown on interrupt
-    private void startCountdown(final BeeperService beeperService) {
+    private void startCountdown(final BeeperService beeperService, final long generation) {
 
         countdownTimerTask = new TimerTask() {
 
             @Override
             public void run() {
-                //Wait if locking distance location
-                if (pref.getBoolean(WaveActivity.GPS_LOCKING, false)) return;
+                synchronized (runLock) {
+                    if (!isCurrentRun(generation)) {
+                        return;
+                    }
+                    if (pref.getBoolean(WaveActivity.GPS_LOCKING, false)) {
+                        return;
+                    }
 
-                if (countdownCyclesElapsed % 10 == 0) {
-                    pref.edit().putInt(WaveActivity.COUNTDOWN_DURATION_LEFT,
-                                    countdownDurationMs - countdownCyclesElapsed * 100)
-                            .apply();
-                }
-                if (++countdownCyclesElapsed >= countdownCyclesTotal) {
-                    pref.edit().putInt(WaveActivity.COUNTDOWN_DURATION_LEFT, 0).apply();
-                    autoProgress(beeperService);
-                    cancelTimer(countdownTimer, this);
-                } else {
-                    try {
-                        countdownToneGen.startTone(ToneGenerator.TONE_CDMA_INTERCEPT, 100);
-                    } catch (Exception e) {
-                        Log.d("TONE GENERATOR", "Starting tone exception");
-//                        Catch undocumented ToneGenerator exception, starting tone after release()
+                    if (countdownCyclesElapsed % 10 == 0) {
+                        pref.edit().putInt(WaveActivity.COUNTDOWN_DURATION_LEFT,
+                                countdownDurationMs - countdownCyclesElapsed * 100).apply();
+                    }
+                    if (++countdownCyclesElapsed >= countdownCyclesTotal) {
+                        pref.edit().putInt(WaveActivity.COUNTDOWN_DURATION_LEFT, 0).apply();
+                        autoProgress(beeperService, generation);
+                        cancelTimer(countdownTimer, this);
+                    } else {
+                        try {
+                            countdownToneGen.startTone(ToneGenerator.TONE_CDMA_INTERCEPT, 100);
+                        } catch (IllegalStateException exception) {
+                            Log.d("TONE GENERATOR", "Starting tone exception", exception);
+                        }
                     }
                 }
             }
@@ -541,72 +620,78 @@ public class BeeperTasks {
     }
 
     //Initialize workout phase
-    private void autoProgress(BeeperService beeperService) {
-
-        //Set exercise to autoProgress;
-        workoutRunning = WaveActivity.WORKOUT_INTERVAL;
-
-        phasesTotal = gearSettings.length;
-
+    private void autoProgress(BeeperService beeperService, long generation) {
+        RunState run = activeRun;
+        if (!isCurrentRun(generation) || run.phaseLengths == null) {
+            return;
+        }
+        if (run.currentPhaseIndex >= run.totalPhases) {
+            endWorkout(beeperService);
+            return;
+        }
         final int[] COLOR_PROGRESSION = new int[]{
                 Color.GREEN, Color.YELLOW
         };
 
-        //Phase number starts from 1
-        phase++;
+        run.currentPhaseIndex++;
+        workoutRunning = run.currentPhaseIndex == run.totalPhases
+                ? WaveActivity.WORKOUT_LAST : WaveActivity.WORKOUT_INTERVAL;
+        run.currentBreadcrumb = run.breadcrumbs[run.currentPhaseIndex - 1];
 
-        if (phase == phasesTotal) {
-            workoutRunning = WaveActivity.WORKOUT_STOP;
-        }
-
-        if ((phase & 1) == 1) {
+        if ((run.currentPhaseIndex & 1) == 1) {
             color = COLOR_PROGRESSION[0];
         } else {
             color = COLOR_PROGRESSION[1];
         }
 
         startPhase(
-                sppSettings[phase - 1],
-                gearSettings[phase - 1],
-                beeperService
+                run.phaseLengths[run.currentPhaseIndex - 1],
+                run.targetSpms[run.currentPhaseIndex - 1],
+                beeperService,
+                generation
         );
     }
 
     //Start phase
-    private void startPhase(int lengthTrigger, int tempo, BeeperService beeperService) {
-        //Init starting time for time-based workouts
-        phaseStartTime = System.currentTimeMillis();
-
+    private void startPhase(int lengthTrigger, int tempo, BeeperService beeperService,
+                            long generation) {
+        if (!isCurrentRun(generation)) {
+            return;
+        }
+        phaseStartElapsedRealtime = SystemClock.elapsedRealtime();
         phaseTrigger = lengthTrigger;
         spm = tempo;
 
-        if (phase == phasesTotal) {
-            workoutRunning = WaveActivity.WORKOUT_LAST;
+        if (Objects.equals(mSppType, SPP_TYPE_METERS)) {
+            startingPhaseLocation = currentLocation;
         }
 
         pref.edit().putInt(WaveActivity.OPERATION_SETTING, workoutRunning).apply();
-
         pref.edit().putInt(WaveActivity.CURRENT_COLOR, color).apply();
-
-        pref.edit().putInt(WaveActivity.PHASE_LENGTH, sppSettings[phase - 1]).apply();
+        pref.edit().putInt(WaveActivity.PHASE_LENGTH, lengthTrigger)
+                .putInt(WaveActivity.SPM_SETTING, tempo)
+                .putInt(WaveActivity.PHASE_INDEX, activeRun.currentPhaseIndex)
+                .putInt(WaveActivity.PHASES_TOTAL, activeRun.totalPhases)
+                .putString(WaveActivity.PHASE_BREADCRUMB, activeRun.currentBreadcrumb)
+                .putInt(WaveActivity.PHASE_PROGRESS, 0)
+                .apply();
 
         Boolean bool = pref.getBoolean(WaveActivity.SWITCH_SETTING, true);
         pref.edit().putBoolean(WaveActivity.SWITCH_SETTING, !bool).apply();
 
-        startTheTempo(beeperService);
+        timeTimerPhaseProgress = 0;
+        startTheTempo(beeperService, generation);
     }
 
     /**
      * Helper method to cancel running Timer, if any
      */
     private void cancelTimer(Timer timer, TimerTask timerTask) {
-        try {
+        if (timer != null) {
             timer.cancel();
+        }
+        if (timerTask != null) {
             timerTask.cancel();
-        } catch (IllegalStateException e) {
-            Log.d("CANCEL TIMER", "IllegalStateException");
-        } catch (NullPointerException e) {
-            Log.d("CANCEL TIMER", "NullPointerException");
         }
     }
 
@@ -614,24 +699,30 @@ public class BeeperTasks {
      * Reset the current workout and stop beeping.
      */
     private void endWorkout(BeeperService beeperService) {
-        resetVariables(beeperService);
-        cancelTimer(workoutTimer, workoutTimerTask);
-        cancelTimer(timeTimer, timeTimerTask);
-        cancelTimer(countdownTimer, countdownTimerTask);
-        cancelTimer(speedLimitTimer, speedLimitTimerTask);
+        synchronized (runLock) {
+            invalidateRunLocked(beeperService);
+            resetVariables(beeperService);
+            workoutTimer = null;
+            workoutTimerTask = null;
+            timeTimer = null;
+            timeTimerTask = null;
+            countdownTimer = null;
+            countdownTimerTask = null;
 
-        pref.edit().putInt(WaveActivity.SPM_SETTING, 0).apply();
-        NotificationUtils.clearAllNotifications(beeperService);
+            pref.edit().putInt(WaveActivity.SPM_SETTING, 0).apply();
+            NotificationUtils.clearAllNotifications(beeperService);
 
-        flushUI();
+            flushUI();
 
-        if (beeperService.locationManager != null) {
-            beeperService.locationManager.removeUpdates(beeperService.locListener);
-            beeperService.locationManager = null;
+            releaseAudioResources();
+            beeperService.stopSelf();
         }
+    }
 
-        if (player != null && pref.getBoolean(CUSTOM_SOUND, false)) {
+    private void releaseAudioResources() {
+        if (player != null) {
             player.release();
+            player = null;
         }
         if (countdownToneGen != null) {
             countdownToneGen.release();
@@ -645,10 +736,33 @@ public class BeeperTasks {
             warningToneGen.release();
             warningToneGen = null;
         }
-        beeperService.stopSelf();
     }
 
-    private void initLocation(BeeperService beeperService) {
+    private void invalidateRunLocked(BeeperService beeperService) {
+        runGeneration++;
+        activeRun = null;
+        cancelTimer(workoutTimer, workoutTimerTask);
+        cancelTimer(timeTimer, timeTimerTask);
+        cancelTimer(countdownTimer, countdownTimerTask);
+        workoutTimer = null;
+        workoutTimerTask = null;
+        timeTimer = null;
+        timeTimerTask = null;
+        countdownTimer = null;
+        countdownTimerTask = null;
+        if (beeperService.locationManager != null && beeperService.locListener != null) {
+            beeperService.locationManager.removeUpdates(beeperService.locListener);
+            beeperService.locationManager = null;
+            beeperService.locListener = null;
+        }
+    }
+
+    private boolean isCurrentRun(long generation) {
+        return activeRun != null && activeRun.generation == generation
+                && runGeneration == generation;
+    }
+
+    private void initLocation(BeeperService beeperService, long generation) {
 
         PackageManager manager = beeperService.getPackageManager();
         int permission = manager.checkPermission("android.permission.ACCESS_FINE_LOCATION", "com.batyanko.strokeratecoach");
@@ -661,7 +775,7 @@ public class BeeperTasks {
         }
 
         beeperService.locationManager = (LocationManager) beeperService.getSystemService(Context.LOCATION_SERVICE);
-        beeperService.locListener = new TehLocListener(beeperService);
+        beeperService.locListener = new TehLocListener(generation);
         beeperService.locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 200, 1, beeperService.locListener);
     }
 
@@ -685,13 +799,16 @@ public class BeeperTasks {
 
     public class TehLocListener implements IBaseGpsListener {
 
-        Context context;
+        private final long generation;
 
-        private TehLocListener(Context context) {
-            this.context = context;
+        private TehLocListener(long generation) {
+            this.generation = generation;
         }
 
         private void updateLocation(CLocation location) {
+            if (!isCurrentRun(generation)) {
+                return;
+            }
             location.setUseMetricunits(true);
             currentLocation = location;
 
@@ -714,7 +831,13 @@ public class BeeperTasks {
 
         @Override
         public void onLocationChanged(Location location) {
-            if (location != null) {
+            if (location == null) {
+                return;
+            }
+            synchronized (runLock) {
+                if (!isCurrentRun(generation)) {
+                    return;
+                }
                 CLocation myLocation = new CLocation(location, this.useMetricUnits());
                 this.updateLocation(myLocation);
                 updateAverageSpeed();

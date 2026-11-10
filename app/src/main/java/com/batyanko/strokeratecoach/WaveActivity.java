@@ -109,6 +109,9 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     public static final String WORKOUT_LENGTH = "workout-length";
     public static final String PHASE_PROGRESS = "phase-strokes-elapsed";
     public static final String WORKOUT_PROGRESS = "total-strokes-elapsed";
+    public static final String PHASE_INDEX = "phase-index";
+    public static final String PHASES_TOTAL = "phases-total";
+    public static final String PHASE_BREADCRUMB = "phase-breadcrumb";
     public static final String CURRENT_COLOR = "current-phase";
     public static final String CURRENT_SPEED = "current-speed";
     public static final String SPEED_LIMIT = "speed-limit";
