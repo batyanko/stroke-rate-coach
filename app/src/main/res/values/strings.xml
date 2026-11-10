@@ -46,6 +46,29 @@
     <string name="workout_phase_progress">%1$d / %2$d</string>
     <string name="workout_phase_context">Phase %1$d / %2$d</string>
     <string name="workout_phase_context_with_breadcrumb">Phase %1$d / %2$d &#183; %3$s</string>
+    <string name="editor_up">Up</string>
+    <string name="editor_root_path">Workout</string>
+    <string name="editor_path_format">Path: %1$s</string>
+    <string name="editor_add_repeat">Add repeat</string>
+    <string name="editor_open">Open</string>
+    <string name="editor_edit">Edit</string>
+    <string name="editor_delete">Delete</string>
+    <string name="editor_repeat_default_label">Repeat</string>
+    <string name="editor_repeat_title">Repeat %1$s × %2$d</string>
+    <string name="editor_phase_title">Phase: %1$d %2$s at %3$d SPM</string>
+    <string name="editor_unit_unspecified">unit</string>
+    <string name="editor_add_phase_title">Add phase</string>
+    <string name="editor_edit_phase_title">Edit phase</string>
+    <string name="editor_add_repeat_title">Add repeat</string>
+    <string name="editor_edit_repeat_title">Edit repeat</string>
+    <string name="editor_phase_length_hint">Phase length</string>
+    <string name="editor_target_spm_hint">Target SPM</string>
+    <string name="editor_repeat_label_hint">Repeat label (optional)</string>
+    <string name="editor_repeat_count_hint">Repeat count</string>
+    <string name="editor_positive_number_required">Enter a positive whole number.</string>
+    <string name="editor_delete_repeat_title">Delete repeat</string>
+    <string name="editor_delete_repeat_confirmation">Delete %1$s and all of its contents?</string>
+    <string name="editor_state_restore_failed">Could not restore the workout editor state.</string>
 
     <string name="path_circle" translatable="false">
     M 50,50

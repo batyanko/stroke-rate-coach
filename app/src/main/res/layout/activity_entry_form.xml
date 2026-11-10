@@ -17,7 +17,6 @@
     -->
 
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
@@ -109,14 +108,53 @@
             />
 
         <LinearLayout
-            android:id="@+id/layout_dynamic"
+            android:id="@+id/editor_controls"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
+            <Button
+                android:id="@+id/editor_up_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/editor_up"
+                android:enabled="false" />
+
+            <TextView
+                android:id="@+id/editor_path"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:paddingStart="8dp"
+                android:text="@string/editor_root_path"
+                android:textStyle="bold" />
         </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/workout_node_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+
+        <Button
+            android:id="@+id/button_add_phase"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/button_add_phase_label" />
+
+        <Button
+            android:id="@+id/button_add_repeat"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/editor_add_repeat" />
+
+        <Button
+            android:id="@+id/button_save_workout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/create_workout_button_label" />
 
     </LinearLayout>
 
 </ScrollView>
-
