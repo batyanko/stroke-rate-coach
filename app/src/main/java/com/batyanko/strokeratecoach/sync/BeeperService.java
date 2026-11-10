@@ -50,19 +50,28 @@ public class BeeperService extends NonStopIntentService {
 
     // Formerly doEpicShit...
     public void modWorkout(Intent intent) {
+        dispatchIntent(intent);
+    }
+
+    private void dispatchIntent(Intent intent) {
         if (intent == null || intent.getAction() == null) {
             return;
         }
         String action = intent.getAction();
+        if (action.equals(BeeperTasks.ACTION_JUST_BIND)) {
+            return;
+        }
         if (beeperTasks == null) {
             beeperTasks = new BeeperTasks();
         }
 
-        int[] workoutSpp = intent.getIntArrayExtra(BeeperTasks.EXTRA_WORKOUT_SPP);
-        int[] workoutGears = intent.getIntArrayExtra(BeeperTasks.EXTRA_WORKOUT_GEARS);
+        int[] phaseLengths = intent.getIntArrayExtra(BeeperTasks.EXTRA_PHASE_LENGTHS);
+        int[] targetSpms = intent.getIntArrayExtra(BeeperTasks.EXTRA_TARGET_SPMS);
+        String[] breadcrumbs = intent.getStringArrayExtra(
+                BeeperTasks.EXTRA_PHASE_BREADCRUMBS);
         String sppType = intent.getStringExtra(BeeperTasks.EXTRA_WORKOUT_SPP_TYPE);
 
-        beeperTasks.executeTask(this, action, workoutSpp, workoutGears, sppType);
+        beeperTasks.executeTask(this, action, phaseLengths, targetSpms, breadcrumbs, sppType);
     }
 
     @Nullable
@@ -75,33 +84,23 @@ public class BeeperService extends NonStopIntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        if (intent == null || intent.getAction() == null) {
-            return;
-        }
-
-        String action = intent.getAction();
-        if (action.equals(BeeperTasks.ACTION_JUST_BIND)) {
-            return;
-        }
-
-        beeperTasks = new BeeperTasks();
-        int[] workoutSpp = intent.getIntArrayExtra(BeeperTasks.EXTRA_WORKOUT_SPP);
-        int[] workoutGears = intent.getIntArrayExtra(BeeperTasks.EXTRA_WORKOUT_GEARS);
-        String sppType = intent.getStringExtra(BeeperTasks.EXTRA_WORKOUT_SPP_TYPE);
-
-        beeperTasks.executeTask(this, action, workoutSpp, workoutGears, sppType);
+        dispatchIntent(intent);
     }
 
     @Override
     public boolean stopService(Intent name) {
-        beeperTasks.executeTask(this, BeeperTasks.ACTION_STOP_BEEP, null, null, BeeperTasks.SPP_TYPE_STROKES);
+        if (beeperTasks != null) {
+            beeperTasks.executeTask(this, BeeperTasks.ACTION_STOP_BEEP,
+                    null, null, null, BeeperTasks.SPP_TYPE_STROKES);
+        }
         return super.stopService(name);
     }
 
     @Override
     public void onDestroy() {
         if (beeperTasks != null) {
-            beeperTasks.executeTask(this, BeeperTasks.ACTION_STOP_BEEP, null, null, BeeperTasks.SPP_TYPE_STROKES);
+            beeperTasks.executeTask(this, BeeperTasks.ACTION_STOP_BEEP,
+                    null, null, null, BeeperTasks.SPP_TYPE_STROKES);
         }
         stopSelf();
         super.onDestroy();

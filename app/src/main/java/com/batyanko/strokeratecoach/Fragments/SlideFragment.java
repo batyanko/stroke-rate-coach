@@ -69,9 +69,17 @@ import com.batyanko.strokeratecoach.Utils.WaveUtilities;
 import com.batyanko.strokeratecoach.WaveActivity;
 import com.batyanko.strokeratecoach.data.WorkoutContract.WorkoutEntry1;
 import com.batyanko.strokeratecoach.data.WorkoutDBHelper;
+import com.batyanko.strokeratecoach.data.WorkoutRecordMapper;
 import com.batyanko.strokeratecoach.sync.BeeperService;
 import com.batyanko.strokeratecoach.sync.BeeperServiceUtils;
 import com.batyanko.strokeratecoach.sync.BeeperTasks;
+import com.batyanko.strokeratecoach.workout.CompiledPhase;
+import com.batyanko.strokeratecoach.workout.CompiledWorkout;
+import com.batyanko.strokeratecoach.workout.LegacyWorkoutParser;
+import com.batyanko.strokeratecoach.workout.WorkoutDefinition;
+import com.batyanko.strokeratecoach.workout.WorkoutCompiler;
+import com.batyanko.strokeratecoach.workout.WorkoutSummaryFormatter;
+import com.batyanko.strokeratecoach.workout.WorkoutValidationException;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class SlideFragment extends Fragment implements SvAdapter.ListItemClickListener {
@@ -101,6 +109,8 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
     public GridView dialGrid;
 
     private static SQLiteDatabase workoutDb;
+    private WorkoutRecordMapper recordMapper;
+    private final WorkoutSummaryFormatter summaryFormatter = new WorkoutSummaryFormatter();
 
     ViewGroup viewGroup;
     private BeeperService mBeeperService;
@@ -160,9 +170,13 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         //SQLite stuff
         WorkoutDBHelper presetDbHelper = new WorkoutDBHelper(getActivity());
         workoutDb = presetDbHelper.getWritableDatabase();
+        recordMapper = new WorkoutRecordMapper(
+                new com.batyanko.strokeratecoach.workout.WorkoutJsonCodec(),
+                new LegacyWorkoutParser(),
+                new WorkoutCompiler());
         presetCursor = getAllPresets();
         historyCursor = getAllHistory();
-        trashCursor = getAllHistory();
+        trashCursor = getAllTrash();
 
         presetsAdapter = new SvAdapter(getContext(), presetCursor, WorkoutEntry1.TABLE_NAME_PRESETS, this);
         historyAdapter = new SvAdapter(getContext(), historyCursor, WorkoutEntry1.TABLE_NAME_HISTORY, this);
@@ -300,14 +314,19 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
 
         if (itemFunction == WaveActivity.WORKOUT_ITEM_FUNCTION) { // Tap anywhere on workout
 
-            message = cursor.getString(cursor.getColumnIndex(WorkoutEntry1.COLUMN_NAME)) +
-                    " : " +
-                    "\n" +
-                    cursor.getString(cursor.getColumnIndex(WorkoutEntry1.COLUMN_SPP_CSV)) +
-                    " at " +
-                    cursor.getString(cursor.getColumnIndex(WorkoutEntry1.COLUMN_GEARS_CSV)) +
-                    "\n" +
-                    cursor.getString(cursor.getColumnIndex(WorkoutEntry1.COLUMN_DESC));
+            final WorkoutDefinition definition;
+            try {
+                definition = recordMapper.readDefinition(cursor);
+            } catch (WorkoutValidationException exception) {
+                showInvalidWorkout(exception);
+                return;
+            }
+            String description = cursor.getString(cursor.getColumnIndexOrThrow(
+                    WorkoutEntry1.COLUMN_DESC));
+            message = getString(R.string.workout_summary_popup_format,
+                    cursor.getString(cursor.getColumnIndexOrThrow(WorkoutEntry1.COLUMN_NAME)),
+                    summaryFormatter.format(definition),
+                    description == null ? "" : description);
 
             LayoutInflater inflater = (LayoutInflater) requireActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             float density = requireActivity().getResources().getDisplayMetrics().density;
@@ -344,56 +363,47 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
             }
 
             workoutCopyButton.setOnClickListener(view2 -> {
-                Cursor bkpCursor = getPreset(clickedItemId, tableName);
-                bkpCursor.moveToFirst();
-                boolean added = addPreset(workoutDb, WorkoutEntry1.TABLE_NAME_PRESETS,
-                        bkpCursor.getString(bkpCursor.getColumnIndex(WorkoutEntry1.COLUMN_NAME)),
-                        bkpCursor.getString(bkpCursor.getColumnIndex(WorkoutEntry1.COLUMN_DESC)),
-                        "",
-                        bkpCursor.getString(bkpCursor.getColumnIndex(WorkoutEntry1.COLUMN_SPP_CSV)),
-                        bkpCursor.getString(bkpCursor.getColumnIndex(WorkoutEntry1.COLUMN_GEARS_CSV)),
-                        bkpCursor.getString(bkpCursor.getColumnIndex(WorkoutEntry1.COLUMN_SPP_TYPE))
-                );
-                if (added) {
+                try (Cursor source = getPreset(clickedItemId, tableName)) {
+                    if (!source.moveToFirst()) {
+                        WaveUtilities.ShowLongToast("Copy failed.", getContext());
+                        return;
+                    }
+                    boolean restoring = tableName.equals(TABLE_NAME_TRASH);
+                    boolean copied = transferWorkout(source, clickedItemId,
+                            tableName, TABLE_NAME_PRESETS, restoring);
+                    if (!copied) {
+                        WaveUtilities.ShowLongToast("Copy failed.", getContext());
+                        return;
+                    }
                     presetsAdapter.swapCursor(getAllPresets(), workoutIsRunning, lastWorkoutId);
-                    if (tableName.equals(WorkoutEntry1.TABLE_NAME_TRASH)) {
-                        removeWorkout(clickedItemId, WorkoutEntry1.TABLE_NAME_TRASH);
+                    if (restoring) {
                         trashAdapter.swapCursor(getAllTrash(), workoutIsRunning, lastWorkoutId);
                         WaveUtilities.ShowShortToast("Restored to Workouts.", getContext());
                     } else {
                         WaveUtilities.ShowShortToast("Copied to Workouts.", getContext());
                     }
-                } else {
-                    WaveUtilities.ShowLongToast("Copy failed.", getContext());
+                } catch (WorkoutValidationException exception) {
+                    showInvalidWorkout(exception);
+                } finally {
+                    descPopupWindow.dismiss();
                 }
-                bkpCursor.close();
-                descPopupWindow.dismiss();
             });
             workoutDelButton.setOnClickListener(view1 -> {
                 boolean success;
-                // Move to trash, or...
                 if (!tableName.equals(WorkoutEntry1.TABLE_NAME_TRASH)) {
-                    Cursor bkpCursor = getPreset(clickedItemId, tableName);
-                    bkpCursor.moveToFirst();
-                    success = addPreset(workoutDb, WorkoutEntry1.TABLE_NAME_TRASH,
-                            bkpCursor.getString(bkpCursor.getColumnIndex(WorkoutEntry1.COLUMN_NAME)),
-                            bkpCursor.getString(bkpCursor.getColumnIndex(WorkoutEntry1.COLUMN_DESC)),
-                            "",
-                            bkpCursor.getString(bkpCursor.getColumnIndex(WorkoutEntry1.COLUMN_SPP_CSV)),
-                            bkpCursor.getString(bkpCursor.getColumnIndex(WorkoutEntry1.COLUMN_GEARS_CSV)),
-                            bkpCursor.getString(bkpCursor.getColumnIndex(WorkoutEntry1.COLUMN_SPP_TYPE))
-                    );
-                    if (success) {
-                        trashAdapter.swapCursor(getAllTrash(), workoutIsRunning, lastWorkoutId);
-                        if (removeWorkout(clickedItemId, tableName)) {
+                    try (Cursor source = getPreset(clickedItemId, tableName)) {
+                        success = source.moveToFirst()
+                                && transferWorkout(source, clickedItemId, tableName,
+                                TABLE_NAME_TRASH, true);
+                        if (success) {
+                            trashAdapter.swapCursor(getAllTrash(), workoutIsRunning, lastWorkoutId);
                             WaveUtilities.ShowShortToast("Moved to trash.", getContext());
                         } else {
                             WaveUtilities.ShowShortToast("Sorry, failed.", getContext());
                         }
-                    } else {
-                        WaveUtilities.ShowShortToast("Sorry, failed.", getContext());
+                    } catch (WorkoutValidationException exception) {
+                        showInvalidWorkout(exception);
                     }
-                    // ...erase from Trash
                 } else {
                     success = removeWorkout(clickedItemId, tableName);
                     if (success) {
@@ -407,35 +417,42 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
             });
 
         } else if (itemFunction == WaveActivity.ENGAGE_WORKOUT_FUNCTION) {
-            stopBeeper();
-
-            lastClickedEngageButton = view;
-            final String name = cursor.getString(cursor.getColumnIndex(WorkoutEntry1.COLUMN_NAME));
-            final String description = cursor.getString(cursor.getColumnIndex(WorkoutEntry1.COLUMN_DESC));
-            final String ts = cursor.getString(cursor.getColumnIndex(WorkoutEntry1.COLUMN_TIMESTAMP));
-            final String sppType =
-                    cursor.getString(cursor.getColumnIndex(WorkoutEntry1.COLUMN_SPP_TYPE));
-            lastWorkoutId = cursor.getInt(cursor.getColumnIndex(WorkoutEntry1._ID));
-            final String gearCSV = cursor.getString(cursor.getColumnIndex(WorkoutEntry1.COLUMN_GEARS_CSV));
-            final String sppCSV = cursor.getString(cursor.getColumnIndex(WorkoutEntry1.COLUMN_SPP_CSV));
-            //TODO check validity
-            final String[] gears = gearCSV.split("\\s*,\\s*");
-            final String[] spp = sppCSV.split("\\s*,\\s*");
-
-            //Number of phases must match number of gears
-            if (gears.length != spp.length) {
+            final CompiledWorkout compiled;
+            try {
+                compiled = recordMapper.readAndCompileDefinition(cursor);
+            } catch (WorkoutValidationException exception) {
+                showInvalidWorkout(exception);
                 return;
             }
 
-            int[] gearInts = new int[gears.length];
-            int[] sppInts = new int[gears.length];
-            for (int i = 0; i < gearInts.length; i++) {
-                gearInts[i] = Integer.parseInt(gears[i]);
-                sppInts[i] = Integer.parseInt(spp[i]);
+            String name = cursor.getString(cursor.getColumnIndexOrThrow(WorkoutEntry1.COLUMN_NAME));
+            String description = cursor.getString(
+                    cursor.getColumnIndexOrThrow(WorkoutEntry1.COLUMN_DESC));
+            String sppType = cursor.getString(
+                    cursor.getColumnIndexOrThrow(WorkoutEntry1.COLUMN_SPP_TYPE));
+            int workoutId = cursor.getInt(cursor.getColumnIndexOrThrow(WorkoutEntry1._ID));
+            int[] sppInts = new int[compiled.getPhases().size()];
+            int[] gearInts = new int[compiled.getPhases().size()];
+            String[] breadcrumbs = new String[compiled.getPhases().size()];
+            for (int i = 0; i < compiled.getPhases().size(); i++) {
+                CompiledPhase phase = compiled.getPhases().get(i);
+                sppInts[i] = phase.getLength();
+                gearInts[i] = phase.getTargetSpm();
+                breadcrumbs[i] = phase.getBreadcrumb();
             }
 
-            //Update History db table
-            addPreset(workoutDb, WorkoutEntry1.TABLE_NAME_HISTORY, name, description, "", sppCSV, gearCSV, sppType);
+            stopBeeper();
+            lastClickedEngageButton = view;
+            lastWorkoutId = workoutId;
+
+            ContentValues historyValues = new ContentValues();
+            historyValues.put(WorkoutEntry1.COLUMN_NAME, name);
+            historyValues.put(WorkoutEntry1.COLUMN_DESC, description);
+            recordMapper.copyDefinition(cursor, historyValues);
+            if (addToDb(workoutDb, TABLE_NAME_HISTORY, historyValues) < 0) {
+                WaveUtilities.ShowLongToast("Could not save workout history.", getContext());
+                return;
+            }
 
             //Highlight last clicked start icon
             switch (tableName) {
@@ -449,13 +466,11 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                     pref.edit().putInt(LAST_TRASH_SETTING, lastWorkoutId).apply();
                     break;
             }
-            if (!tableName.equals(TABLE_NAME_HISTORY)) {
-                historyAdapter.swapCursor(getAllHistory(), true, lastWorkoutId);
-            }
+            historyAdapter.swapCursor(getAllHistory(), true, lastWorkoutId);
             refresh(tableName);
 
             // Start beeping?
-            initIntent(sppInts, gearInts, sppType);
+            initIntent(sppInts, gearInts, breadcrumbs, sppType);
         }
     }
 
@@ -590,7 +605,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
             firstDigitView.setBackgroundColor(Color.TRANSPARENT);
             spm = firstDigit * 10 + digitalInput;
             int[] gearArray = new int[]{spm};
-            initIntent(null, gearArray, BeeperTasks.SPP_TYPE_STROKES);
+            initIntent(null, gearArray, null, BeeperTasks.SPP_TYPE_STROKES);
             firstDigit = 0;
 
         } else {
@@ -610,11 +625,13 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         }
     }
 
-    private void initIntent(int[] sppSettings, int[] gearSettings, String sppType) {
+    private void initIntent(int[] phaseLengths, int[] targetSpms,
+                            String[] breadcrumbs, String sppType) {
 
         intent.setAction(BeeperTasks.ACTION_START_BEEP);
-        intent.putExtra(BeeperTasks.EXTRA_WORKOUT_SPP, sppSettings);
-        intent.putExtra(BeeperTasks.EXTRA_WORKOUT_GEARS, gearSettings);
+        intent.putExtra(BeeperTasks.EXTRA_PHASE_LENGTHS, phaseLengths);
+        intent.putExtra(BeeperTasks.EXTRA_TARGET_SPMS, targetSpms);
+        intent.putExtra(BeeperTasks.EXTRA_PHASE_BREADCRUMBS, breadcrumbs);
         intent.putExtra(BeeperTasks.EXTRA_WORKOUT_SPP_TYPE, sppType);
 
         startBeeper();
@@ -628,6 +645,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
     //TODO extract static method and use in Notification stopper
     public void stopBeeper() {
         pref.edit().putInt(WaveActivity.OPERATION_SETTING, WaveActivity.WORKOUT_STOP).apply();
+        pref.edit().putBoolean(WaveActivity.WORKOUT_PAUSED, false).apply();
         if (lastClickedEngageButton != null) {
             lastClickedEngageButton.setBackgroundResource(R.drawable.ic_play_4);
         }
@@ -640,6 +658,19 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         }
         intent.setAction(BeeperTasks.ACTION_STOP_BEEP);
         mBeeperService.modWorkout(intent);
+    }
+
+    public void togglePause() {
+        mBeeperService = BeeperServiceUtils.getBeeperService();
+        if (intent == null) {
+            return;
+        }
+        intent.setAction(BeeperTasks.ACTION_TOGGLE_PAUSE);
+        if (mBeeperService != null) {
+            mBeeperService.modWorkout(intent);
+            return;
+        }
+        requireActivity().startService(intent);
     }
 
     /////////////////
@@ -685,34 +716,50 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         return workoutDb.query(
                 tab,
                 null,
-                WorkoutEntry1._ID + "=" + position,
-                null,
+                WorkoutEntry1._ID + " = ?",
+                new String[]{Long.toString(position)},
                 null,
                 null,
                 WorkoutEntry1.COLUMN_TIMESTAMP
         );
     }
 
-    private boolean addPreset(SQLiteDatabase db, String tab, String name, String description,
-                              String ts, String spp, String gears, String sppType) {
-        ContentValues cv = new ContentValues();
-        cv.put(WorkoutEntry1.COLUMN_NAME, name);
-        cv.put(WorkoutEntry1.COLUMN_DESC, description);
-        cv.put(WorkoutEntry1.COLUMN_SPP_CSV, spp);
-        cv.put(WorkoutEntry1.COLUMN_GEARS_CSV, gears);
-        cv.put(WorkoutEntry1.COLUMN_SPP_TYPE, sppType);
-        if (!ts.isEmpty()) {
-            cv.put(WorkoutEntry1.COLUMN_TIMESTAMP, ts);
+    private boolean transferWorkout(Cursor source, long sourceId, String sourceTable,
+                                    String destinationTable, boolean removeSource) {
+        workoutDb.beginTransaction();
+        try {
+            ContentValues values = new ContentValues();
+            values.put(WorkoutEntry1.COLUMN_NAME,
+                    source.getString(source.getColumnIndexOrThrow(WorkoutEntry1.COLUMN_NAME)));
+            values.put(WorkoutEntry1.COLUMN_DESC,
+                    source.getString(source.getColumnIndexOrThrow(WorkoutEntry1.COLUMN_DESC)));
+            recordMapper.copyDefinition(source, values);
+
+            if (addToDb(workoutDb, destinationTable, values) < 0) {
+                return false;
+            }
+            if (removeSource && workoutDb.delete(sourceTable,
+                    WorkoutEntry1._ID + " = ?", new String[]{Long.toString(sourceId)}) != 1) {
+                return false;
+            }
+            workoutDb.setTransactionSuccessful();
+            return true;
+        } finally {
+            workoutDb.endTransaction();
         }
-        return addToDb(db, tab, cv) != -1;
     }
 
-    private long addToDb(SQLiteDatabase db, String table, android.content.ContentValues values) {
+    private void showInvalidWorkout(WorkoutValidationException exception) {
+        WaveUtilities.ShowLongToast(exception.getMessage(), getContext());
+    }
+
+    private long addToDb(SQLiteDatabase db, String table, ContentValues values) {
         return db.insert(table, null, values);
     }
 
     private boolean removeWorkout(long position, String tableName) {
-        return workoutDb.delete(tableName, WorkoutEntry1._ID + "=" + position, null) > 0;
+        return workoutDb.delete(tableName, WorkoutEntry1._ID + " = ?",
+                new String[]{Long.toString(position)}) > 0;
     }
 
 }

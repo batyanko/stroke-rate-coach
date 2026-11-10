@@ -16,7 +16,9 @@
 
 <resources>
     <string name="app_name" translatable="false">Stroke Rate Coach</string>
-    <string name="stopper_button_text">stop</string>
+    <string name="stop_workout">Stop workout</string>
+    <string name="pause_workout">Pause workout</string>
+    <string name="resume_workout">Resume workout</string>
     <!--Depreciated: -->
     <string name="initial_spm" translatable="false">00</string>
     <string name="default_kph" translatable="false">000.0 hours/hour</string>
@@ -39,9 +41,43 @@
     <string name="strokes">strokes</string>
     <string name="workout_unit_choose_title">Choose workout unit:</string>
     <string name="empty_workout_warning">Empty workout not created.</string>
+    <string name="nested_workout_edit_not_supported">Nested workouts cannot be edited in this version.</string>
     <string name="missing_workout_type_warning">Please select workout unit (strokes, meters or seconds)</string>
     <string name="entry_form_label">Enter new workout</string>
     <string name="workout_in_progress">Workout in progress</string>
+    <string name="workout_phase_progress">%1$d / %2$d</string>
+    <string name="workout_phase_context">Phase %1$d / %2$d</string>
+    <string name="workout_phase_context_with_breadcrumb">Phase %1$d / %2$d &#183; %3$s</string>
+    <string name="editor_up">Up</string>
+    <string name="editor_root_path">Workout</string>
+    <string name="editor_path_format">Path: %1$s</string>
+    <string name="editor_add_repeat">Add repeat</string>
+    <string name="editor_open">Open</string>
+    <string name="editor_edit">Edit</string>
+    <string name="editor_delete">Delete</string>
+    <string name="editor_repeat_default_label">Repeat</string>
+    <string name="editor_repeat_title">Repeat %1$s × %2$d</string>
+    <string name="editor_phase_title">Phase: %1$d %2$s at %3$d SPM</string>
+    <string name="editor_unit_unspecified">unit</string>
+    <string name="editor_add_phase_title">Add phase</string>
+    <string name="editor_edit_phase_title">Edit phase</string>
+    <string name="editor_add_repeat_title">Add repeat</string>
+    <string name="editor_edit_repeat_title">Edit repeat</string>
+    <string name="editor_phase_length_hint">Phase length</string>
+    <string name="editor_target_spm_hint">Target SPM (0 = rest in metres/seconds workouts)</string>
+    <string name="editor_repeat_label_hint">Repeat label (optional)</string>
+    <string name="editor_repeat_count_hint">Repeat count</string>
+    <string name="editor_positive_number_required">Enter a positive whole number.</string>
+    <string name="editor_delete_repeat_title">Delete repeat</string>
+    <string name="editor_delete_repeat_confirmation">Delete %1$s and all of its contents?</string>
+    <string name="editor_state_restore_failed">Could not restore the workout editor state.</string>
+    <string name="editor_skip_last_rest">Skip last repeat rest</string>
+    <string name="editor_skip_last_rest_description">Skip the zero-SPM rest at the end of the final iteration of a repeat.</string>
+    <string name="editor_rest_title">Rest: %1$d %2$s</string>
+    <string name="editor_zero_spm_strokes_not_supported">Zero SPM rests are supported only in metres- or seconds-based workouts.</string>
+    <string name="editor_target_spm_required">Enter a non-negative target SPM.</string>
+    <string name="repeat_indicator">repeats</string>
+    <string name="workout_summary_popup_format">%1$s\n%2$s\n\n%3$s</string>
 
     <string name="path_circle" translatable="false">
     M 50,50
@@ -100,9 +136,10 @@
     <string name="help_how_to_speed4">\'Min Speed\' shows the current speed warning threshold. If on, it will sound a warning as long as your current speed is below that level. Tap to enable and set minimum speed threshold.</string>
     <string name="help_how_to_create1">- Creating a new workout</string>
     <string name="help_how_to_create2">Tap the menu button (\'⋮\') while the beeper is stopped, then tap \'Create workout\'.
-        Choose \'strokes\', \'metres\' or \'seconds\' for workout unit, enter a workout name and then enter data for all workout legs/phases:
-        \nThe first (left hand) field of each phase for phase duration.
-        \nThe second (right hand) for SPM rate of that phase.</string>
+        Choose \'strokes\', \'metres\' or \'seconds\' for workout unit and enter a workout name.
+        \nAdd a phase for one duration and SPM pair.
+        \nAdd a repeat block to group phases, then tap \'Open\' on that repeat to edit its contents.
+        \nRepeat blocks can be nested up to four levels.</string>
     <string name="help_how_to_create3">Example: to create a 2000m workout comprising 4 legs of 500m each at 22/24/26/28 SPM, create 4 phases and put \'500\' in the left hand field for each phase.
         Then, in the right hand field, put 22 for the first phase, then 24 for the second, 26 for the third and 28 for the fourth phase.</string>
     <string name="help_about1">About</string>
@@ -154,10 +191,10 @@ limitations under the License.</string>
     <string name="delete_workout">Delete workout</string>
     <string name="menu_image">Details image</string>
     <string name="backup_title">Backup/Restore</string>
-    <string name="backup_howto" translatable="false">You can backup your workout presets by copy / paste.\n\n- To create a backup of all presets, hit CREATE(COPY). All presets will be copied as text, which you can paste in your favorite app (like e-mail or docs/notes).\n\n- To restore a previously created backup, copy the same text from the source you stored it in, then hit RESTORE(PASTE). All backup workouts will be added automatically.</string>
+    <string name="backup_howto" translatable="false">You can backup your workout presets by copy / paste.\n\n- To create a backup of all presets, hit CREATE(COPY). All presets will be copied as text, which you can paste in your favorite app (like e-mail or docs/notes). Nested repeats are stored in the optional TREE_B64 field.\n\n- To restore a previously created backup, copy the same text from the source you stored it in, then hit RESTORE(PASTE). All valid backup workouts will be added automatically. Older backups without TREE_B64 are still supported.</string>
     <string name="create_backup">CREATE (COPY) from StrokeRateCoach</string>
     <string name="restore_backup">RESTORE (PASTE) to StrokeRateCoach</string>
-    <string name="backup_comment" translatable="false">-------\n#Copy this whole text to backup/restore StrokeRateCoach workouts\n#Workouts are described by several lines. Workouts starting with # are ignored.\n#Format:\n#1. Title\n#2. Description\n#3. Type: 0 - strokes, 1 - meters, 2 - seconds.\n#4. Strokes per minute for each phase\n#5. Duration of each phase (in strokes, metres or seconds).\n-------\n\n</string>
+    <string name="backup_comment" translatable="false">-------\n#Copy this whole text to backup/restore StrokeRateCoach workouts\n#Workouts are described by several lines. Workouts starting with # are ignored.\n#Format:\n#1. Title\n#2. Description\n#3. Type: 0 - strokes, 1 - meters, 2 - seconds.\n#4. Strokes per minute for each phase\n#5. Duration of each phase (in strokes, metres or seconds).\n#6. Optional TREE_B64: standard Base64-encoded workout tree; older backups without it remain supported.\n-------\n\n</string>
     <string name="preset_delimiter" translatable="false">-------</string>
     <string name="restore_result_text">Restore Result:</string>
     <string name="restore_added_text">Restored:</string>

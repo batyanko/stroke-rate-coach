@@ -1,15 +1,9 @@
 package com.batyanko.strokeratecoach;
 
-import static com.batyanko.strokeratecoach.Fragments.SlideFragment.SPP_VALID;
 import static com.batyanko.strokeratecoach.WaveActivity.windowWidth;
 import static com.batyanko.strokeratecoach.data.WorkoutContract.WorkoutEntry1.COLUMN_DESC;
-import static com.batyanko.strokeratecoach.data.WorkoutContract.WorkoutEntry1.COLUMN_GEARS_CSV;
 import static com.batyanko.strokeratecoach.data.WorkoutContract.WorkoutEntry1.COLUMN_NAME;
-import static com.batyanko.strokeratecoach.data.WorkoutContract.WorkoutEntry1.COLUMN_SPP_CSV;
-import static com.batyanko.strokeratecoach.data.WorkoutContract.WorkoutEntry1.COLUMN_SPP_TYPE;
-import static com.batyanko.strokeratecoach.sync.BeeperTasks.SPP_TYPE_METERS;
-import static com.batyanko.strokeratecoach.sync.BeeperTasks.SPP_TYPE_SECONDS;
-import static com.batyanko.strokeratecoach.sync.BeeperTasks.SPP_TYPE_STROKES;
+import static com.batyanko.strokeratecoach.data.WorkoutContract.WorkoutEntry1.TABLE_NAME_PRESETS;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -29,6 +23,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -38,16 +33,18 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.batyanko.strokeratecoach.data.WorkoutContract;
 import com.batyanko.strokeratecoach.data.WorkoutDBHelper;
-
-import java.util.Arrays;
+import com.batyanko.strokeratecoach.data.WorkoutRecordMapper;
+import com.batyanko.strokeratecoach.workout.LegacyWorkoutParser;
+import com.batyanko.strokeratecoach.workout.WorkoutBackupCodec;
+import com.batyanko.strokeratecoach.workout.WorkoutCompiler;
+import com.batyanko.strokeratecoach.workout.WorkoutDefinition;
+import com.batyanko.strokeratecoach.workout.WorkoutJsonCodec;
+import com.batyanko.strokeratecoach.workout.WorkoutValidationException;
 
 public class BackupActivity extends AppCompatActivity {
 
-    private static final String BKP_ID_NAME = "Name: ";
-    private static final String BKP_ID_DESC = "Desc: ";
-    private static final String BKP_ID_TYPE = "Type: ";
-    private static final String BKP_ID_GEARS = "SPM: ";
-    private static final String BKP_ID_SPP = "SPP: ";
+    private WorkoutRecordMapper recordMapper;
+    private WorkoutBackupCodec backupCodec;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +61,11 @@ public class BackupActivity extends AppCompatActivity {
         WorkoutDBHelper presetDbHelper;
         presetDbHelper = new WorkoutDBHelper(this);
         workoutDb = presetDbHelper.getWritableDatabase();
+        WorkoutJsonCodec jsonCodec = new WorkoutJsonCodec();
+        LegacyWorkoutParser legacyParser = new LegacyWorkoutParser();
+        WorkoutCompiler compiler = new WorkoutCompiler();
+        recordMapper = new WorkoutRecordMapper(jsonCodec, legacyParser, compiler);
+        backupCodec = new WorkoutBackupCodec(jsonCodec, legacyParser, compiler);
 
         Button createBkpButton = findViewById(R.id.create_backup);
         Button restoreBkpButton = findViewById(R.id.restore_backup);
@@ -96,28 +98,32 @@ public class BackupActivity extends AppCompatActivity {
     }
 
     private void createBkp(SQLiteDatabase workoutDb) {
-        Cursor bkpCursor = workoutDb.query(
-                WorkoutContract.WorkoutEntry1.TABLE_NAME_PRESETS,
+        StringBuilder dump = new StringBuilder();
+        dump.append(this.getString(R.string.backup_comment));
+        try (Cursor bkpCursor = workoutDb.query(
+                TABLE_NAME_PRESETS,
                 null,
                 null,
                 null,
                 null,
                 null,
                 WorkoutContract.WorkoutEntry1.COLUMN_TIMESTAMP
-        );
-        bkpCursor.moveToFirst();
-        StringBuilder dump = new StringBuilder();
-        dump.append(this.getString(R.string.backup_comment));
-        while (!bkpCursor.isAfterLast()) {
-            dump.append(BKP_ID_NAME).append(bkpCursor.getString(bkpCursor.getColumnIndex(COLUMN_NAME))).append("\n")
-                    .append(BKP_ID_DESC).append(bkpCursor.getString(bkpCursor.getColumnIndex(COLUMN_DESC))).append("\n")
-                    .append(BKP_ID_TYPE).append(bkpCursor.getString(bkpCursor.getColumnIndex(COLUMN_SPP_TYPE))).append("\n")
-                    .append(BKP_ID_GEARS).append(bkpCursor.getString(bkpCursor.getColumnIndex(COLUMN_GEARS_CSV))).append("\n")
-                    .append(BKP_ID_SPP).append(bkpCursor.getString(bkpCursor.getColumnIndex(COLUMN_SPP_CSV))).append("\n")
-                    .append(this.getString(R.string.preset_delimiter)).append("\n");
-            bkpCursor.moveToNext();
+        )) {
+            while (bkpCursor.moveToNext()) {
+                WorkoutDefinition definition = recordMapper.readDefinition(bkpCursor);
+                String name = bkpCursor.getString(bkpCursor.getColumnIndexOrThrow(COLUMN_NAME));
+                String description = bkpCursor.getString(
+                        bkpCursor.getColumnIndexOrThrow(COLUMN_DESC));
+                dump.append(backupCodec.encodeRecord(name, description, definition))
+                        .append('\n')
+                        .append(getString(R.string.preset_delimiter))
+                        .append("\n\n");
+            }
+        } catch (WorkoutValidationException exception) {
+            Toast.makeText(this, "Backup failed: " + exception.getMessage(),
+                    Toast.LENGTH_LONG).show();
+            return;
         }
-        bkpCursor.close();
         ClipboardManager clipboard = (ClipboardManager)
                 getSystemService(CLIPBOARD_SERVICE);
         ClipData clip = ClipData.newPlainText("simple text", dump.toString());
@@ -133,18 +139,15 @@ public class BackupActivity extends AppCompatActivity {
             return;
         }
 
-        String gottenDump = primaryClip.getItemAt(0).getText().toString();
+        CharSequence clipboardText = primaryClip.getItemAt(0).getText();
+        if (clipboardText == null) {
+            displayReport(getString(R.string.bkp_nobkp_error), "-", "-");
+            return;
+        }
+        String gottenDump = clipboardText.toString();
 
         String[] presets = gottenDump.split(this.getString(R.string.preset_delimiter));
-        int plausibleWorkouts = 0;
-        for (String string : presets) {
-            if ((string.contains(BKP_ID_TYPE)
-                    || string.contains(BKP_ID_GEARS)
-                    || string.contains(BKP_ID_SPP))) {
-                plausibleWorkouts++;
-            }
-        }
-        if (plausibleWorkouts == 0) {
+        if (!containsBackupFields(presets)) {
             displayReport(getString(R.string.bkp_nobkp_error), "-", "-");
             return;
         }
@@ -154,63 +157,36 @@ public class BackupActivity extends AppCompatActivity {
         int cntAdded = 0;
         int cntFailed = 0;
 
-        presetsLoop:
         for (int i = 0; i < presets.length; i++) {
             String preset = presets[i];
             String trimmedPreset = preset.trim();
             if (trimmedPreset.isBlank() || trimmedPreset.charAt(0) == '#') {
                 continue;
             }
-            String[] details = trimmedPreset.split("\n");
-            ContentValues cv = new ContentValues();
-
-            String name = String.valueOf(i);
-
-            for (String s : details) {
-                String detail = s.trim();
-                if (detail.length() <= 5) {
-                    continue; // positions reserved for workout detail ID
+            String name = extractName(preset, Integer.toString(i));
+            try {
+                WorkoutBackupCodec.BackupRecord record = backupCodec.parseRecord(preset, name);
+                name = record.getName();
+                WorkoutDefinition definition = record.getDefinition();
+                ContentValues values = new ContentValues();
+                values.put(COLUMN_NAME, name);
+                if (record.getDescription() != null) {
+                    values.put(COLUMN_DESC, record.getDescription());
                 }
-                if (detail.startsWith(BKP_ID_NAME)) {
-                    name = detail.substring(BKP_ID_NAME.length());
-                    cv.put(COLUMN_NAME, name);
-                } else if (detail.startsWith(BKP_ID_DESC)) {
-                    cv.put(COLUMN_DESC, detail.substring(BKP_ID_DESC.length()));
-                } else if (detail.startsWith(BKP_ID_TYPE)) {
-                    String type = detail.substring(BKP_ID_TYPE.length());
-                    if (!Arrays.asList(SPP_TYPE_STROKES, SPP_TYPE_METERS, SPP_TYPE_SECONDS).contains(type)) {
-                        presetsBotched.append("- ").append(name)
-                                .append(getString(R.string.spp_type_error));
-                        cntFailed++;
-                        continue presetsLoop;
-                    }
-                    cv.put(COLUMN_SPP_TYPE, detail.substring(BKP_ID_TYPE.length()));
-                } else if (detail.startsWith(BKP_ID_GEARS)) {
-                    String gears = detail.substring(BKP_ID_GEARS.length());
-                    if (!gears.matches(SPP_VALID)) {
-                        presetsBotched.append("- ").append(name)
-                                .append(getString(R.string.spp_gears_error));
-                        cntFailed++;
-                        continue presetsLoop;
-                    }
-                    cv.put(COLUMN_GEARS_CSV, gears);
-                } else if (detail.startsWith(BKP_ID_SPP)) {
-                    String spp = detail.substring(BKP_ID_SPP.length());
-                    if (!spp.matches(SPP_VALID)) {
-                        presetsBotched.append("- ").append(name)
-                                .append(getString(R.string.spp_length_error));
-                        cntFailed++;
-                        continue presetsLoop;
-                    }
-                    cv.put(COLUMN_SPP_CSV, spp);
+                recordMapper.putDefinition(values, definition);
+
+                long rowInserted = workoutDb.insert(TABLE_NAME_PRESETS, null, values);
+                if (rowInserted == -1) {
+                    presetsBotched.append("- ").append(name)
+                            .append(": database insert failed\n");
+                    cntFailed++;
+                    continue;
                 }
-            }
-            long rowInserted = workoutDb.insert(WorkoutContract.WorkoutEntry1.TABLE_NAME_PRESETS, null, cv);
-            if (rowInserted != -1) {
                 presetsAdded.append("- ").append(name).append("\n");
                 cntAdded++;
-            } else {
-                presetsBotched.append("- ").append(name).append("\n");
+            } catch (WorkoutValidationException exception) {
+                presetsBotched.append("- ").append(name)
+                        .append(": ").append(exception.getMessage()).append('\n');
                 cntFailed++;
             }
         }
@@ -220,6 +196,29 @@ public class BackupActivity extends AppCompatActivity {
         }
 
         displayReport(summary, presetsAdded.toString(), presetsBotched.toString());
+    }
+
+    private boolean containsBackupFields(String[] presets) {
+        for (String preset : presets) {
+            String trimmed = preset.trim();
+            if (trimmed.isEmpty() || trimmed.charAt(0) == '#') {
+                continue;
+            }
+            if (preset.contains("Type: ") || preset.contains("SPM: ")
+                    || preset.contains("SPP: ")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private String extractName(String record, String fallback) {
+        for (String line : record.split("\n", -1)) {
+            if (line.startsWith("Name: ")) {
+                return line.substring("Name: ".length()).trim();
+            }
+        }
+        return fallback;
     }
 
     private void displayReport(String summary, String added, String failed) {

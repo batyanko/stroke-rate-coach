@@ -46,6 +46,7 @@ import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.ImageButton;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -107,8 +108,12 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 
     public static final String PHASE_LENGTH = "phase-length";
     public static final String WORKOUT_LENGTH = "workout-length";
+    public static final String WORKOUT_PAUSED = "workout-paused";
     public static final String PHASE_PROGRESS = "phase-strokes-elapsed";
     public static final String WORKOUT_PROGRESS = "total-strokes-elapsed";
+    public static final String PHASE_INDEX = "phase-index";
+    public static final String PHASES_TOTAL = "phases-total";
+    public static final String PHASE_BREADCRUMB = "phase-breadcrumb";
     public static final String CURRENT_COLOR = "current-phase";
     public static final String CURRENT_SPEED = "current-speed";
     public static final String SPEED_LIMIT = "speed-limit";
@@ -150,7 +155,8 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     private TextView speedView;
     private TextView speedLimitView;
     private Spinner speedUnitSpinner;
-    private TextView stopperButton;
+    private ImageButton stopperButton;
+    private ImageButton pauseButton;
 
     private static Animation beeperAnimation;
     public static Animation warningAnimation;
@@ -283,6 +289,8 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
             slideFragment.stopBeeper();
             flushGUI();
         });
+        pauseButton = findViewById(R.id.pause_button);
+        pauseButton.setOnClickListener(view -> slideFragment.togglePause());
 
         String[] speeds = {SPEED_MS_SETTING, SPEED_500M_SETTING};
         String initSpeedUnit = pref.getString(SPEED_UNIT, SPEED_MS_SETTING);
@@ -444,7 +452,11 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         //Assuming no running workout at onCreate()
         if (!BeeperServiceUtils.serviceIsRunning()) {
             pref.edit().putInt(OPERATION_SETTING, WORKOUT_STOP).apply();
+            workoutRunning = WORKOUT_STOP;
+        } else {
+            workoutRunning = pref.getInt(OPERATION_SETTING, WORKOUT_STOP);
         }
+        updatePauseButton();
         flushGUI();
     }
 
@@ -598,10 +610,19 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
                 case WORKOUT_STOP: {
                     workoutRunning = WORKOUT_STOP;
                     flushGUI();
+                    onProgressChange();
                     break;
                 }
             }
-        } else if (s.equals(PHASE_PROGRESS)) {
+        } else if (s.equals(WORKOUT_PAUSED)) {
+            updatePauseButton();
+        } else if (s.equals(PHASE_PROGRESS)
+                || s.equals(PHASE_LENGTH)
+                || s.equals(PHASE_INDEX)
+                || s.equals(PHASES_TOTAL)
+                || s.equals(PHASE_BREADCRUMB)
+                || s.equals(WORKOUT_PROGRESS)
+                || s.equals(WORKOUT_LENGTH)) {
             onProgressChange();
             //TODO update speed limit if necessary
         } else if (s.equals(SPEED_UNIT)) {
@@ -615,6 +636,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
             } catch (NumberFormatException e) {
                 duration = 3;
             }
+
             int durationLeft = sharedPreferences.getInt(COUNTDOWN_DURATION_LEFT, 0) / 1000;
             String countdownString = durationLeft + "";
             if (durationLeft == 0) {
@@ -699,35 +721,64 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         }
     }
 
+    private void updatePauseButton() {
+        if (pauseButton == null || pref == null) {
+            return;
+        }
+        boolean paused = pref.getBoolean(WORKOUT_PAUSED, false);
+        pauseButton.setImageResource(paused
+                ? R.drawable.ic_workout_resume : R.drawable.ic_workout_pause);
+        pauseButton.setContentDescription(getString(
+                paused ? R.string.resume_workout : R.string.pause_workout));
+    }
+
     /**
      * Update GUI according to workout
      */
     private void onProgressChange() {
-        if (workoutRunning != WORKOUT_INTERVAL && workoutRunning != WORKOUT_LAST) return;
+        if (workoutRunning != WORKOUT_INTERVAL && workoutRunning != WORKOUT_LAST) {
+            progressTextView.setText("");
+            waveProgress.setProgress(0);
+            waveProgress.setSecondaryProgress(0);
+            return;
+        }
 
         int[] phaseProgress = new int[2];    //0 = current phaseProgress 1 = total length
         phaseProgress[0] = pref.getInt(PHASE_PROGRESS, 0);
         phaseProgress[1] = pref.getInt(PHASE_LENGTH, 0);
 
-        if (phaseProgress[0] > phaseProgress[1]) {
-            //Take a break :3
-            return;
-        }
-
         int[] workoutProgress = new int[2];    //0 = current phaseProgress 1 = total length
         workoutProgress[0] = pref.getInt(WORKOUT_PROGRESS, 0);
         workoutProgress[1] = pref.getInt(WORKOUT_LENGTH, 0);
 
-        String progressViewText = phaseProgress[0] +
-                " / " + phaseProgress[1]/* +
-                " @ " +
-                rowingSpeedString +
-                "/500m"*/;
+        String phaseProgressText = getString(
+                R.string.workout_phase_progress,
+                Math.min(phaseProgress[0], phaseProgress[1]),
+                phaseProgress[1]);
+        int phaseIndex = pref.getInt(PHASE_INDEX, 0);
+        int phasesTotal = pref.getInt(PHASES_TOTAL, 0);
+        String breadcrumb = pref.getString(PHASE_BREADCRUMB, "");
+        String phaseContextText = "";
+        if (phaseIndex > 0 && phasesTotal > 0) {
+            phaseContextText = breadcrumb == null || breadcrumb.isEmpty()
+                    ? getString(R.string.workout_phase_context, phaseIndex, phasesTotal)
+                    : getString(R.string.workout_phase_context_with_breadcrumb,
+                            phaseIndex, phasesTotal, breadcrumb);
+        }
+        String progressViewText = phaseContextText.isEmpty()
+                ? phaseProgressText
+                : phaseProgressText + "\n" + phaseContextText;
         progressTextView.setText(progressViewText);
 
-        int phaseProgressPercent = (int) (((float) phaseProgress[0] / (float) phaseProgress[1]) * 100);
+        int boundedPhaseProgress = Math.max(0,
+                Math.min(phaseProgress[0], phaseProgress[1]));
+        int phaseProgressPercent = phaseProgress[1] <= 0 ? 0
+                : (int) ((boundedPhaseProgress * 100L) / phaseProgress[1]);
         waveProgress.setProgress(phaseProgressPercent);
-        int workoutProgressPercent = (int) (((float) workoutProgress[0] / (float) workoutProgress[1]) * 100);
+        int boundedWorkoutProgress = Math.max(0,
+                Math.min(workoutProgress[0], workoutProgress[1]));
+        int workoutProgressPercent = workoutProgress[1] <= 0 ? 0
+                : (int) ((boundedWorkoutProgress * 100L) / workoutProgress[1]);
         waveProgress.setSecondaryProgress(workoutProgressPercent);
 
     }
