@@ -7,6 +7,9 @@ public final class WorkoutSummaryFormatter {
     public String format(WorkoutDefinition definition) {
         Objects.requireNonNull(definition, "definition");
         StringBuilder summary = new StringBuilder();
+        if (definition.shouldSkipLastRest()) {
+            summary.append("Skip last repeat rest\n");
+        }
         appendNodes(summary, definition.getNodes(), definition.getUnit(), 0);
         return summary.toString();
     }
@@ -33,6 +36,11 @@ public final class WorkoutSummaryFormatter {
             }
 
             PhaseNode phase = (PhaseNode) node;
+            if (phase.getTargetSpm() == 0) {
+                summary.append("Rest for ").append(phase.getLength()).append(' ')
+                        .append(unitLabel(unit, phase.getLength())).append('\n');
+                continue;
+            }
             summary.append(phase.getLength()).append(' ')
                     .append(unitLabel(unit, phase.getLength()))
                     .append(" at ").append(phase.getTargetSpm()).append(" SPM\n");

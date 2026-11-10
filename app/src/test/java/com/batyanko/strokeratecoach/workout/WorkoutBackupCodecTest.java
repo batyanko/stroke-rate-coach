@@ -41,8 +41,10 @@ public class WorkoutBackupCodecTest {
         WorkoutDefinition original = new WorkoutDefinition(WorkoutUnit.SECONDS,
                 Arrays.<WorkoutNode>asList(
                         new PhaseNode(12, 21),
-                        new RepeatNode(2, label, Collections.<WorkoutNode>singletonList(
-                                new PhaseNode(30, 25)))));
+                        new RepeatNode(2, label, Arrays.<WorkoutNode>asList(
+                                new PhaseNode(30, 25),
+                                new PhaseNode(10, 0)))),
+                true);
 
         String exported = backupCodec.encodeRecord("Nested", "Description", original);
         assertEquals(6, exported.split("\n", -1).length);
@@ -51,8 +53,9 @@ public class WorkoutBackupCodecTest {
 
         assertEquals(jsonCodec.serialize(original), jsonCodec.serialize(restored));
         CompiledWorkout compiled = new WorkoutCompiler().compile(restored);
-        assertEquals(3, compiled.getTotalPhases());
-        assertEquals(72, compiled.getTotalLength());
+        assertEquals(4, compiled.getTotalPhases());
+        assertEquals(82, compiled.getTotalLength());
+        assertEquals(true, restored.shouldSkipLastRest());
         assertEquals(label, ((RepeatNode) restored.getNodes().get(1)).getLabel());
     }
 

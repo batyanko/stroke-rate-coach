@@ -52,6 +52,109 @@ public class WorkoutCompilerTest {
     }
 
     @Test
+    public void allowsZeroSpmRestInMeterAndSecondWorkoutsOnly() {
+        for (WorkoutUnit unit : new WorkoutUnit[]{WorkoutUnit.METERS, WorkoutUnit.SECONDS}) {
+            CompiledWorkout workout = compiler.compile(new WorkoutDefinition(
+                    unit, Collections.singletonList(new PhaseNode(10, 0))));
+            assertEquals(0, workout.getPhases().get(0).getTargetSpm());
+        }
+        assertCode(WorkoutValidationException.Code.INVALID_TARGET_SPM,
+                definition(new PhaseNode(1, 0)));
+    }
+
+    @Test
+    public void skipsOnlyFinalIterationTrailingRepeatRestAndKeepsFollowingPhases() {
+        WorkoutDefinition definition = new WorkoutDefinition(WorkoutUnit.SECONDS,
+                Arrays.asList(
+                        new RepeatNode(3, Arrays.asList(
+                                new PhaseNode(70, 22),
+                                new PhaseNode(50, 24),
+                                new PhaseNode(10, 0))),
+                        new PhaseNode(5, 20)),
+                true);
+
+        CompiledWorkout workout = compiler.compile(definition);
+
+        assertEquals(9, workout.getTotalPhases());
+        assertEquals(385, workout.getTotalLength());
+        assertEquals(0, workout.getPhases().get(2).getTargetSpm());
+        assertEquals(0, workout.getPhases().get(5).getTargetSpm());
+        assertEquals(70, workout.getPhases().get(6).getLength());
+        assertEquals(50, workout.getPhases().get(7).getLength());
+        assertEquals(5, workout.getPhases().get(8).getLength());
+        assertEquals(9, workout.getPhases().get(8).getTotalPhases());
+    }
+
+    @Test
+    public void skipsTrailingRestsAtEachNestedRepeatBoundary() {
+        WorkoutDefinition definition = new WorkoutDefinition(WorkoutUnit.SECONDS,
+                Collections.singletonList(new RepeatNode(3, "Outer",
+                        Arrays.asList(
+                                new RepeatNode(3, "Inner", Arrays.asList(
+                                        new PhaseNode(75, 50),
+                                        new PhaseNode(75, 90),
+                                        new PhaseNode(75, 60),
+                                        new PhaseNode(75, 80),
+                                        new PhaseNode(75, 70),
+                                        new PhaseNode(60, 0))),
+                                new PhaseNode(60, 0)))),
+                true);
+
+        CompiledWorkout workout = compiler.compile(definition);
+
+        assertEquals(53, workout.getTotalPhases());
+        assertEquals(3855, workout.getTotalLength());
+        int restCount = 0;
+        for (int i = 0; i < workout.getPhases().size(); i++) {
+            CompiledPhase phase = workout.getPhases().get(i);
+            assertEquals(i + 1, phase.getPhaseIndex());
+            assertEquals(53, phase.getTotalPhases());
+            if (phase.getTargetSpm() != 0) {
+                continue;
+            }
+            restCount++;
+            assertTrue(i == 5 || i == 11 || i == 17
+                    || i == 23 || i == 29 || i == 35
+                    || i == 41 || i == 47);
+        }
+        assertEquals(8, restCount);
+        assertTrue(workout.getPhases().get(52).getTargetSpm() > 0);
+    }
+
+    @Test
+    public void doesNotSkipStandaloneOrNonTrailingRestPhases() {
+        WorkoutDefinition definition = new WorkoutDefinition(WorkoutUnit.METERS,
+                Arrays.asList(
+                        new PhaseNode(10, 0),
+                        new RepeatNode(2, Arrays.asList(
+                                new PhaseNode(10, 0),
+                                new PhaseNode(20, 22)))),
+                true);
+
+        CompiledWorkout workout = compiler.compile(definition);
+
+        assertEquals(5, workout.getTotalPhases());
+        assertEquals(0, workout.getPhases().get(0).getTargetSpm());
+        assertEquals(0, workout.getPhases().get(1).getTargetSpm());
+        assertEquals(0, workout.getPhases().get(3).getTargetSpm());
+    }
+
+    @Test
+    public void skipLastRestCanBringExpandedWorkoutWithinPhaseLimit() {
+        WorkoutDefinition definition = new WorkoutDefinition(WorkoutUnit.SECONDS,
+                Arrays.asList(
+                        new RepeatNode(250, Arrays.asList(
+                                new PhaseNode(1, 20), new PhaseNode(1, 0))),
+                        new PhaseNode(1, 20)),
+                true);
+
+        CompiledWorkout workout = compiler.compile(definition);
+
+        assertEquals(500, workout.getTotalPhases());
+        assertEquals(500, workout.getTotalLength());
+    }
+
+    @Test
     public void compilesNested45PhaseSampleWithExactLengthAndBreadcrumbs() {
         WorkoutNode tree = new RepeatNode(3, "Cycle", Collections.singletonList(
                 new RepeatNode(3, "Set", Collections.singletonList(

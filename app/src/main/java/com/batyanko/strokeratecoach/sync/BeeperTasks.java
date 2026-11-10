@@ -54,6 +54,7 @@ import java.util.TimerTask;
  */
 
 public class BeeperTasks {
+    private static final long METERS_REST_MONITOR_INTERVAL_MS = 250L;
 
     public static final String EXTRA_WORKOUT_SPP_TYPE = "workout-spp-type";
     public static final String EXTRA_PHASE_LENGTHS = "phase_lengths";
@@ -272,8 +273,11 @@ public class BeeperTasks {
 
         long totalLength = 0;
         for (int i = 0; i < phaseLengths.length; i++) {
-            if (phaseLengths[i] < 1 || targetSpms[i] < 1 || breadcrumbs[i] == null) {
-                return "phase lengths and target SPM must be positive";
+            if (phaseLengths[i] < 1 || targetSpms[i] < 0 || breadcrumbs[i] == null) {
+                return "phase lengths must be positive and target SPM non-negative";
+            }
+            if (targetSpms[i] == 0 && SPP_TYPE_STROKES.equals(sppType)) {
+                return "zero-SPM rests require a metres- or seconds-based workout";
             }
             totalLength += phaseLengths[i];
             if (totalLength > Integer.MAX_VALUE) {
@@ -406,7 +410,7 @@ public class BeeperTasks {
             phaseProgress = 0;
             pref.edit().putInt(WaveActivity.PHASE_PROGRESS, 0).apply();
 
-            strokeDuration = SpmUtilities.spmToMilis(spm);
+            strokeDuration = spm > 0 ? SpmUtilities.spmToMilis(spm) : 0;
 
             cancelTimer(workoutTimer, workoutTimerTask);
             if (mSppType.equals(SPP_TYPE_SECONDS)) {
@@ -415,6 +419,9 @@ public class BeeperTasks {
                 startTimeTimerTask(beeperService, generation);
                 timeTimer = new Timer();
                 timeTimer.scheduleAtFixedRate(timeTimerTask, 1, 1000);
+            }
+            if (spm == 0 && !SPP_TYPE_METERS.equals(mSppType)) {
+                return;
             }
 
             workoutTimerTask = new TimerTask() {
@@ -492,6 +499,9 @@ public class BeeperTasks {
                         if (!isCurrentRun(generation)) {
                             return;
                         }
+                        if (spm == 0) {
+                            return;
+                        }
                         if (sndPref.equals(beeperService.getString(R.string.beep_sound_default))) {
                             workoutToneGen.startTone(
                                     ToneGenerator.TONE_CDMA_EMERGENCY_RINGBACK, 150);
@@ -505,7 +515,9 @@ public class BeeperTasks {
             };
 
             workoutTimer = new Timer();
-            workoutTimer.scheduleAtFixedRate(workoutTimerTask, 1, strokeDuration);
+            long monitorInterval = spm == 0
+                    ? METERS_REST_MONITOR_INTERVAL_MS : strokeDuration;
+            workoutTimer.scheduleAtFixedRate(workoutTimerTask, 1, monitorInterval);
         }
     }
 

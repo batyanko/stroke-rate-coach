@@ -13,6 +13,7 @@ public final class WorkoutEditorDraft {
 
     private final List<Node> nodes;
     private final List<Integer> path;
+    private boolean skipLastRest;
 
     public WorkoutEditorDraft() {
         nodes = new ArrayList<>();
@@ -57,7 +58,15 @@ public final class WorkoutEditorDraft {
     }
 
     public WorkoutDefinition toDefinition(WorkoutUnit unit) {
-        return new WorkoutDefinition(unit, toWorkoutNodes(nodes));
+        return new WorkoutDefinition(unit, toWorkoutNodes(nodes), skipLastRest);
+    }
+
+    public boolean shouldSkipLastRest() {
+        return skipLastRest;
+    }
+
+    public void setSkipLastRest(boolean skipLastRest) {
+        this.skipLastRest = skipLastRest;
     }
 
     public String serialize() {
@@ -83,6 +92,7 @@ public final class WorkoutEditorDraft {
     public static WorkoutEditorDraft fromDefinition(WorkoutDefinition definition) {
         WorkoutEditorDraft draft = new WorkoutEditorDraft();
         draft.nodes.addAll(fromWorkoutNodes(definition.getNodes()));
+        draft.skipLastRest = definition.shouldSkipLastRest();
         return draft;
     }
 

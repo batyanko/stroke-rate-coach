@@ -38,4 +38,18 @@ public class WorkoutSummaryFormatterTest {
                 formatter.format(definition));
         assertTrue(formatter.containsRepeats(definition));
     }
+
+    @Test
+    public void formatsRestPhasesAndSkipLastRestSetting() {
+        WorkoutDefinition definition = new WorkoutDefinition(WorkoutUnit.SECONDS,
+                Collections.singletonList(new RepeatNode(2,
+                        Arrays.asList(new PhaseNode(60, 22), new PhaseNode(10, 0)))),
+                true);
+
+        assertEquals("Skip last repeat rest\n"
+                        + "Repeat Repeat \u00d72\n"
+                        + "  60 seconds at 22 SPM\n"
+                        + "  Rest for 10 seconds\n",
+                formatter.format(definition));
+    }
 }

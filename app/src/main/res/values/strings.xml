@@ -62,13 +62,18 @@
     <string name="editor_add_repeat_title">Add repeat</string>
     <string name="editor_edit_repeat_title">Edit repeat</string>
     <string name="editor_phase_length_hint">Phase length</string>
-    <string name="editor_target_spm_hint">Target SPM</string>
+    <string name="editor_target_spm_hint">Target SPM (0 = rest in metres/seconds workouts)</string>
     <string name="editor_repeat_label_hint">Repeat label (optional)</string>
     <string name="editor_repeat_count_hint">Repeat count</string>
     <string name="editor_positive_number_required">Enter a positive whole number.</string>
     <string name="editor_delete_repeat_title">Delete repeat</string>
     <string name="editor_delete_repeat_confirmation">Delete %1$s and all of its contents?</string>
     <string name="editor_state_restore_failed">Could not restore the workout editor state.</string>
+    <string name="editor_skip_last_rest">Skip last repeat rest</string>
+    <string name="editor_skip_last_rest_description">Skip the zero-SPM rest at the end of the final iteration of a repeat.</string>
+    <string name="editor_rest_title">Rest: %1$d %2$s</string>
+    <string name="editor_zero_spm_strokes_not_supported">Zero SPM rests are supported only in metres- or seconds-based workouts.</string>
+    <string name="editor_target_spm_required">Enter a non-negative target SPM.</string>
     <string name="repeat_indicator">repeats</string>
     <string name="workout_summary_popup_format">%1$s\n%2$s\n\n%3$s</string>
 

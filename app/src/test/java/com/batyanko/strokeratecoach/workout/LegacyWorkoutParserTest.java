@@ -62,6 +62,15 @@ public class LegacyWorkoutParserTest {
         }
     }
 
+    @Test
+    public void allowsZeroSpmOnlyForMetresAndSeconds() {
+        assertEquals(0, ((PhaseNode) parser.parse("10", "0", "1")
+                .getNodes().get(0)).getTargetSpm());
+        assertEquals(0, ((PhaseNode) parser.parse("10", "0", "2")
+                .getNodes().get(0)).getTargetSpm());
+        assertInvalid("10", "0", "0");
+    }
+
     private void assertInvalid(String spp, String gears, String type) {
         try {
             parser.parse(spp, gears, type);

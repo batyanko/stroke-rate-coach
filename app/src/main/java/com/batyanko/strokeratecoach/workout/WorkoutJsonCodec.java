@@ -22,7 +22,7 @@ public final class WorkoutJsonCodec {
     private static final int SCHEMA_VERSION = 1;
     private static final Pattern INTEGER_PATTERN = Pattern.compile("-?(0|[1-9][0-9]*)");
     private static final Set<String> ROOT_FIELDS = new HashSet<>(
-            Arrays.asList("schemaVersion", "nodes"));
+            Arrays.asList("schemaVersion", "nodes", "skipLastRest"));
     private static final Set<String> PHASE_FIELDS = new HashSet<>(
             Arrays.asList("type", "length", "targetSpm", "label"));
     private static final Set<String> REPEAT_FIELDS = new HashSet<>(
@@ -35,6 +35,7 @@ public final class WorkoutJsonCodec {
 
         JsonObject root = new JsonObject();
         root.addProperty("schemaVersion", SCHEMA_VERSION);
+        root.addProperty("skipLastRest", definition.shouldSkipLastRest());
         JsonArray nodes = new JsonArray();
         for (WorkoutNode node : definition.getNodes()) {
             nodes.add(serializeNode(node));
@@ -44,6 +45,15 @@ public final class WorkoutJsonCodec {
     }
 
     public List<WorkoutNode> deserializeNodes(String json) {
+        return parseTree(json).nodes;
+    }
+
+    public WorkoutDefinition deserializeDefinition(String json, WorkoutUnit unit) {
+        ParsedTree tree = parseTree(json);
+        return new WorkoutDefinition(unit, tree.nodes, tree.skipLastRest);
+    }
+
+    private ParsedTree parseTree(String json) {
         if (json == null || json.trim().isEmpty()) {
             throw error(WorkoutValidationException.Code.MALFORMED_JSON,
                     "Workout JSON must not be empty");
@@ -64,7 +74,9 @@ public final class WorkoutJsonCodec {
         }
 
         JsonArray nodes = requiredArray(root, "nodes", "workout");
-        return parseNodes(nodes, "nodes", 0);
+        return new ParsedTree(
+                parseNodes(nodes, "nodes", 0),
+                optionalBoolean(root, "skipLastRest", false, "workout"));
     }
 
     private JsonElement parseDocument(String json) {
@@ -191,6 +203,19 @@ public final class WorkoutJsonCodec {
         return requiredString(object, "label", path);
     }
 
+    private boolean optionalBoolean(JsonObject object, String field, boolean defaultValue,
+                                    String path) {
+        if (!object.has(field)) {
+            return defaultValue;
+        }
+        JsonElement element = required(object, field, path);
+        if (!element.isJsonPrimitive() || !element.getAsJsonPrimitive().isBoolean()) {
+            throw error(WorkoutValidationException.Code.INVALID_FIELD_TYPE,
+                    path + "." + field + " must be a boolean");
+        }
+        return element.getAsBoolean();
+    }
+
     private JsonArray requiredArray(JsonObject object, String field, String path) {
         JsonElement element = required(object, field, path);
         if (!element.isJsonArray()) {
@@ -241,5 +266,15 @@ public final class WorkoutJsonCodec {
 
     private WorkoutValidationException error(WorkoutValidationException.Code code, String message) {
         return new WorkoutValidationException(code, message);
+    }
+
+    private static final class ParsedTree {
+        private final List<WorkoutNode> nodes;
+        private final boolean skipLastRest;
+
+        private ParsedTree(List<WorkoutNode> nodes, boolean skipLastRest) {
+            this.nodes = nodes;
+            this.skipLastRest = skipLastRest;
+        }
     }
 }

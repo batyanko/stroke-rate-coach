@@ -107,6 +107,18 @@
             android:textColor="@color/blueAppColor"
             />
 
+        <CheckBox
+            android:id="@+id/skip_last_rest_checkbox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/editor_skip_last_rest" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/editor_skip_last_rest_description"
+            android:textSize="12sp" />
+
         <LinearLayout
             android:id="@+id/editor_controls"
             android:layout_width="match_parent"

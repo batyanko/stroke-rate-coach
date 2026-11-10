@@ -15,11 +15,17 @@ public final class WorkoutCompiler {
                     "Workout must contain at least one phase");
         }
 
-        ExpansionStats stats = measure(definition.getNodes(), 0, "workout");
+        ExpansionStats stats = measure(
+                definition.getNodes(), 0, "workout", definition.getUnit(),
+                definition.shouldSkipLastRest());
         if (stats.phaseCount > MAX_COMPILED_PHASES) {
             throw error(WorkoutValidationException.Code.MAX_PHASE_COUNT_EXCEEDED,
                     "Workout expands to " + stats.phaseCount + " phases; maximum is "
                             + MAX_COMPILED_PHASES);
+        }
+        if (stats.phaseCount == 0) {
+            throw error(WorkoutValidationException.Code.EMPTY_WORKOUT,
+                    "Workout must contain a phase after skipping repeat rests");
         }
         if (stats.totalLength > Integer.MAX_VALUE) {
             throw error(WorkoutValidationException.Code.WORKOUT_LENGTH_OVERFLOW,
@@ -28,11 +34,12 @@ public final class WorkoutCompiler {
 
         List<CompiledPhase> phases = new ArrayList<>((int) stats.phaseCount);
         expand(definition.getNodes(), new ArrayList<>(), phases, (int) stats.phaseCount,
-                "workout");
+                "workout", false, definition.shouldSkipLastRest());
         return new CompiledWorkout(definition.getUnit(), phases, stats.totalLength);
     }
 
-    private ExpansionStats measure(List<WorkoutNode> nodes, int repeatDepth, String path) {
+    private ExpansionStats measure(List<WorkoutNode> nodes, int repeatDepth, String path,
+                                   WorkoutUnit unit, boolean skipLastRest) {
         long phaseCount = 0;
         long totalLength = 0;
 
@@ -41,7 +48,7 @@ public final class WorkoutCompiler {
             WorkoutNode node = nodes.get(i);
 
             if (node instanceof PhaseNode) {
-                ExpansionStats phaseStats = measurePhase((PhaseNode) node, nodePath);
+                ExpansionStats phaseStats = measurePhase((PhaseNode) node, nodePath, unit);
                 phaseCount = addPhaseCounts(phaseCount, phaseStats.phaseCount, nodePath);
                 totalLength = addLengths(totalLength, phaseStats.totalLength, nodePath);
                 continue;
@@ -55,11 +62,18 @@ public final class WorkoutCompiler {
             int childDepth = repeatDepth + 1;
             validateRepeat(repeat, childDepth, nodePath);
 
-            ExpansionStats childStats = measure(repeat.getChildren(), childDepth, nodePath);
+            ExpansionStats childStats = measure(
+                    repeat.getChildren(), childDepth, nodePath, unit, skipLastRest);
             long repeatedPhases = multiplyPhaseCounts(
                     childStats.phaseCount, repeat.getRepeatCount(), nodePath);
             long repeatedLength = multiplyLengths(
                     childStats.totalLength, repeat.getRepeatCount(), nodePath);
+            if (skipLastRest && hasTrailingRest(repeat.getChildren())) {
+                PhaseNode trailingRest = (PhaseNode) repeat.getChildren().get(
+                        repeat.getChildren().size() - 1);
+                repeatedPhases--;
+                repeatedLength -= trailingRest.getLength();
+            }
             phaseCount = addPhaseCounts(phaseCount, repeatedPhases, nodePath);
             totalLength = addLengths(totalLength, repeatedLength, nodePath);
         }
@@ -67,16 +81,26 @@ public final class WorkoutCompiler {
         return new ExpansionStats(phaseCount, totalLength);
     }
 
-    private ExpansionStats measurePhase(PhaseNode phase, String path) {
+    private ExpansionStats measurePhase(PhaseNode phase, String path, WorkoutUnit unit) {
         if (phase.getLength() < 1) {
             throw error(WorkoutValidationException.Code.INVALID_PHASE_LENGTH,
                     path + " has a phase length below 1");
         }
-        if (phase.getTargetSpm() < 1) {
+        if (phase.getTargetSpm() < 0
+                || (phase.getTargetSpm() == 0 && unit == WorkoutUnit.STROKES)) {
             throw error(WorkoutValidationException.Code.INVALID_TARGET_SPM,
-                    path + " has a target SPM below 1");
+                    path + " uses zero SPM in a stroke-count workout; rests require a "
+                            + "metres- or seconds-based workout");
         }
         return new ExpansionStats(1, phase.getLength());
+    }
+
+    private boolean hasTrailingRest(List<WorkoutNode> nodes) {
+        if (nodes.isEmpty()) {
+            return false;
+        }
+        WorkoutNode lastNode = nodes.get(nodes.size() - 1);
+        return lastNode instanceof PhaseNode && ((PhaseNode) lastNode).getTargetSpm() == 0;
     }
 
     private void validateRepeat(RepeatNode repeat, int depth, String path) {
@@ -135,20 +159,27 @@ public final class WorkoutCompiler {
     }
 
     private void expand(List<WorkoutNode> nodes, List<RepeatFrame> repeatPath,
-                        List<CompiledPhase> phases, int totalPhases, String path) {
+                        List<CompiledPhase> phases, int totalPhases, String path,
+                        boolean finalRepeatIteration, boolean skipLastRest) {
         for (int i = 0; i < nodes.size(); i++) {
             String nodePath = path + " item " + (i + 1);
             WorkoutNode node = nodes.get(i);
 
             if (node instanceof PhaseNode) {
-                addCompiledPhase((PhaseNode) node, repeatPath, phases, totalPhases);
+                PhaseNode phase = (PhaseNode) node;
+                if (skipLastRest && finalRepeatIteration && i == nodes.size() - 1
+                        && phase.getTargetSpm() == 0) {
+                    continue;
+                }
+                addCompiledPhase(phase, repeatPath, phases, totalPhases);
                 continue;
             }
             if (!(node instanceof RepeatNode)) {
                 throw error(WorkoutValidationException.Code.INVALID_FIELD_TYPE,
                         nodePath + " has an unsupported workout node");
             }
-            expandRepeat((RepeatNode) node, repeatPath, phases, totalPhases, nodePath);
+            expandRepeat((RepeatNode) node, repeatPath, phases, totalPhases, nodePath,
+                    skipLastRest);
         }
     }
 
@@ -164,11 +195,13 @@ public final class WorkoutCompiler {
     }
 
     private void expandRepeat(RepeatNode repeat, List<RepeatFrame> repeatPath,
-                              List<CompiledPhase> phases, int totalPhases, String path) {
+                              List<CompiledPhase> phases, int totalPhases, String path,
+                              boolean skipLastRest) {
         String label = normalizedLabel(repeat.getLabel());
         for (int iteration = 1; iteration <= repeat.getRepeatCount(); iteration++) {
             repeatPath.add(new RepeatFrame(label, iteration, repeat.getRepeatCount()));
-            expand(repeat.getChildren(), repeatPath, phases, totalPhases, path);
+            expand(repeat.getChildren(), repeatPath, phases, totalPhases, path,
+                    iteration == repeat.getRepeatCount(), skipLastRest);
             repeatPath.remove(repeatPath.size() - 1);
         }
     }

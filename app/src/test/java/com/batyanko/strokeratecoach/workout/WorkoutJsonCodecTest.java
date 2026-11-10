@@ -18,11 +18,12 @@ public class WorkoutJsonCodecTest {
                 new PhaseNode(12, 20, "Warmup"),
                 new RepeatNode(2, "Set", Arrays.asList(
                         new PhaseNode(60, 22, "Work"),
-                        new RepeatNode(3, Arrays.asList(new PhaseNode(10, 18)))))));
+                        new RepeatNode(3, Arrays.asList(new PhaseNode(10, 18)))))),
+                true);
 
         String json = codec.serialize(definition);
         assertEquals(
-                "{\"schemaVersion\":1,\"nodes\":[{\"type\":\"phase\",\"length\":12,"
+                "{\"schemaVersion\":1,\"skipLastRest\":true,\"nodes\":[{\"type\":\"phase\",\"length\":12,"
                         + "\"targetSpm\":20,\"label\":\"Warmup\"},{\"type\":\"repeat\","
                         + "\"count\":2,\"label\":\"Set\",\"children\":[{\"type\":\"phase\","
                         + "\"length\":60,\"targetSpm\":22,\"label\":\"Work\"},{\"type\":"
@@ -40,6 +41,15 @@ public class WorkoutJsonCodecTest {
         RepeatNode inner = (RepeatNode) outer.getChildren().get(1);
         assertEquals(3, inner.getRepeatCount());
         assertPhase((PhaseNode) inner.getChildren().get(0), 10, 18, null);
+        assertEquals(true, codec.deserializeDefinition(json, WorkoutUnit.SECONDS)
+                .shouldSkipLastRest());
+    }
+
+    @Test
+    public void defaultsSkipLastRestToFalseForExistingDocuments() {
+        assertEquals(false, codec.deserializeDefinition(
+                "{\"schemaVersion\":1,\"nodes\":[]}", WorkoutUnit.METERS)
+                .shouldSkipLastRest());
     }
 
     @Test
@@ -82,7 +92,8 @@ public class WorkoutJsonCodecTest {
                         + "\"targetSpm\":22,\"label\":false}]}",
                 "{\"schemaVersion\":1,\"nodes\":[{\"type\":\"repeat\",\"count\":1.2,"
                         + "\"children\":[]}]}",
-                "{\"schemaVersion\":1,\"nodes\":[],\"extra\":true}"
+                "{\"schemaVersion\":1,\"nodes\":[],\"extra\":true}",
+                "{\"schemaVersion\":1,\"nodes\":[],\"skipLastRest\":\"true\"}"
         };
         for (String document : invalidDocuments) {
             assertCode(WorkoutValidationException.Code.INVALID_FIELD_TYPE, document);

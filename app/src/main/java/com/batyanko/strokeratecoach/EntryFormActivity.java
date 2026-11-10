@@ -31,6 +31,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
@@ -66,6 +67,7 @@ public class EntryFormActivity extends AppCompatActivity {
     private RadioButton radioStrokes;
     private RadioButton radioMeters;
     private RadioButton radioSeconds;
+    private CheckBox skipLastRestCheckBox;
     private LinearLayout nodeList;
     private TextView pathLabel;
     private Button upButton;
@@ -96,6 +98,7 @@ public class EntryFormActivity extends AppCompatActivity {
         radioStrokes = findViewById(R.id.radio_strokes);
         radioMeters = findViewById(R.id.radio_meters);
         radioSeconds = findViewById(R.id.radio_seconds);
+        skipLastRestCheckBox = findViewById(R.id.skip_last_rest_checkbox);
         nameEt = findViewById(R.id.workout_name_et);
         descEt = findViewById(R.id.workout_desc_et);
         nodeList = findViewById(R.id.workout_node_list);
@@ -112,6 +115,11 @@ public class EntryFormActivity extends AppCompatActivity {
         addPhaseButton.setOnClickListener(view -> showPhaseDialog(-1));
         addRepeatButton.setOnClickListener(view -> showRepeatDialog(-1));
         saveButton.setOnClickListener(view -> saveWorkout());
+        skipLastRestCheckBox.setOnCheckedChangeListener((button, checked) -> {
+            if (draft != null) {
+                draft.setSkipLastRest(checked);
+            }
+        });
 
         workoutId = getIntent().getStringExtra(EXTRA_WORKOUT_ID);
         if (savedInstanceState != null) {
@@ -154,6 +162,7 @@ public class EntryFormActivity extends AppCompatActivity {
         if (selectedUnitId != RadioGroup.NO_ID) {
             unitRadioGroup.check(selectedUnitId);
         }
+        skipLastRestCheckBox.setChecked(draft.shouldSkipLastRest());
         saveButton.setText(isEditing()
                 ? R.string.edit_workout_button_label : R.string.create_workout_button_label);
         renderDraft();
@@ -175,6 +184,7 @@ public class EntryFormActivity extends AppCompatActivity {
             WorkoutDefinition definition = recordMapper.readDefinition(cursor);
             selectUnit(definition.getUnit());
             draft = WorkoutEditorDraft.fromDefinition(definition);
+            skipLastRestCheckBox.setChecked(draft.shouldSkipLastRest());
             saveButton.setText(R.string.edit_workout_button_label);
             renderDraft();
         } catch (WorkoutValidationException exception) {
@@ -258,6 +268,9 @@ public class EntryFormActivity extends AppCompatActivity {
 
     private String getPhaseTitle(WorkoutEditorDraft.Node phase) {
         String unit = getSelectedUnitLabel();
+        if (phase.getTargetSpm() == 0) {
+            return getString(R.string.editor_rest_title, phase.getLength(), unit);
+        }
         return getString(R.string.editor_phase_title, phase.getLength(), unit,
                 phase.getTargetSpm());
     }
@@ -294,9 +307,19 @@ public class EntryFormActivity extends AppCompatActivity {
         dialog.setOnShowListener(ignored -> dialog.getButton(AlertDialog.BUTTON_POSITIVE)
                 .setOnClickListener(view -> {
                     Integer length = parsePositiveNumber(lengthInput);
-                    Integer targetSpm = parsePositiveNumber(spmInput);
-                    if (length == null || targetSpm == null) {
+                    Integer targetSpm = parseTargetSpm(spmInput);
+                    if (length == null) {
                         showInvalidNumber();
+                        return;
+                    }
+                    if (targetSpm == null) {
+                        Toast.makeText(this, R.string.editor_target_spm_required,
+                                Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    if (targetSpm == 0 && radioStrokes.isChecked()) {
+                        Toast.makeText(this, R.string.editor_zero_spm_strokes_not_supported,
+                                Toast.LENGTH_LONG).show();
                         return;
                     }
                     if (existing == null) {
@@ -380,9 +403,18 @@ public class EntryFormActivity extends AppCompatActivity {
     }
 
     private Integer parsePositiveNumber(EditText input) {
+        Integer value = parseNonNegativeNumber(input);
+        return value != null && value > 0 ? value : null;
+    }
+
+    private Integer parseTargetSpm(EditText input) {
+        return parseNonNegativeNumber(input);
+    }
+
+    private Integer parseNonNegativeNumber(EditText input) {
         try {
             int value = Integer.parseInt(input.getText().toString().trim());
-            return value > 0 ? value : null;
+            return value >= 0 ? value : null;
         } catch (NumberFormatException exception) {
             return null;
         }
@@ -402,6 +434,7 @@ public class EntryFormActivity extends AppCompatActivity {
     }
 
     private void saveWorkout() {
+        draft.setSkipLastRest(skipLastRestCheckBox.isChecked());
         WorkoutUnit unit = getSelectedUnit();
         if (unit == null) {
             Toast.makeText(this, R.string.missing_workout_type_warning, Toast.LENGTH_LONG).show();

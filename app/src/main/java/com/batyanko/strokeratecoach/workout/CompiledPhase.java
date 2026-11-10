@@ -18,8 +18,9 @@ public final class CompiledPhase {
         if (phaseIndex < 1 || totalPhases < phaseIndex) {
             throw new IllegalArgumentException("Invalid compiled phase index");
         }
-        if (length < 1 || targetSpm < 1) {
-            throw new IllegalArgumentException("Compiled phase values must be positive");
+        if (length < 1 || targetSpm < 0) {
+            throw new IllegalArgumentException(
+                    "Compiled phase length must be positive and target SPM non-negative");
         }
         Objects.requireNonNull(repeatPath, "repeatPath");
         this.phaseIndex = phaseIndex;

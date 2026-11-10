@@ -10,7 +10,6 @@ import com.batyanko.strokeratecoach.workout.LegacyWorkoutParser;
 import com.batyanko.strokeratecoach.workout.WorkoutCompiler;
 import com.batyanko.strokeratecoach.workout.WorkoutDefinition;
 import com.batyanko.strokeratecoach.workout.WorkoutJsonCodec;
-import com.batyanko.strokeratecoach.workout.WorkoutNode;
 import com.batyanko.strokeratecoach.workout.WorkoutUnit;
 
 import java.util.List;
@@ -35,10 +34,9 @@ public final class WorkoutRecordMapper {
         String serializedTree = cursor.getString(
                 cursor.getColumnIndexOrThrow(WorkoutEntry1.COLUMN_SERIALIZED_TREE));
         if (serializedTree != null && !serializedTree.isEmpty()) {
-            List<WorkoutNode> nodes = codec.deserializeNodes(serializedTree);
             WorkoutUnit unit = WorkoutUnit.fromDbValue(cursor.getString(
                     cursor.getColumnIndexOrThrow(WorkoutEntry1.COLUMN_SPP_TYPE)));
-            WorkoutDefinition definition = new WorkoutDefinition(unit, nodes);
+            WorkoutDefinition definition = codec.deserializeDefinition(serializedTree, unit);
             compiler.compile(definition);
             return definition;
         }

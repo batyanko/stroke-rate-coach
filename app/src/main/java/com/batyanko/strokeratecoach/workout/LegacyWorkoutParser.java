@@ -19,10 +19,31 @@ public final class LegacyWorkoutParser {
         List<WorkoutNode> nodes = new ArrayList<>(lengths.length);
         for (int i = 0; i < lengths.length; i++) {
             int length = parsePositiveInteger(lengths[i], "phase length", i);
-            int targetSpm = parsePositiveInteger(targets[i], "target SPM", i);
+            int targetSpm = parseTargetSpm(targets[i], i, unit);
             nodes.add(new PhaseNode(length, targetSpm));
         }
         return new WorkoutDefinition(unit, nodes);
+    }
+
+    private int parseTargetSpm(String token, int index, WorkoutUnit unit) {
+        String trimmed = token.trim();
+        if (trimmed.isEmpty()) {
+            throw invalid("Legacy target SPM at item " + (index + 1) + " is empty");
+        }
+        final int value;
+        try {
+            value = Integer.parseInt(trimmed);
+        } catch (NumberFormatException e) {
+            throw new WorkoutValidationException(
+                    WorkoutValidationException.Code.INVALID_LEGACY_CSV,
+                    "Legacy target SPM at item " + (index + 1) + " is not a valid integer", e);
+        }
+        if (value < 0 || (value == 0 && unit == WorkoutUnit.STROKES)) {
+            throw invalid("Legacy target SPM at item " + (index + 1)
+                    + " must be positive for stroke-count workouts; zero-SPM rests require"
+                    + " a metres- or seconds-based workout");
+        }
+        return value;
     }
 
     private int parsePositiveInteger(String token, String field, int index) {

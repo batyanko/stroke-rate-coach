@@ -131,8 +131,8 @@ public final class WorkoutBackupCodec {
         }
 
         String json = decodeUtf8(jsonBytes);
-        WorkoutDefinition definition = new WorkoutDefinition(
-                WorkoutUnit.fromDbValue(record.unit), jsonCodec.deserializeNodes(json));
+        WorkoutDefinition definition = jsonCodec.deserializeDefinition(
+                json, WorkoutUnit.fromDbValue(record.unit));
         CompiledWorkout compiled = compiler.compile(definition);
         if (!joinLengths(compiled).equals(record.spp)
                 || !joinTargets(compiled).equals(record.spm)) {

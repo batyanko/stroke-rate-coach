@@ -24,6 +24,19 @@ public class BeeperTasksPayloadTest {
     }
 
     @Test
+    public void acceptsZeroSpmForMeterAndSecondRestsButNotStrokeWorkouts() {
+        assertNull(BeeperTasks.validateStartPayload(
+                new int[]{10}, new int[]{0}, new String[]{""},
+                BeeperTasks.SPP_TYPE_METERS));
+        assertNull(BeeperTasks.validateStartPayload(
+                new int[]{10}, new int[]{0}, new String[]{""},
+                BeeperTasks.SPP_TYPE_SECONDS));
+        assertNotNull(BeeperTasks.validateStartPayload(
+                new int[]{10}, new int[]{0}, new String[]{""},
+                BeeperTasks.SPP_TYPE_STROKES));
+    }
+
+    @Test
     public void rejectsMismatchedOrMissingPresetMetadata() {
         assertNotNull(BeeperTasks.validateStartPayload(
                 new int[]{10}, new int[]{22, 24}, new String[]{""},

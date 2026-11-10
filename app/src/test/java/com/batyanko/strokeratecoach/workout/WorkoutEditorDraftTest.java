@@ -45,6 +45,23 @@ public class WorkoutEditorDraftTest {
     }
 
     @Test
+    public void preservesSkipLastRestWhenSerializingAndEditingDraft() {
+        WorkoutDefinition definition = new WorkoutDefinition(WorkoutUnit.SECONDS,
+                java.util.Collections.singletonList(new RepeatNode(2,
+                        java.util.Collections.singletonList(new PhaseNode(10, 0)))),
+                true);
+
+        WorkoutEditorDraft restored = WorkoutEditorDraft.deserialize(
+                WorkoutEditorDraft.fromDefinition(definition).serialize());
+        WorkoutDefinition restoredDefinition = restored.toDefinition(WorkoutUnit.SECONDS);
+        CompiledWorkout compiled = new WorkoutCompiler().compile(restoredDefinition);
+
+        assertEquals(true, restoredDefinition.shouldSkipLastRest());
+        assertEquals(10, compiled.getPhases().get(0).getLength());
+        assertEquals(1, compiled.getTotalPhases());
+    }
+
+    @Test
     public void compilerRejectsIncompleteDraftAfterConversion() {
         WorkoutEditorDraft draft = new WorkoutEditorDraft();
         draft.addRepeat(2, "Empty set");
