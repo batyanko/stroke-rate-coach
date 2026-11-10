@@ -16,7 +16,9 @@
 
 <resources>
     <string name="app_name" translatable="false">Stroke Rate Coach</string>
-    <string name="stopper_button_text">stop</string>
+    <string name="stop_workout">Stop workout</string>
+    <string name="pause_workout">Pause workout</string>
+    <string name="resume_workout">Resume workout</string>
     <!--Depreciated: -->
     <string name="initial_spm" translatable="false">00</string>
     <string name="default_kph" translatable="false">000.0 hours/hour</string>

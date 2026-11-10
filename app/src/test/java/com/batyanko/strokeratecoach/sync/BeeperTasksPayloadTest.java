@@ -1,5 +1,6 @@
 package com.batyanko.strokeratecoach.sync;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -69,5 +70,18 @@ public class BeeperTasksPayloadTest {
                 BeeperTasks.SPP_TYPE_SECONDS));
         assertFalse(BeeperTasks.isTimePhaseComplete(targetMillis - 1, phaseLengthSeconds));
         assertTrue(BeeperTasks.isTimePhaseComplete(targetMillis, phaseLengthSeconds));
+    }
+
+    @Test
+    public void excludesPausedDurationFromElapsedPhaseClock() {
+        long phaseStartedAt = 1_000L;
+        long pausedAt = 2_000L;
+        long resumedAt = 7_000L;
+
+        long adjustedPhaseStart = BeeperTasks.adjustPhaseStartForPause(
+                phaseStartedAt, pausedAt, resumedAt);
+
+        assertEquals(1_000L, pausedAt - phaseStartedAt);
+        assertEquals(1_000L, resumedAt - adjustedPhaseStart);
     }
 }

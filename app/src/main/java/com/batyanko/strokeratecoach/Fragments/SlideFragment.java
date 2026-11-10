@@ -645,6 +645,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
     //TODO extract static method and use in Notification stopper
     public void stopBeeper() {
         pref.edit().putInt(WaveActivity.OPERATION_SETTING, WaveActivity.WORKOUT_STOP).apply();
+        pref.edit().putBoolean(WaveActivity.WORKOUT_PAUSED, false).apply();
         if (lastClickedEngageButton != null) {
             lastClickedEngageButton.setBackgroundResource(R.drawable.ic_play_4);
         }
@@ -657,6 +658,19 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         }
         intent.setAction(BeeperTasks.ACTION_STOP_BEEP);
         mBeeperService.modWorkout(intent);
+    }
+
+    public void togglePause() {
+        mBeeperService = BeeperServiceUtils.getBeeperService();
+        if (intent == null) {
+            return;
+        }
+        intent.setAction(BeeperTasks.ACTION_TOGGLE_PAUSE);
+        if (mBeeperService != null) {
+            mBeeperService.modWorkout(intent);
+            return;
+        }
+        requireActivity().startService(intent);
     }
 
     /////////////////

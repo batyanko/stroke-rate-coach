@@ -63,6 +63,7 @@ public class BeeperTasks {
     public static final String EXTRA_WORKOUT_ID = "workout-id";
     public static final String ACTION_START_BEEP = "start-beep";
     public static final String ACTION_STOP_BEEP = "stop-beep";
+    public static final String ACTION_TOGGLE_PAUSE = "toggle-pause";
     public static final String ACTION_CHECK_SERVICE = "check-service";
     public static final String ACTION_JUST_BIND = "just-bind";
     public static final String ACTION_START_WARNING = "start-warning";
@@ -132,7 +133,11 @@ public class BeeperTasks {
 
     //TODO make static?
     private long phaseStartElapsedRealtime;
+    private long pauseStartedElapsedRealtime;
     private int timeTimerPhaseProgress;
+    private int pausedPhaseProgress;
+    private int meterProgressOffset;
+    private boolean paused;
     public static int countdownCyclesTotal;
     public static int countdownCyclesElapsed;
     private int countdownCycleDuration;
@@ -202,6 +207,8 @@ public class BeeperTasks {
             }
         } else if (action.equals(ACTION_STOP_BEEP)) {
             endWorkout(beeperService);
+        } else if (action.equals(ACTION_TOGGLE_PAUSE)) {
+            togglePause();
         } else if (action.equals(ACTION_CHECK_SERVICE)) {
             if (pref == null) {
                 pref = PreferenceManager.getDefaultSharedPreferences(beeperService);
@@ -322,6 +329,10 @@ public class BeeperTasks {
         workoutRunning = WaveActivity.WORKOUT_STOP;
         countdownRunning = 0;
         phaseProgress = 0;
+        meterProgressOffset = 0;
+        pausedPhaseProgress = 0;
+        pauseStartedElapsedRealtime = 0;
+        paused = false;
         phaseTrigger = 0;
         color = 0;
         beeps = 0;
@@ -381,6 +392,7 @@ public class BeeperTasks {
                 .putInt(WaveActivity.PHASE_PROGRESS, 0)
                 .putInt(WaveActivity.PHASE_LENGTH, 0)
                 .putInt(WaveActivity.WORKOUT_LENGTH, 0)
+                .putBoolean(WaveActivity.WORKOUT_PAUSED, false)
                 .apply();
         pref.edit().putBoolean(WaveActivity.GPS_LOCKING, false).apply();
         flushUI();
@@ -429,6 +441,9 @@ public class BeeperTasks {
                 public void run() {
                     synchronized (runLock) {
                         if (!isCurrentRun(generation)) {
+                            return;
+                        }
+                        if (paused) {
                             return;
                         }
 
@@ -529,6 +544,9 @@ public class BeeperTasks {
                     if (!isCurrentRun(generation)) {
                         return;
                     }
+                    if (paused) {
+                        return;
+                    }
                     long elapsedMillis = SystemClock.elapsedRealtime()
                             - phaseStartElapsedRealtime;
                     if (isTimePhaseComplete(elapsedMillis, phaseTrigger)) {
@@ -568,6 +586,45 @@ public class BeeperTasks {
         return elapsedMillis >= targetMillis;
     }
 
+    static long adjustPhaseStartForPause(long phaseStartElapsedRealtime,
+                                         long pauseStartedElapsedRealtime,
+                                         long resumedElapsedRealtime) {
+        return phaseStartElapsedRealtime
+                + (resumedElapsedRealtime - pauseStartedElapsedRealtime);
+    }
+
+    private void togglePause() {
+        synchronized (runLock) {
+            if (activeRun == null) {
+                return;
+            }
+            if (!paused) {
+                paused = true;
+                pauseStartedElapsedRealtime = SystemClock.elapsedRealtime();
+                pausedPhaseProgress = phaseProgress;
+                pref.edit().putBoolean(WaveActivity.WORKOUT_PAUSED, true).apply();
+                return;
+            }
+
+            long resumedElapsedRealtime = SystemClock.elapsedRealtime();
+            phaseStartElapsedRealtime = adjustPhaseStartForPause(
+                    phaseStartElapsedRealtime, pauseStartedElapsedRealtime,
+                    resumedElapsedRealtime);
+            if (SPP_TYPE_METERS.equals(mSppType)) {
+                meterProgressOffset = pausedPhaseProgress;
+                if (currentLocation != null) {
+                    startingPhaseLocation = currentLocation;
+                }
+                locationPool = new CLocation[speedSampleCount];
+                locCycleCount = 0;
+                locationPoolIsFull = false;
+            }
+            paused = false;
+            pauseStartedElapsedRealtime = 0;
+            pref.edit().putBoolean(WaveActivity.WORKOUT_PAUSED, false).apply();
+        }
+    }
+
     private void startSpeedLimit(final BeeperService beeperService) {
         long generation;
         synchronized (runLock) {
@@ -581,6 +638,9 @@ public class BeeperTasks {
             public void run() {
                 synchronized (runLock) {
                     if (!isCurrentRun(generation)) {
+                        return;
+                    }
+                    if (paused) {
                         return;
                     }
                     pref.edit().putInt(WaveActivity.WARN, ++warns).apply();
@@ -601,6 +661,9 @@ public class BeeperTasks {
             public void run() {
                 synchronized (runLock) {
                     if (!isCurrentRun(generation)) {
+                        return;
+                    }
+                    if (paused) {
                         return;
                     }
                     if (pref.getBoolean(WaveActivity.GPS_LOCKING, false)) {
@@ -672,6 +735,7 @@ public class BeeperTasks {
         phaseStartElapsedRealtime = SystemClock.elapsedRealtime();
         phaseTrigger = lengthTrigger;
         spm = tempo;
+        meterProgressOffset = 0;
 
         if (Objects.equals(mSppType, SPP_TYPE_METERS)) {
             startingPhaseLocation = currentLocation;
@@ -830,8 +894,9 @@ public class BeeperTasks {
 
                 if (startingPhaseLocation == null && locationAccuracy <= acceptableAccuracy) {
                     completeLocking();
-                } else if (startingPhaseLocation != null) {
-                    phaseProgress = (int) location.distanceTo(startingPhaseLocation);
+                } else if (!paused && startingPhaseLocation != null) {
+                    phaseProgress = meterProgressOffset
+                            + (int) location.distanceTo(startingPhaseLocation);
                 }
             }
         }
@@ -851,7 +916,9 @@ public class BeeperTasks {
                 }
                 CLocation myLocation = new CLocation(location, this.useMetricUnits());
                 this.updateLocation(myLocation);
-                updateAverageSpeed();
+                if (!paused) {
+                    updateAverageSpeed();
+                }
             }
         }
 

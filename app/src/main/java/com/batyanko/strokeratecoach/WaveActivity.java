@@ -46,6 +46,7 @@ import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.ImageButton;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -107,6 +108,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
 
     public static final String PHASE_LENGTH = "phase-length";
     public static final String WORKOUT_LENGTH = "workout-length";
+    public static final String WORKOUT_PAUSED = "workout-paused";
     public static final String PHASE_PROGRESS = "phase-strokes-elapsed";
     public static final String WORKOUT_PROGRESS = "total-strokes-elapsed";
     public static final String PHASE_INDEX = "phase-index";
@@ -153,7 +155,8 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
     private TextView speedView;
     private TextView speedLimitView;
     private Spinner speedUnitSpinner;
-    private TextView stopperButton;
+    private ImageButton stopperButton;
+    private ImageButton pauseButton;
 
     private static Animation beeperAnimation;
     public static Animation warningAnimation;
@@ -286,6 +289,8 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
             slideFragment.stopBeeper();
             flushGUI();
         });
+        pauseButton = findViewById(R.id.pause_button);
+        pauseButton.setOnClickListener(view -> slideFragment.togglePause());
 
         String[] speeds = {SPEED_MS_SETTING, SPEED_500M_SETTING};
         String initSpeedUnit = pref.getString(SPEED_UNIT, SPEED_MS_SETTING);
@@ -451,6 +456,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
         } else {
             workoutRunning = pref.getInt(OPERATION_SETTING, WORKOUT_STOP);
         }
+        updatePauseButton();
         flushGUI();
     }
 
@@ -608,6 +614,8 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
                     break;
                 }
             }
+        } else if (s.equals(WORKOUT_PAUSED)) {
+            updatePauseButton();
         } else if (s.equals(PHASE_PROGRESS)
                 || s.equals(PHASE_LENGTH)
                 || s.equals(PHASE_INDEX)
@@ -628,6 +636,7 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
             } catch (NumberFormatException e) {
                 duration = 3;
             }
+
             int durationLeft = sharedPreferences.getInt(COUNTDOWN_DURATION_LEFT, 0) / 1000;
             String countdownString = durationLeft + "";
             if (durationLeft == 0) {
@@ -710,6 +719,17 @@ public class WaveActivity extends AppCompatActivity implements SharedPreferences
             speedView.startAnimation(warningAnimation);
             speedLimitView.startAnimation(warningAnimation);
         }
+    }
+
+    private void updatePauseButton() {
+        if (pauseButton == null || pref == null) {
+            return;
+        }
+        boolean paused = pref.getBoolean(WORKOUT_PAUSED, false);
+        pauseButton.setImageResource(paused
+                ? R.drawable.ic_workout_resume : R.drawable.ic_workout_pause);
+        pauseButton.setContentDescription(getString(
+                paused ? R.string.resume_workout : R.string.pause_workout));
     }
 
     /**
