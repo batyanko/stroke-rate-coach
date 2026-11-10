@@ -83,7 +83,10 @@
                 android:gravity="center"
                 android:textAlignment="center"
                 android:textColor="@android:color/white"
-                android:textSize="24sp" />
+                android:textSize="14sp"
+                android:maxLines="2"
+                android:ellipsize="middle"
+                android:lineSpacingExtra="0dp" />
 
         </FrameLayout>
 
