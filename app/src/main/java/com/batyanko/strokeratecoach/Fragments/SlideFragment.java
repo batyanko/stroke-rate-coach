@@ -425,11 +425,17 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
             int workoutId = cursor.getInt(cursor.getColumnIndexOrThrow(WorkoutEntry1._ID));
             int[] sppInts = new int[compiled.getPhases().size()];
             int[] gearInts = new int[compiled.getPhases().size()];
+            String[] breadcrumbs = new String[compiled.getPhases().size()];
             for (int i = 0; i < compiled.getPhases().size(); i++) {
                 CompiledPhase phase = compiled.getPhases().get(i);
                 sppInts[i] = phase.getLength();
                 gearInts[i] = phase.getTargetSpm();
+                breadcrumbs[i] = phase.getBreadcrumb();
             }
+
+            stopBeeper();
+            lastClickedEngageButton = view;
+            lastWorkoutId = workoutId;
 
             ContentValues historyValues = new ContentValues();
             historyValues.put(WorkoutEntry1.COLUMN_NAME, name);
@@ -439,10 +445,6 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
                 WaveUtilities.ShowLongToast("Could not save workout history.", getContext());
                 return;
             }
-
-            stopBeeper();
-            lastClickedEngageButton = view;
-            lastWorkoutId = workoutId;
 
             //Highlight last clicked start icon
             switch (tableName) {
@@ -460,7 +462,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
             refresh(tableName);
 
             // Start beeping?
-            initIntent(sppInts, gearInts, sppType);
+            initIntent(sppInts, gearInts, breadcrumbs, sppType);
         }
     }
 
@@ -595,7 +597,7 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
             firstDigitView.setBackgroundColor(Color.TRANSPARENT);
             spm = firstDigit * 10 + digitalInput;
             int[] gearArray = new int[]{spm};
-            initIntent(null, gearArray, BeeperTasks.SPP_TYPE_STROKES);
+            initIntent(null, gearArray, null, BeeperTasks.SPP_TYPE_STROKES);
             firstDigit = 0;
 
         } else {
@@ -615,11 +617,13 @@ public class SlideFragment extends Fragment implements SvAdapter.ListItemClickLi
         }
     }
 
-    private void initIntent(int[] sppSettings, int[] gearSettings, String sppType) {
+    private void initIntent(int[] phaseLengths, int[] targetSpms,
+                            String[] breadcrumbs, String sppType) {
 
         intent.setAction(BeeperTasks.ACTION_START_BEEP);
-        intent.putExtra(BeeperTasks.EXTRA_WORKOUT_SPP, sppSettings);
-        intent.putExtra(BeeperTasks.EXTRA_WORKOUT_GEARS, gearSettings);
+        intent.putExtra(BeeperTasks.EXTRA_PHASE_LENGTHS, phaseLengths);
+        intent.putExtra(BeeperTasks.EXTRA_TARGET_SPMS, targetSpms);
+        intent.putExtra(BeeperTasks.EXTRA_PHASE_BREADCRUMBS, breadcrumbs);
         intent.putExtra(BeeperTasks.EXTRA_WORKOUT_SPP_TYPE, sppType);
 
         startBeeper();

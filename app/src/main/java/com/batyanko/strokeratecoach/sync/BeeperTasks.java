@@ -53,9 +53,10 @@ import java.util.TimerTask;
 
 public class BeeperTasks {
 
-    public static final String EXTRA_WORKOUT_SPP = "workout_spp";   //Units per phase
-    public static final String EXTRA_WORKOUT_GEARS = "workout_gears";
     public static final String EXTRA_WORKOUT_SPP_TYPE = "workout-spp-type";
+    public static final String EXTRA_PHASE_LENGTHS = "phase_lengths";
+    public static final String EXTRA_TARGET_SPMS = "target_spms";
+    public static final String EXTRA_PHASE_BREADCRUMBS = "phase_breadcrumbs";
     public static final String EXTRA_WORKOUT_ID = "workout-id";
     public static final String ACTION_START_BEEP = "start-beep";
     public static final String ACTION_STOP_BEEP = "stop-beep";
@@ -109,6 +110,7 @@ public class BeeperTasks {
     private static int[] sppSettings;
 
     private static int[] gearSettings;
+    private static String[] phaseBreadcrumbs;
 
     private static SharedPreferences pref;
 
@@ -151,8 +153,18 @@ public class BeeperTasks {
     private static boolean warningIsRunning = false;
 
     void executeTask(BeeperService beeperService, String action,
-                     int[] sppSettings, int[] gearSettings, String sppType) {
+                     int[] phaseLengths, int[] targetSpms,
+                     String[] breadcrumbs, String sppType) {
         if (action.equals(ACTION_START_BEEP)) {
+            String invalidPayload = validateStartPayload(
+                    phaseLengths, targetSpms, breadcrumbs, sppType);
+            if (invalidPayload != null) {
+                Log.e("BeeperTasks", "Rejected workout start payload: " + invalidPayload);
+                Toast.makeText(beeperService, "Workout could not start: " + invalidPayload,
+                        LENGTH_LONG).show();
+                return;
+            }
+
             NotificationUtils.showWorkoutNotification(beeperService);
             mSppType = sppType;
             initBeeper(beeperService);
@@ -172,26 +184,28 @@ public class BeeperTasks {
                 startTimeTimerTask(beeperService);
             }
 
-            if (gearSettings != null) {
-                if (sppSettings == null) {  //Manual SPM setting
-                    //TODO show speed?
-                    workoutRunning = WaveActivity.WORKOUT_SIMPLE;
-                    flushUI();
-                    spm = gearSettings[0];
-                    startTheTempo(beeperService);
-                } else {                    //Preset workout
-                    workoutRunning = WaveActivity.WORKOUT_INTERVAL;
-                    pref.edit().putInt(WaveActivity.OPERATION_SETTING, workoutRunning).apply();
-                    BeeperTasks.sppSettings = sppSettings;
-                    BeeperTasks.gearSettings = gearSettings;
-                    workoutLength = 0;
-                    for (int i : sppSettings) {
-                        workoutLength += i;     //Be it strokes, metres or seconds
-                    }
-                    pref.edit().putInt(WaveActivity.WORKOUT_LENGTH, workoutLength).apply();
-                    startCountdown(beeperService);
-                }
+            if (phaseLengths == null) {
+                workoutRunning = WaveActivity.WORKOUT_SIMPLE;
+                flushUI();
+                sppSettings = null;
+                gearSettings = targetSpms;
+                phaseBreadcrumbs = null;
+                spm = targetSpms[0];
+                startTheTempo(beeperService);
+                return;
             }
+
+            workoutRunning = WaveActivity.WORKOUT_INTERVAL;
+            pref.edit().putInt(WaveActivity.OPERATION_SETTING, workoutRunning).apply();
+            sppSettings = phaseLengths;
+            gearSettings = targetSpms;
+            phaseBreadcrumbs = breadcrumbs;
+            workoutLength = 0;
+            for (int length : phaseLengths) {
+                workoutLength += length;
+            }
+            pref.edit().putInt(WaveActivity.WORKOUT_LENGTH, workoutLength).apply();
+            startCountdown(beeperService);
         } else if (action.equals(ACTION_STOP_BEEP)) {
             endWorkout(beeperService);
         } else if (action.equals(ACTION_CHECK_SERVICE)) {
@@ -208,6 +222,40 @@ public class BeeperTasks {
             cancelTimer(speedLimitTimer, speedLimitTimerTask);
             warningIsRunning = false;
         }
+    }
+
+    static String validateStartPayload(int[] phaseLengths, int[] targetSpms,
+                                       String[] breadcrumbs, String sppType) {
+        if (!SPP_TYPE_STROKES.equals(sppType)
+                && !SPP_TYPE_METERS.equals(sppType)
+                && !SPP_TYPE_SECONDS.equals(sppType)) {
+            return "unknown workout unit";
+        }
+        if (phaseLengths == null) {
+            if (!SPP_TYPE_STROKES.equals(sppType) || targetSpms == null
+                    || targetSpms.length != 1 || breadcrumbs != null) {
+                return "invalid manual-pace data";
+            }
+            return targetSpms[0] > 0 ? null : "target SPM must be positive";
+        }
+        if (phaseLengths.length < 1 || phaseLengths.length > 500
+                || targetSpms == null || breadcrumbs == null
+                || phaseLengths.length != targetSpms.length
+                || phaseLengths.length != breadcrumbs.length) {
+            return "phase arrays must contain 1 to 500 matching entries";
+        }
+
+        long totalLength = 0;
+        for (int i = 0; i < phaseLengths.length; i++) {
+            if (phaseLengths[i] < 1 || targetSpms[i] < 1 || breadcrumbs[i] == null) {
+                return "phase lengths and target SPM must be positive";
+            }
+            totalLength += phaseLengths[i];
+            if (totalLength > Integer.MAX_VALUE) {
+                return "total workout length exceeds the supported maximum";
+            }
+        }
+        return null;
     }
 
     private void initBeeper(BeeperService beeperService) {
