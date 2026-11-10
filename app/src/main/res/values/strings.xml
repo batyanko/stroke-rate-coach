@@ -39,6 +39,7 @@
     <string name="strokes">strokes</string>
     <string name="workout_unit_choose_title">Choose workout unit:</string>
     <string name="empty_workout_warning">Empty workout not created.</string>
+    <string name="nested_workout_edit_not_supported">Nested workouts cannot be edited in this version.</string>
     <string name="missing_workout_type_warning">Please select workout unit (strokes, meters or seconds)</string>
     <string name="entry_form_label">Enter new workout</string>
     <string name="workout_in_progress">Workout in progress</string>

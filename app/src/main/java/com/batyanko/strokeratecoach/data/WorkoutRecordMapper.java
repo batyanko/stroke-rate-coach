@@ -64,6 +64,19 @@ public final class WorkoutRecordMapper {
         values.put(WorkoutEntry1.COLUMN_GEARS_CSV, joinTargets(compiled));
     }
 
+    public void copyDefinition(Cursor source, ContentValues destination) {
+        Objects.requireNonNull(source, "source");
+        Objects.requireNonNull(destination, "destination");
+
+        String serializedTree = source.getString(
+                source.getColumnIndexOrThrow(WorkoutEntry1.COLUMN_SERIALIZED_TREE));
+        WorkoutDefinition definition = readDefinition(source);
+        putDefinition(destination, definition);
+        if (serializedTree != null && !serializedTree.isEmpty()) {
+            destination.put(WorkoutEntry1.COLUMN_SERIALIZED_TREE, serializedTree);
+        }
+    }
+
     private String joinLengths(CompiledWorkout workout) {
         StringBuilder values = new StringBuilder();
         for (CompiledPhase phase : workout.getPhases()) {

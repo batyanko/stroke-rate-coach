@@ -223,6 +223,50 @@ public class WorkoutDBHelperMigrationTest {
         }
     }
 
+    @Test
+    public void mapperCopiesExactValidTreeAndCanonicalizesLegacyRows() {
+        SQLiteDatabase database = openFreshDatabase();
+        WorkoutDefinition nestedDefinition = new WorkoutDefinition(WorkoutUnit.SECONDS,
+                Collections.singletonList(new RepeatNode(
+                        2, "Set", Collections.singletonList(new PhaseNode(60, 22)))));
+        ContentValues nestedValues = new ContentValues();
+        nestedValues.put(COLUMN_NAME, "Nested source");
+        newMapper().putDefinition(nestedValues, nestedDefinition);
+        String originalTree = nestedValues.getAsString(COLUMN_SERIALIZED_TREE);
+        String spacedTree = originalTree.replace(",", ", ");
+        nestedValues.put(COLUMN_SERIALIZED_TREE, spacedTree);
+        long nestedId = database.insertOrThrow(TABLE_NAME_HISTORY, null, nestedValues);
+
+        ContentValues legacyValues = new ContentValues();
+        legacyValues.put(COLUMN_NAME, "Legacy source");
+        legacyValues.put(COLUMN_DESC, "Legacy");
+        legacyValues.put(COLUMN_TIMESTAMP, "2022-01-02 03:04:05");
+        legacyValues.put(COLUMN_SPP_TYPE, "0");
+        legacyValues.put(COLUMN_SPP_CSV, "10,20");
+        legacyValues.put(COLUMN_GEARS_CSV, "22,24");
+        legacyValues.putNull(COLUMN_SERIALIZED_TREE);
+        long legacyId = database.insertOrThrow(TABLE_NAME_HISTORY, null, legacyValues);
+
+        WorkoutRecordMapper mapper = newMapper();
+        ContentValues nestedCopy = new ContentValues();
+        try (Cursor cursor = database.query(TABLE_NAME_HISTORY, null,
+                _ID + " = ?", new String[]{Long.toString(nestedId)}, null, null, null)) {
+            assertTrue(cursor.moveToFirst());
+            mapper.copyDefinition(cursor, nestedCopy);
+        }
+        assertEquals(spacedTree, nestedCopy.getAsString(COLUMN_SERIALIZED_TREE));
+
+        ContentValues legacyCopy = new ContentValues();
+        try (Cursor cursor = database.query(TABLE_NAME_HISTORY, null,
+                _ID + " = ?", new String[]{Long.toString(legacyId)}, null, null, null)) {
+            assertTrue(cursor.moveToFirst());
+            mapper.copyDefinition(cursor, legacyCopy);
+        }
+        assertNotNull(legacyCopy.getAsString(COLUMN_SERIALIZED_TREE));
+        assertEquals("10,20", legacyCopy.getAsString(COLUMN_SPP_CSV));
+        assertEquals("22,24", legacyCopy.getAsString(COLUMN_GEARS_CSV));
+    }
+
     private SQLiteDatabase openFreshDatabase() {
         helper = new WorkoutDBHelper(context);
         return helper.getWritableDatabase();

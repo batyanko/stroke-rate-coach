@@ -16,7 +16,6 @@
 
 package com.batyanko.strokeratecoach;
 
-import static android.text.TextUtils.join;
 import static com.batyanko.strokeratecoach.WaveActivity.THEME_COLOR;
 import static com.batyanko.strokeratecoach.sync.BeeperTasks.EXTRA_WORKOUT_ID;
 
@@ -41,10 +40,20 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.batyanko.strokeratecoach.data.WorkoutContract;
 import com.batyanko.strokeratecoach.data.WorkoutDBHelper;
+import com.batyanko.strokeratecoach.data.WorkoutRecordMapper;
 import com.batyanko.strokeratecoach.sync.BeeperTasks;
+import com.batyanko.strokeratecoach.workout.CompiledPhase;
+import com.batyanko.strokeratecoach.workout.CompiledWorkout;
+import com.batyanko.strokeratecoach.workout.LegacyWorkoutParser;
+import com.batyanko.strokeratecoach.workout.PhaseNode;
+import com.batyanko.strokeratecoach.workout.WorkoutCompiler;
+import com.batyanko.strokeratecoach.workout.WorkoutDefinition;
+import com.batyanko.strokeratecoach.workout.WorkoutJsonCodec;
+import com.batyanko.strokeratecoach.workout.WorkoutNode;
+import com.batyanko.strokeratecoach.workout.WorkoutUnit;
+import com.batyanko.strokeratecoach.workout.WorkoutValidationException;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class EntryFormActivity extends AppCompatActivity {
@@ -53,8 +62,8 @@ public class EntryFormActivity extends AppCompatActivity {
     private EditText descEt;
     Button addPhaseButton;
     Button createWorkoutButton;
-    private static int numberOfLines;
-    private static boolean editMode;
+    private int numberOfLines;
+    private boolean editMode;
 
     RadioGroup rGroup;
     RadioButton radioStrokes;
@@ -66,6 +75,7 @@ public class EntryFormActivity extends AppCompatActivity {
     LinearLayout lb;
 
     private SQLiteDatabase mDb;
+    private WorkoutRecordMapper recordMapper;
 
     List<EditText> sppEditTexts;
     List<EditText> gearEditTexts;
@@ -89,6 +99,10 @@ public class EntryFormActivity extends AppCompatActivity {
 
         WorkoutDBHelper presetDbHelper = new WorkoutDBHelper(this);
         mDb = presetDbHelper.getWritableDatabase();
+        recordMapper = new WorkoutRecordMapper(
+                new WorkoutJsonCodec(),
+                new LegacyWorkoutParser(),
+                new WorkoutCompiler());
 
         rGroup = findViewById(R.id.create_workout_radio_group);
         radioStrokes = findViewById(R.id.radio_strokes);
@@ -102,60 +116,64 @@ public class EntryFormActivity extends AppCompatActivity {
 
         workoutId = intent.getStringExtra(EXTRA_WORKOUT_ID);
 
-        String sppCSV;
-        String gearCSV;
-
         // In case we are editing...
         if (workoutId != null && !workoutId.isEmpty()) {
             editMode = true;
-            Cursor cursor = getPreset(mDb, workoutId);
-            if (cursor.getCount() <= 0) {
-                // TODO Bail
-            }
-
-            cursor.moveToFirst();
-
-            int cIdxName = cursor.getColumnIndex(WorkoutContract.WorkoutEntry1.COLUMN_NAME);
-            String workoutName = cursor.getString(cIdxName);
-            nameEt.setText(workoutName);
-
-            int cIdxDesc = cursor.getColumnIndex(WorkoutContract.WorkoutEntry1.COLUMN_DESC);
-            String workoutDesc = cursor.getString(cIdxDesc);
-            descEt.setText(workoutDesc);
-
-            int cIdxType = cursor.getColumnIndex(WorkoutContract.WorkoutEntry1.COLUMN_SPP_TYPE);
-            String workoutType = cursor.getString(cIdxType);
-            switch (workoutType) {
-                case BeeperTasks.SPP_TYPE_STROKES:
-                    radioStrokes.toggle();
-                    break;
-                case BeeperTasks.SPP_TYPE_METERS:
-                    radioMeters.toggle();
-                    break;
-                case BeeperTasks.SPP_TYPE_SECONDS:
-                    radioSeconds.toggle();
-                    break;
-                default:
-                    //TODO bail
-            }
-
-            int cIdxSpp = cursor.getColumnIndex(WorkoutContract.WorkoutEntry1.COLUMN_SPP_CSV);
-            sppCSV = cursor.getString(cIdxSpp);
-
-            int cIdxGears = cursor.getColumnIndex(WorkoutContract.WorkoutEntry1.COLUMN_GEARS_CSV);
-            gearCSV = cursor.getString(cIdxGears);
-
-            final String[] gears = gearCSV.split("\\s*,\\s*");
-            final String[] spp = sppCSV.split("\\s*,\\s*");
-
-            for (int i = 0; i < gears.length; i++) {
-                addLine(spp[i], gears[i]);
-            }
-            cursor.close();
+            loadPresetForEditing(workoutId);
             return;
         }
         //...or else start with blank form.
         addLine("", "");
+    }
+
+    private void loadPresetForEditing(String id) {
+        try (Cursor cursor = getPreset(mDb, id)) {
+            if (!cursor.moveToFirst()) {
+                Toast.makeText(this, R.string.preset_add_failed, Toast.LENGTH_LONG).show();
+                finish();
+                return;
+            }
+
+            nameEt.setText(cursor.getString(cursor.getColumnIndexOrThrow(
+                    WorkoutContract.WorkoutEntry1.COLUMN_NAME)));
+            descEt.setText(cursor.getString(cursor.getColumnIndexOrThrow(
+                    WorkoutContract.WorkoutEntry1.COLUMN_DESC)));
+
+            WorkoutDefinition definition = recordMapper.readDefinition(cursor);
+            for (WorkoutNode node : definition.getNodes()) {
+                if (!(node instanceof PhaseNode)) {
+                    Toast.makeText(this, R.string.nested_workout_edit_not_supported,
+                            Toast.LENGTH_LONG).show();
+                    finish();
+                    return;
+                }
+            }
+            selectUnit(definition.getUnit());
+            CompiledWorkout compiled = new WorkoutCompiler().compile(definition);
+            for (CompiledPhase phase : compiled.getPhases()) {
+                addLine(Integer.toString(phase.getLength()),
+                        Integer.toString(phase.getTargetSpm()));
+            }
+        } catch (WorkoutValidationException exception) {
+            Toast.makeText(this, exception.getMessage(), Toast.LENGTH_LONG).show();
+            finish();
+        }
+    }
+
+    private void selectUnit(WorkoutUnit unit) {
+        switch (unit) {
+            case STROKES:
+                rGroup.check(radioStrokes.getId());
+                return;
+            case METERS:
+                rGroup.check(radioMeters.getId());
+                return;
+            case SECONDS:
+                rGroup.check(radioSeconds.getId());
+                return;
+            default:
+                throw new IllegalStateException("Unsupported workout unit: " + unit);
+        }
     }
 
     private void addLine(String spp, String gear) {
@@ -235,188 +253,115 @@ public class EntryFormActivity extends AppCompatActivity {
         lb.addView(createWorkoutButton);
     }
 
-    private View.OnClickListener CreateButtonListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
+    private final View.OnClickListener CreateButtonListener = view -> saveWorkout(false);
+    private final View.OnClickListener EditButtonListener = view -> saveWorkout(true);
 
-            String sppType = getSPPFromRadio();
-
-            //Don't create training if no SPP type selected
-            if (sppType.equals("9")) {
-                Toast.makeText(EntryFormActivity.this, R.string.missing_workout_type_warning, Toast.LENGTH_LONG).show();
-                return;
-            }
-
-            nameEt = EntryFormActivity.this.findViewById(R.id.workout_name_et);
-            String name = nameEt.getText().toString();
-            descEt = EntryFormActivity.this.findViewById(R.id.workout_desc_et);
-            String desc = descEt.getText().toString();
-
-            String[] spp = new String[numberOfLines];
-            String[] gears = new String[numberOfLines];
-            int j = 0;
-            boolean emptyLinesExist = false;
-
-            for (int i = 1; i <= numberOfLines; i++) {
-
-                String sppString = sppEditTexts.get(i - 1).getText().toString();
-                String gearString = gearEditTexts.get(i - 1).getText().toString();
-
-                //Skip phases with empty data
-                if (sppString.length() == 0 || gearString.length() == 0) {
-                    emptyLinesExist = true;
-                    continue;
-                }
-
-                j++;
-
-                spp[j - 1] = sppString;
-                gears[j - 1] = gearString;
-            }
-
-            String emptyPhasesPresent = "";
-            //Check for empty lines or an empty workout
-            if (j == 0) {
-                Toast.makeText(
-                        EntryFormActivity.this,
-                        R.string.empty_workout_warning,
-                        Toast.LENGTH_LONG).show();
-                return;
-            } else if (emptyLinesExist) {
-
-                emptyPhasesPresent = getResources().getString(R.string.empty_data_notification) + " ";
-            }
-
-            String[] sppResized = Arrays.copyOfRange(spp, 0, j);
-            String[] gearsResized = Arrays.copyOfRange(gears, 0, j);
-
-            long i = addPreset(
-                    mDb,
-                    name,
-                    desc,
-                    join(",", sppResized),
-                    join(",", gearsResized),
-                    sppType);
-            Toast.makeText(EntryFormActivity.this,
-                    emptyPhasesPresent + getString(R.string.preset_added),
-                    Toast.LENGTH_LONG).show();
-            finish();
+    private void saveWorkout(boolean editing) {
+        String sppType = getSPPFromRadio();
+        if ("9".equals(sppType)) {
+            Toast.makeText(this, R.string.missing_workout_type_warning, Toast.LENGTH_LONG).show();
+            return;
         }
-    };
-    private View.OnClickListener EditButtonListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
 
-            String sppType = getSPPFromRadio();
+        if (!hasCompletePhase()) {
+            Toast.makeText(this, R.string.empty_workout_warning, Toast.LENGTH_LONG).show();
+            return;
+        }
+        boolean incompletePhasesExist = hasIncompletePhase();
 
-            //Don't create training if no SPP type selected
-            if (sppType.equals("9")) {
-                Toast.makeText(EntryFormActivity.this, R.string.missing_workout_type_warning, Toast.LENGTH_LONG).show();
-                return;
-            }
+        ContentValues values = new ContentValues();
+        try {
+            WorkoutDefinition definition = readDefinitionFromForm(sppType);
+            recordMapper.putDefinition(values, definition);
+        } catch (WorkoutValidationException exception) {
+            Toast.makeText(this, exception.getMessage(), Toast.LENGTH_LONG).show();
+            return;
+        }
 
-            nameEt = EntryFormActivity.this.findViewById(R.id.workout_name_et);
-            String name = nameEt.getText().toString();
-            descEt = EntryFormActivity.this.findViewById(R.id.workout_desc_et);
-            String desc = descEt.getText().toString();
+        values.put(WorkoutContract.WorkoutEntry1.COLUMN_NAME, nameEt.getText().toString());
+        values.put(WorkoutContract.WorkoutEntry1.COLUMN_DESC, descEt.getText().toString());
 
-            String[] spp = new String[numberOfLines];
-            String[] gears = new String[numberOfLines];
-            int j = 0;
-            boolean emptyLinesExist = false;
-
-            for (int i = 1; i <= numberOfLines; i++) {
-
-                String sppString = sppEditTexts.get(i - 1).getText().toString();
-                String gearString = gearEditTexts.get(i - 1).getText().toString();
-
-                //Skip phases with empty data
-                if (sppString.length() == 0 || gearString.length() == 0) {
-                    emptyLinesExist = true;
-                    continue;
-                }
-
-                j++;
-
-                spp[j - 1] = sppString;
-                gears[j - 1] = gearString;
-            }
-
-            String emptyPhasesPresent = "";
-            //Check for empty lines or an empty workout
-            if (j == 0) {
-                Toast.makeText(
-                        EntryFormActivity.this,
-                        R.string.empty_workout_warning,
-                        Toast.LENGTH_LONG).show();
-                return;
-            } else if (emptyLinesExist) {
-
-                emptyPhasesPresent = getResources().getString(R.string.empty_data_notification) + " ";
-            }
-
-            String[] sppResized = Arrays.copyOfRange(spp, 0, j);
-            String[] gearsResized = Arrays.copyOfRange(gears, 0, j);
-
-            long i = updatePreset(
-                    mDb,
-                    workoutId,
-                    name,
-                    desc,
-                    join(",", sppResized),
-                    join(",", gearsResized),
-                    sppType);
-            if (i > 0) {
-                Toast.makeText(EntryFormActivity.this,
-                        emptyPhasesPresent + getString(R.string.preset_added),
-                        Toast.LENGTH_LONG).show();
+        long result;
+        if (editing) {
+            result = mDb.update(WorkoutContract.WorkoutEntry1.TABLE_NAME_PRESETS,
+                    values,
+                    WorkoutContract.WorkoutEntry1._ID + " = ?",
+                    new String[]{workoutId});
+            if (result > 0) {
                 updateTimestamp(mDb, workoutId);
-            } else {
-                Toast.makeText(EntryFormActivity.this, getString(R.string.preset_add_failed),
-                        Toast.LENGTH_LONG).show();
             }
-            finish();
+        } else {
+            result = mDb.insert(WorkoutContract.WorkoutEntry1.TABLE_NAME_PRESETS, null, values);
         }
-    };
 
-    // TODO use same SQLite methods from all activities?
-    private long addPreset(SQLiteDatabase db, String name, String description,
-                           String spp, String gears, String sppType) {
-        ContentValues cv = new ContentValues();
-        cv.put(WorkoutContract.WorkoutEntry1.COLUMN_NAME, name);
-        cv.put(WorkoutContract.WorkoutEntry1.COLUMN_DESC, description);
-        cv.put(WorkoutContract.WorkoutEntry1.COLUMN_SPP_CSV, spp);
-        cv.put(WorkoutContract.WorkoutEntry1.COLUMN_GEARS_CSV, gears);
-        cv.put(WorkoutContract.WorkoutEntry1.COLUMN_SPP_TYPE, sppType);
-        return db.insert(WorkoutContract.WorkoutEntry1.TABLE_NAME_PRESETS, null, cv);
+        if (result > 0) {
+            String message = incompletePhasesExist
+                    ? getString(R.string.empty_data_notification) + " "
+                    : "";
+            Toast.makeText(this, message + getString(R.string.preset_added),
+                    Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(this, R.string.preset_add_failed, Toast.LENGTH_LONG).show();
+            return;
+        }
+        finish();
     }
 
-    private long updatePreset(SQLiteDatabase db, String workoutId, String name, String description,
-                              String spp, String gears, String sppType) {
-        ContentValues cv = new ContentValues();
-        cv.put(WorkoutContract.WorkoutEntry1.COLUMN_NAME, name);
-        cv.put(WorkoutContract.WorkoutEntry1.COLUMN_DESC, description);
-        cv.put(WorkoutContract.WorkoutEntry1.COLUMN_SPP_CSV, spp);
-        cv.put(WorkoutContract.WorkoutEntry1.COLUMN_GEARS_CSV, gears);
-        cv.put(WorkoutContract.WorkoutEntry1.COLUMN_SPP_TYPE, sppType);
-        return db.update(WorkoutContract.WorkoutEntry1.TABLE_NAME_PRESETS,
-                cv,
-                WorkoutContract.WorkoutEntry1._ID + " = " + workoutId + ";",
-                null);
+    private WorkoutDefinition readDefinitionFromForm(String sppType) {
+        StringBuilder lengths = new StringBuilder();
+        StringBuilder targets = new StringBuilder();
+        for (int i = 0; i < numberOfLines; i++) {
+            String length = sppEditTexts.get(i).getText().toString().trim();
+            String target = gearEditTexts.get(i).getText().toString().trim();
+            if (length.isEmpty() || target.isEmpty()) {
+                continue;
+            }
+            appendCsv(lengths, length);
+            appendCsv(targets, target);
+        }
+        return new LegacyWorkoutParser().parse(
+                lengths.toString(), targets.toString(), sppType);
+    }
+
+    private boolean hasCompletePhase() {
+        for (int i = 0; i < numberOfLines; i++) {
+            if (!sppEditTexts.get(i).getText().toString().trim().isEmpty()
+                    && !gearEditTexts.get(i).getText().toString().trim().isEmpty()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean hasIncompletePhase() {
+        for (int i = 0; i < numberOfLines; i++) {
+            if (sppEditTexts.get(i).getText().toString().trim().isEmpty()
+                    || gearEditTexts.get(i).getText().toString().trim().isEmpty()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void appendCsv(StringBuilder values, String value) {
+        if (values.length() > 0) {
+            values.append(',');
+        }
+        values.append(value);
     }
 
     private void updateTimestamp(SQLiteDatabase db, String wId) {
-        String updd = "UPDATE " + WorkoutContract.WorkoutEntry1.TABLE_NAME_PRESETS +
+        db.execSQL("UPDATE " + WorkoutContract.WorkoutEntry1.TABLE_NAME_PRESETS +
                 " SET " + WorkoutContract.WorkoutEntry1.COLUMN_TIMESTAMP + " = CURRENT_TIMESTAMP" +
-                " WHERE " + WorkoutContract.WorkoutEntry1._ID + " = " + wId + ";";
-        db.execSQL(updd);
+                " WHERE " + WorkoutContract.WorkoutEntry1._ID + " = ?",
+                new Object[]{wId});
     }
 
     private Cursor getPreset(SQLiteDatabase db, String workoutId) {
         return db.query(WorkoutContract.WorkoutEntry1.TABLE_NAME_PRESETS,
                 null,
-                WorkoutContract.WorkoutEntry1._ID + " = " + workoutId + ";",
-                null,
+        WorkoutContract.WorkoutEntry1._ID + " = ?",
+        new String[]{workoutId},
                 null,
                 null,
                 WorkoutContract.WorkoutEntry1.COLUMN_TIMESTAMP);
